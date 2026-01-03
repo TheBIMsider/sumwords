@@ -6,7 +6,7 @@ A constraint-based math puzzle game that combines trivia knowledge with equation
 
 ## 🎮 Play Now
 
-**Live Demo:** [Play Sumwords](https://biminsider.github.io/sumwords/) _(Coming soon)_
+**Live Demo:** [Play Sumwords](https://biminsider.github.io/sumwords/V01)
 
 ## ✨ Features
 
@@ -235,3 +235,4 @@ This project was developed over 14 documented sessions with comprehensive planni
 **Enjoy playing Sumwords!** 🎮🧮
 
 If you find a bug or have suggestions, please open an issue on GitHub.
+
