@@ -12,6 +12,7 @@ A constraint-based math puzzle game that combines trivia knowledge with equation
 ## ✨ Features
 
 ### Core Gameplay
+
 - **Three Difficulty Levels**
   - **Easy:** Addition/subtraction with 10 numbers
   - **Medium:** Addition/subtraction with hidden operators, 12 numbers and 2 decoys
@@ -22,14 +23,14 @@ A constraint-based math puzzle game that combines trivia knowledge with equation
 
 ### Categories
 
-1. Sports & Olympics
-2. US History & Government
-3. World Geography & Travel
-4. Pop Culture & Entertainment
-5. Science & Technology
+1. Sports
+2. History
+3. Geography
+4. Pop Culture
+5. Science
 6. Movies & TV
 7. Food & Drink
-8. Technology & Computing
+8. Technology
 9. Games & Literature
 10. Animals & Nature
 
@@ -235,9 +236,3 @@ This project was developed over 14 documented sessions with comprehensive planni
 **Enjoy playing Sumwords!** 🎮🧮
 
 If you find a bug or have suggestions, please open an issue on GitHub.
-
-
-
-
-
-
