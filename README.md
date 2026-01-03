@@ -1,10 +1,10 @@
-<img width="1000" height="500" alt="Sumwords_Logo" src="https://github.com/user-attachments/assets/69c496db-0b85-48b8-8596-52d1aa6e609e" />
-
 # Sumwords
 
 **"Know the Facts, Do the Math"**
 
 A constraint-based math puzzle game that combines trivia knowledge with equation solving. Answer trivia questions by placing numbers from a limited pool into mathematical equations while satisfying column sum constraints.
+
+<img width="1000" height="500" alt="Sumwords_Logo" src="https://github.com/user-attachments/assets/69c496db-0b85-48b8-8596-52d1aa6e609e" />
 
 ## 🎮 Play Now
 
@@ -239,6 +239,7 @@ This project was developed over 14 documented sessions with comprehensive planni
 **Enjoy playing Sumwords!** 🎮🧮
 
 If you find a bug or have suggestions, please open an issue on GitHub.
+
 
 
 
