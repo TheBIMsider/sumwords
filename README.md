@@ -1,4 +1,4 @@
-width="1000" height="500" alt="Sumwords_Logo" src="https://github.com/user-attachments/assets/eefbe0ea-907a-4ae3-99e0-6ec8900d76cf" />
+<img width="1000" height="500" alt="Sumwords_Logo" src="https://github.com/user-attachments/assets/69c496db-0b85-48b8-8596-52d1aa6e609e" />
 
 # Sumwords
 
@@ -239,5 +239,6 @@ This project was developed over 14 documented sessions with comprehensive planni
 **Enjoy playing Sumwords!** 🎮🧮
 
 If you find a bug or have suggestions, please open an issue on GitHub.
+
 
 
