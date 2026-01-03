@@ -6,7 +6,8 @@ A constraint-based math puzzle game that combines trivia knowledge with equation
 
 ## 🎮 Play Now
 
-**Live Demo:** [Play Sumwords](https://thebimsider.github.io/sumwords/V01)
+**Landing Page:** [Sumwords Home](https://thebimsider.github.io/sumwords/landing/)  
+**Play Game:** [Launch Game](https://thebimsider.github.io/sumwords/)
 
 ## ✨ Features
 
@@ -234,6 +235,7 @@ This project was developed over 14 documented sessions with comprehensive planni
 **Enjoy playing Sumwords!** 🎮🧮
 
 If you find a bug or have suggestions, please open an issue on GitHub.
+
 
 
 
