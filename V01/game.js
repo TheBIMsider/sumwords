@@ -1,9 +1,58 @@
-/* ===================================
-   GAME DATA & STATE
-   =================================== */
+// ==========================================
+// SUMWORDS GAME - MAIN JAVASCRIPT
+// ==========================================
 
-// Test puzzle data (manually created - mathematically valid)
-// Note: Number pool can contain duplicates
+// ==========================================
+// THEME MANAGEMENT
+// ==========================================
+
+/**
+ * Initialize theme based on:
+ * 1. Saved preference in localStorage
+ * 2. System preference (prefers-color-scheme)
+ * 3. Default to light mode
+ */
+function initializeTheme() {
+  const savedTheme = localStorage.getItem('sumwords_landing_theme');
+  const systemPrefersDark = window.matchMedia(
+    '(prefers-color-scheme: dark)'
+  ).matches;
+
+  // Priority: saved preference > system preference > light default
+  const theme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+
+  applyTheme(theme);
+}
+
+/**
+ * Apply theme to the document
+ * @param {string} theme - 'light' or 'dark'
+ */
+function applyTheme(theme) {
+  if (theme === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  } else {
+    document.documentElement.removeAttribute('data-theme');
+  }
+  localStorage.setItem('sumwords_landing_theme', theme);
+}
+
+/**
+ * Toggle between light and dark themes
+ */
+function toggleTheme() {
+  const currentTheme = document.documentElement.getAttribute('data-theme');
+  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+  applyTheme(newTheme);
+}
+
+// Initialize theme on page load (before DOM content loads to prevent flash)
+initializeTheme();
+
+// ==========================================
+// QUESTION LIBRARY
+// ==========================================
+
 const testPuzzle = {
   id: 'puzzle_001',
   category: 'Sports',
@@ -3220,10 +3269,18 @@ function setupStatsModalListeners() {
 }
 
 /* ===================================
-  INITIALIZATION
+  INITIALIZATION - COMBINED LISTENERS
   =================================== */
 
-// Initialize hint button states on page load
+// Note: Main game initialization happens at line 1526
+// This listener handles additional setup after DOM loads
 document.addEventListener('DOMContentLoaded', () => {
-  updateHintButtonStates(); // Disable all hint buttons initially
+  // Theme toggle button event listener
+  const themeToggle = document.getElementById('theme-toggle');
+  if (themeToggle) {
+    themeToggle.addEventListener('click', toggleTheme);
+  }
+
+  // Initialize hint button states
+  updateHintButtonStates();
 });

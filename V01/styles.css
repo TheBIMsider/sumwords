@@ -1,3 +1,238 @@
+/* ==========================================
+   CSS CUSTOM PROPERTIES (Variables)
+   Light Mode Theme - Default
+   ========================================== */
+
+:root {
+  /* Brand Colors */
+  --color-primary-orange: #ff9d5c;
+  --color-primary-orange-dark: #ff8142;
+  --color-primary-blue: #1976d2;
+  --color-primary-blue-dark: #1565c0;
+  --color-primary-blue-light: #bbdefb;
+  --color-primary-blue-lighter: #e3f2fd;
+
+  /* Background Colors */
+  --bg-body: #f5f5f5;
+  --bg-container: #ffffff;
+  --bg-card: #fafafa;
+  --bg-card-alt: #f8f9fa;
+  --bg-modal: #ffffff;
+  --bg-modal-overlay: rgba(0, 0, 0, 0.7);
+
+  /* Text Colors */
+  --text-primary: #333333;
+  --text-heading: #2c3e50;
+  --text-secondary: #6c757d;
+  --text-tertiary: #495057;
+  --text-on-dark: #ffffff;
+
+  /* Border Colors */
+  --border-light: #e0e0e0;
+  --border-medium: #dee2e6;
+  --border-dark: #ced4da;
+  --border-darker: #495057;
+
+  /* Interactive Elements */
+  --button-primary-bg: #1976d2;
+  --button-primary-hover: #1565c0;
+  --button-secondary-bg: #95a5a6;
+  --button-secondary-hover: #7f8c8d;
+  --button-success-bg: #28a745;
+  --button-success-hover: #218838;
+  --button-warning-bg: #ffc107;
+  --button-warning-hover: #ffb300;
+  --button-disabled-bg: #6c757d;
+  --button-disabled-text: #999999;
+
+  /* State Colors */
+  --state-correct-bg: #d4edda;
+  --state-correct-border: #28a745;
+  --state-correct-text: #155724;
+  --state-incorrect-bg: #f8d7da;
+  --state-incorrect-border: #dc3545;
+  --state-incorrect-text: #721c24;
+  --state-incomplete-bg: #fff3cd;
+  --state-incomplete-border: #ffc107;
+  --state-warning-text: #856404;
+
+  /* Hint & Selection Colors */
+  --hint-revealed-bg: #fff3cd;
+  --hint-revealed-border: #ffc107;
+  --hint-revealed-text: #856404;
+  --selection-bg: #e3f2fd;
+  --selection-border: #0d47a1;
+  --selection-shadow: rgba(25, 118, 210, 0.3);
+
+  /* Puzzle Select Colors */
+  --puzzle-select-bg: #e8f4f8;
+  --puzzle-select-border: #1976d2;
+  --puzzle-select-hover: #bbdefb;
+
+  /* Assigned Difficulty */
+  --assigned-diff-bg: #f0f7ff;
+  --assigned-diff-text: #666666;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --shadow-xl: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Dark Mode Theme Overrides */
+[data-theme='dark'] {
+  /* Brand Colors - adjusted for dark backgrounds */
+  --color-primary-blue: #64b5f6;
+  --color-primary-blue-light: #1e3a5f;
+  --color-primary-blue-lighter: #0d1b2a;
+  --color-secondary-orange: #ff9800;
+  --color-secondary-orange-light: #ffb74d;
+  --color-secondary-gray: #424242;
+
+  /* Background Colors - dark surfaces */
+  --bg-body: #121212;
+  --bg-container: #1e1e1e;
+  --bg-card: #2d2d2d;
+  --bg-card-alt: #252525;
+  --bg-modal: #1e1e1e;
+  --bg-modal-overlay: rgba(0, 0, 0, 0.8);
+
+  /* Text Colors - light text on dark */
+  --text-primary: #e0e0e0;
+  --text-secondary: #b0b0b0;
+  --text-tertiary: #888888;
+  --text-heading: #ffffff;
+  --text-muted: #666666;
+
+  /* Border Colors - subtle borders */
+  --border-light: #3a3a3a;
+  --border-medium: #4a4a4a;
+  --border-dark: #5a5a5a;
+  --border-focus: #64b5f6;
+
+  /* Interactive Elements - buttons and controls */
+  --button-primary-bg: #ff9800;
+  --button-primary-hover: #fb8c00;
+  --button-primary-text: #000000;
+  --button-secondary-bg: #3a3a3a;
+  --button-secondary-hover: #4a4a4a;
+  --button-secondary-text: #e0e0e0;
+  --button-success-bg: #66bb6a;
+  --button-success-hover: #57a65a;
+  --button-warning-bg: #ffa726;
+  --button-warning-hover: #fb8c00;
+  --button-disabled-text: #666666;
+
+  /* State Colors - validation states */
+  --state-correct-bg: #1b5e20;
+  --state-correct-border: #66bb6a;
+  --state-correct-text: #a5d6a7;
+  --state-incorrect-bg: #b71c1c;
+  --state-incorrect-border: #ef5350;
+  --state-incorrect-text: #ef9a9a;
+  --state-incomplete-bg: #e65100;
+  --state-incomplete-border: #ffa726;
+  --state-incomplete-text: #ffcc80;
+
+  /* Hint & Selection - game-specific */
+  --selection-bg: #1e3a5f;
+  --selection-border: #64b5f6;
+  --selection-shadow: 0 0 0 3px rgba(100, 181, 246, 0.3);
+  --hint-revealed-bg: #4a148c;
+  --hint-revealed-border: #9c27b0;
+  --hint-revealed-text: #e1bee7;
+
+  /* Puzzle Select - dropdown styling */
+  --puzzle-select-bg: #2d2d2d;
+  --puzzle-select-border: #4a4a4a;
+  --puzzle-select-hover: #3a3a3a;
+
+  /* Assigned Difficulty - label styling */
+  --assigned-diff-bg: #1e3a5f;
+  --assigned-diff-text: #64b5f6;
+
+  /* Shadows - adjusted for dark mode */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 4px 6px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 10px 15px rgba(0, 0, 0, 0.5);
+}
+
+/* Theme Toggle Button */
+#theme-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 2px solid var(--border-medium);
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-md);
+  z-index: 1000;
+  transition: all 0.3s ease;
+}
+
+#theme-toggle:hover {
+  background-color: var(--bg-card-alt);
+  transform: scale(1.05);
+  box-shadow: var(--shadow-lg);
+}
+
+#theme-toggle:active {
+  transform: scale(0.95);
+}
+
+/* Sun and Moon Icons */
+#theme-toggle .sun-icon,
+#theme-toggle .moon-icon {
+  position: absolute;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* Light mode: show moon, hide sun */
+#theme-toggle .sun-icon {
+  transform: rotate(0deg);
+  opacity: 0;
+}
+
+#theme-toggle .moon-icon {
+  transform: rotate(0deg);
+  opacity: 1;
+}
+
+/* Dark mode: show sun, hide moon */
+[data-theme='dark'] #theme-toggle .sun-icon {
+  transform: rotate(180deg);
+  opacity: 1;
+}
+
+[data-theme='dark'] #theme-toggle .moon-icon {
+  transform: rotate(180deg);
+  opacity: 0;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  #theme-toggle {
+    width: 45px;
+    height: 45px;
+    top: 15px;
+    right: 15px;
+  }
+
+  #theme-toggle svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
 /* ===================================
    RESET & BASE STYLES
    =================================== */
@@ -11,9 +246,13 @@
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
     Ubuntu, Cantarell, sans-serif;
-  background-color: #f5f5f5;
-  color: #333;
-  line-height: 1.6;
+  background-color: var(--bg-body);
+  color: var(--text-primary);
+  margin: 0;
+  padding: 20px;
+  min-height: 100vh;
+  /* Smooth transitions for theme switching */
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* ===================================
@@ -24,10 +263,12 @@ body {
   max-width: 600px;
   margin: 0 auto;
   padding: 16px;
-  background-color: #fff;
+  background-color: var(--bg-container);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  /* Smooth transitions for theme switching */
+  transition: background-color 0.3s ease;
 }
 
 /* ===================================
@@ -36,16 +277,27 @@ body {
 
 .game-header {
   text-align: center;
-  margin-bottom: 20px;
-  padding-bottom: 12px;
-  border-bottom: 2px solid #e0e0e0;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--border-light);
+  transition: border-color 0.3s ease;
 }
 
+/* Game Logo */
+.game-logo {
+  max-width: 280px;
+  width: 100%;
+  height: auto;
+  margin: 0 auto 16px auto;
+  display: block;
+}
+
+/* Remove the h1 styles since we replaced it with logo */
 .game-header h1 {
-  font-size: 32px;
+  font-size: 2rem;
+  margin: 0 0 16px 0;
+  color: var(--text-heading);
   font-weight: 700;
-  color: #2c3e50;
-  margin-bottom: 8px;
 }
 
 .puzzle-info {
@@ -58,22 +310,22 @@ body {
 .puzzle-select {
   padding: 6px 12px;
   border-radius: 12px;
-  background-color: #e8f4f8;
-  color: #1976d2;
+  background-color: var(--puzzle-select-bg);
+  color: var(--color-primary-blue);
   font-weight: 500;
-  border: 2px solid #1976d2;
+  border: 2px solid var(--puzzle-select-border);
   font-size: 14px;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .puzzle-select:hover {
-  background-color: #bbdefb;
+  background-color: var(--puzzle-select-hover);
 }
 
 .puzzle-select:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.2);
+  box-shadow: 0 0 0 3px var(--selection-shadow);
 }
 
 .header-controls {
@@ -87,8 +339,8 @@ body {
   padding: 8px 16px;
   font-size: 14px;
   font-weight: 600;
-  color: #fff;
-  background-color: #1976d2;
+  color: var(--text-on-dark);
+  background-color: var(--button-primary-bg);
   border: none;
   border-radius: 6px;
   cursor: pointer;
@@ -96,7 +348,7 @@ body {
 }
 
 .btn-header:hover {
-  background-color: #1565c0;
+  background-color: var(--button-primary-hover);
   transform: translateY(-1px);
 }
 
@@ -116,17 +368,17 @@ body {
 }
 
 .target {
-  background-color: #f8f9fa;
+  background-color: var(--bg-card-alt);
   padding: 12px;
   border-radius: 8px;
   text-align: center;
-  border: 2px solid #dee2e6;
+  border: 2px solid var(--border-medium);
 }
 
 .target .label {
   display: block;
   font-size: 12px;
-  color: #6c757d;
+  color: var(--text-secondary);
   margin-bottom: 4px;
   font-weight: 500;
 }
@@ -134,7 +386,7 @@ body {
 .target .current {
   font-size: 24px;
   font-weight: 700;
-  color: #495057;
+  color: var(--text-tertiary);
 }
 
 .target .separator {
@@ -146,34 +398,33 @@ body {
 .target .goal {
   font-size: 20px;
   font-weight: 600;
-  color: #28a745;
+  color: var(--state-correct-border);
 }
 
 /* Column target status colors */
 .target.correct {
-  border-color: #28a745;
-  background-color: #d4edda;
+  border-color: var(--state-correct-border);
+  background-color: var(--state-correct-bg);
 }
 
 .target.incorrect {
-  border-color: #dc3545;
-  background-color: #f8d7da;
+  border-color: var(--state-incorrect-border);
+  background-color: var(--state-incorrect-bg);
 }
 
 .target.incomplete {
-  border-color: #ffc107;
-  background-color: #fff3cd;
+  border-color: var(--state-incomplete-border);
+  background-color: var(--state-incomplete-bg);
 }
 
-/* Assigned Difficulty Label */
 .assigned-difficulty {
   text-align: center;
   font-size: 14px;
-  color: #666;
+  color: var(--assigned-diff-text);
   padding: 8px;
   margin-bottom: 15px;
   font-style: italic;
-  background: #f0f7ff;
+  background: var(--assigned-diff-bg);
   border-radius: 6px;
 }
 
@@ -189,18 +440,26 @@ body {
 .equation {
   margin-bottom: 20px;
   padding: 16px;
-  background-color: #fafafa;
+  background-color: var(--bg-card);
   border-radius: 8px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--border-light);
+}
+
+.question {
+  font-size: 14px;
+  color: var(--text-tertiary);
+  margin-bottom: 16px;
+  line-height: 1.4;
+  padding-bottom: 4px;
 }
 
 .equation.error {
-  border-color: #dc3545;
+  border-color: var(--state-incorrect-border);
   background-color: #fff5f5;
 }
 
 .equation.selected-for-hint {
-  border-color: #ffc107;
+  border-color: var(--state-incomplete-border);
   background-color: #fff9e6;
   box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.2);
 }
@@ -216,13 +475,6 @@ body {
   margin-left: 8px;
   font-size: 18px;
   opacity: 0.7;
-}
-
-.question {
-  font-size: 14px;
-  color: #495057;
-  margin-bottom: 12px;
-  font-weight: 500;
 }
 
 .equation-row {
@@ -242,74 +494,67 @@ body {
   height: 60px;
   font-size: 24px;
   font-weight: 700;
-  border: 2px solid #ced4da;
+  border: 2px solid var(--border-dark);
   border-radius: 8px;
-  background-color: #fff;
+  background-color: var(--bg-container);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 /* Operand blanks (buttons) */
 .blank.operand {
-  color: #495057;
+  color: var(--text-tertiary);
 }
 
 .blank.operand:hover {
-  border-color: #1976d2;
-  background-color: #e3f2fd;
+  border-color: var(--color-primary-blue);
+  background-color: var(--color-primary-blue-lighter);
 }
 
 .blank.operand.selected {
-  border-color: #0d47a1;
-  background-color: #bbdefb;
-  box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.2);
+  border-color: var(--selection-border);
+  background-color: var(--color-primary-blue-light);
+  box-shadow: 0 0 0 3px var(--selection-shadow);
 }
 
 /* Solution blanks (inputs) */
 .blank.solution {
   text-align: center;
-  color: #6c757d;
+  color: var(--text-secondary);
 }
 
 .blank.solution:focus {
   outline: none;
-  border-color: #1976d2;
-  background-color: #e3f2fd;
+  border-color: var(--color-primary-blue);
+  background-color: var(--selection-bg);
 }
 
 .blank.operand.filled {
-  background-color: #e8f4f8;
-  border-color: #1976d2;
+  background-color: var(--puzzle-select-bg);
+  border-color: var(--color-primary-blue);
 }
 
 /* Hint-revealed styling - HIGHER SPECIFICITY to override filled state */
 .blank.operand.hint-revealed,
 .blank.solution.hint-revealed {
-  background-color: #fff3cd !important;
-  border-color: #ffc107 !important;
+  background-color: var(--hint-revealed-bg) !important;
+  border-color: var(--hint-revealed-border) !important;
   font-style: italic;
-  color: #856404 !important;
+  color: var(--hint-revealed-text) !important;
 }
 
 .operator-select.hint-revealed {
-  background-color: #fff3cd;
-  border-color: #ffc107;
+  background-color: var(--hint-revealed-bg);
+  border-color: var(--hint-revealed-border);
   font-style: italic;
-  color: #856404;
+  color: var(--hint-revealed-text);
 }
 
 .solution.hint-revealed {
-  background-color: #fff3cd;
-  border-color: #ffc107;
+  background-color: var(--hint-revealed-bg);
+  border-color: var(--hint-revealed-border);
   font-style: italic;
-  color: #856404;
-}
-
-.operator-select.hint-revealed {
-  background-color: #fff3cd;
-  border-color: #ffc107;
-  font-style: italic;
-  color: #856404;
+  color: var(--hint-revealed-text);
 }
 
 /* No spinner removal needed - using text input with numeric keyboard */
@@ -322,7 +567,7 @@ body {
 .equals {
   font-size: 28px;
   font-weight: 700;
-  color: #6c757d;
+  color: var(--text-secondary);
   user-select: none;
 }
 
@@ -352,10 +597,10 @@ body {
 .operator-select {
   font-size: 24px;
   font-weight: 700;
-  color: #495057;
-  border: 2px solid #1976d2;
+  color: var(--text-tertiary);
+  border: 2px solid var(--color-primary-blue);
   border-radius: 6px;
-  background-color: #fff;
+  background-color: var(--bg-container);
   padding: 4px 8px;
   cursor: pointer;
   text-align: center;
@@ -364,8 +609,8 @@ body {
 
 .operator-select:focus {
   outline: none;
-  border-color: #0d47a1;
-  background-color: #e3f2fd;
+  border-color: var(--selection-border);
+  background-color: var(--selection-bg);
 }
 
 /* Style for selected operator */
@@ -378,17 +623,17 @@ body {
    =================================== */
 
 .number-pool {
-  background-color: #f8f9fa;
+  background-color: var(--bg-card-alt);
   padding: 16px;
   border-radius: 8px;
-  border: 2px solid #dee2e6;
+  border: 2px solid var(--border-medium);
   margin-bottom: 20px;
 }
 
 .pool-label {
   font-size: 14px;
   font-weight: 600;
-  color: #6c757d;
+  color: var(--text-secondary);
   margin-bottom: 12px;
   text-align: center;
 }
@@ -422,10 +667,10 @@ body {
   height: 52px;
   font-size: 20px;
   font-weight: 700;
-  border: 2px solid #495057;
+  border: 2px solid var(--border-darker);
   border-radius: 8px;
-  background-color: #fff;
-  color: #495057;
+  background-color: var(--bg-container);
+  color: var(--text-tertiary);
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
@@ -434,22 +679,16 @@ body {
 }
 
 .pool-number:hover {
-  border-color: #1976d2;
-  background-color: #e3f2fd;
+  border-color: var(--color-primary-blue);
+  background-color: var(--selection-bg);
   transform: translateY(-2px);
 }
 
 .pool-number.selected {
-  border-color: #0d47a1;
-  background-color: #1976d2;
-  color: #fff;
-  box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.3);
-}
-
-.pool-number.used {
-  opacity: 0.3;
-  cursor: not-allowed;
-  pointer-events: none;
+  border-color: var(--selection-border);
+  background-color: var(--color-primary-blue);
+  color: var(--text-on-dark);
+  box-shadow: 0 0 0 3px var(--selection-shadow);
 }
 
 /* ===================================
@@ -486,8 +725,8 @@ body {
   padding: 16px;
   font-size: 18px;
   font-weight: 700;
-  color: #fff;
-  background-color: #28a745;
+  color: var(--text-on-dark);
+  background-color: var(--button-success-bg);
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -495,9 +734,9 @@ body {
 }
 
 .btn-submit:hover {
-  background-color: #218838;
+  background-color: var(--button-success-hover);
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
 }
 
 .btn-submit:active {
@@ -505,7 +744,7 @@ body {
 }
 
 .btn-submit:disabled {
-  background-color: #6c757d;
+  background-color: var(--button-disabled-bg);
   cursor: not-allowed;
   transform: none;
 }
@@ -515,8 +754,8 @@ body {
   padding: 12px;
   font-size: 16px;
   font-weight: 600;
-  color: #fff;
-  background-color: #ffc107;
+  color: var(--text-on-dark);
+  background-color: var(--button-warning-bg);
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -524,7 +763,7 @@ body {
 }
 
 .btn-hint:hover {
-  background-color: #ffb300;
+  background-color: var(--button-warning-hover);
   transform: translateY(-1px);
 }
 
@@ -534,7 +773,7 @@ body {
 
 .btn-hint:disabled {
   background-color: #d6d6d6;
-  color: #999;
+  color: var(--button-disabled-text);
   cursor: not-allowed;
   opacity: 0.6;
   transform: none;
@@ -544,7 +783,7 @@ body {
 .hints {
   text-align: center;
   font-size: 14px;
-  color: #6c757d;
+  color: var(--text-secondary);
   font-weight: 500;
 }
 
@@ -562,21 +801,21 @@ body {
 }
 
 .feedback.success {
-  background-color: #d4edda;
-  color: #155724;
-  border: 2px solid #28a745;
+  background-color: var(--state-correct-bg);
+  color: var(--state-correct-text);
+  border: 2px solid var(--state-correct-border);
 }
 
 .feedback.error {
-  background-color: #f8d7da;
-  color: #721c24;
-  border: 2px solid #dc3545;
+  background-color: var(--state-incorrect-bg);
+  color: var(--state-incorrect-text);
+  border: 2px solid var(--state-incorrect-border);
 }
 
 .feedback.warning {
-  background-color: #fff3cd;
-  color: #856404;
-  border: 2px solid #ffc107;
+  background-color: var(--state-incomplete-bg);
+  color: var(--state-warning-text);
+  border: 2px solid var(--state-incomplete-border);
 }
 
 /* ===================================
@@ -586,6 +825,11 @@ body {
 @media (max-width: 480px) {
   .game-container {
     padding: 12px;
+  }
+
+  /* Mobile logo sizing */
+  .game-logo {
+    max-width: 220px;
   }
 
   .blank {
@@ -621,7 +865,7 @@ body {
   .game-container {
     margin-top: 20px;
     border-radius: 12px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-lg);
   }
 }
 
@@ -692,7 +936,7 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: var(--bg-modal-overlay);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -705,10 +949,10 @@ body {
 }
 
 .modal-content {
-  background-color: white;
+  background-color: var(--bg-modal);
   padding: 2rem;
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-xl);
   max-width: 400px;
   width: 90%;
   text-align: center;
@@ -716,7 +960,7 @@ body {
 
 .modal-content h2 {
   margin: 0 0 1rem 0;
-  color: #2c3e50;
+  color: var(--text-heading);
   font-size: 1.5rem;
 }
 
@@ -745,22 +989,22 @@ body {
 }
 
 .btn-primary {
-  background-color: #3498db;
-  color: white;
+  background-color: var(--button-primary-bg);
+  color: var(--text-on-dark);
 }
 
 .btn-primary:hover {
-  background-color: #2980b9;
+  background-color: var(--button-primary-hover);
   transform: translateY(-1px);
 }
 
 .btn-secondary {
-  background-color: #95a5a6;
-  color: white;
+  background-color: var(--button-secondary-bg);
+  color: var(--text-on-dark);
 }
 
 .btn-secondary:hover {
-  background-color: #7f8c8d;
+  background-color: var(--button-secondary-hover);
   transform: translateY(-1px);
 }
 
@@ -804,7 +1048,7 @@ body {
   background: none;
   border: none;
   font-size: 2rem;
-  color: #7f8c8d;
+  color: var(--button-secondary-bg);
   cursor: pointer;
   padding: 0;
   width: 30px;
@@ -816,7 +1060,7 @@ body {
 }
 
 .close-btn:hover {
-  color: #2c3e50;
+  color: var(--text-heading);
 }
 
 .stats-section {
@@ -825,9 +1069,9 @@ body {
 
 .stats-section h3 {
   margin: 0 0 1rem 0;
-  color: #2c3e50;
+  color: var(--text-heading);
   font-size: 1.2rem;
-  border-bottom: 2px solid #3498db;
+  border-bottom: 2px solid var(--button-primary-bg);
   padding-bottom: 0.5rem;
 }
 
@@ -841,14 +1085,14 @@ body {
 .stat-item {
   text-align: center;
   padding: 1rem;
-  background-color: #f8f9fa;
+  background-color: var(--bg-card-alt);
   border-radius: 8px;
 }
 
 .stat-value {
   font-size: 2rem;
   font-weight: bold;
-  color: #3498db;
+  color: var(--button-primary-bg);
   margin-bottom: 0.25rem;
 }
 
@@ -860,7 +1104,7 @@ body {
 }
 
 .difficulty-stats {
-  background-color: #f8f9fa;
+  background-color: var(--bg-card-alt);
   padding: 1rem;
   border-radius: 8px;
   margin-bottom: 1rem;
@@ -868,7 +1112,7 @@ body {
 
 .difficulty-stats h4 {
   margin: 0 0 0.75rem 0;
-  color: #2c3e50;
+  color: var(--text-heading);
   font-size: 1rem;
 }
 
@@ -876,7 +1120,7 @@ body {
   display: flex;
   justify-content: space-between;
   padding: 0.5rem 0;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--border-light);
 }
 
 .stats-row:last-child {
@@ -889,13 +1133,13 @@ body {
 
 .stats-row span:last-child {
   font-weight: bold;
-  color: #2c3e50;
+  color: var(--text-heading);
 }
 
 .modal-footer {
   margin-top: 1.5rem;
   padding-top: 1rem;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--border-light);
   text-align: center;
 }
 
