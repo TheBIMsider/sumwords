@@ -89,7 +89,7 @@ Place numbers from the number pool into the equation blanks to make valid equati
 1. **Clone the repository**
 
 ```bash
-   git clone https://github.com/BIMsider/sumwords.git
+   git clone https://github.com/TheBIMsider/sumwords.git
    cd sumwords
 ```
 
@@ -185,7 +185,7 @@ This project is licensed under the **BSD 3-Clause License** - see the [LICENSE](
 
 ## 👤 Author
 
-**Carl Storms (BIMsider)**
+**Carl Storms (The BIMsider)**
 
 - Role: Technical Success Manager, AECO Software
 - Experience: 25+ years in AECO technology and BIM
