@@ -12,10 +12,11 @@ A constraint-based math puzzle game that combines trivia knowledge with equation
 
 ### Core Gameplay
 
+### Core Gameplay
 - **Three Difficulty Levels**
   - **Easy:** Addition/subtraction with 10 numbers
-  - **Medium:** All four operators (+, −, ×, ÷) with 12 numbers and 2 decoys
-  - **Hard:** Complex equations with 16 numbers and 6 decoys
+  - **Medium:** Addition/subtraction with hidden operators, 12 numbers and 2 decoys
+  - **Hard:** All four operators (+, −, ×, ÷) with 16 numbers and 6 decoys
 - **Random Difficulty Mode:** Game randomly selects difficulty for variety
 - **500 Trivia Questions** across 10 diverse categories
 - **Constraint-Based Puzzles:** Numbers must satisfy both equations AND column totals
@@ -235,5 +236,6 @@ This project was developed over 14 documented sessions with comprehensive planni
 **Enjoy playing Sumwords!** 🎮🧮
 
 If you find a bug or have suggestions, please open an issue on GitHub.
+
 
 
