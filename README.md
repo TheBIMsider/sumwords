@@ -6,9 +6,9 @@
 
 A constraint-based math puzzle game that combines trivia knowledge with equation solving. Answer trivia questions by placing numbers from a limited pool into mathematical equations while satisfying column sum constraints.
 
-## 🎮 Play Now
+**Landing Page:** [Sumwords](https://thebimsider.github.io/sumwords/landing/)     
 
-**Landing Page:** [Sumwords Home](https://thebimsider.github.io/sumwords/landing/)     
+## 🎮 Play Now
 
 **Play Game:** [Launch Game](https://thebimsider.github.io/sumwords/V01/)
 
@@ -239,6 +239,7 @@ This project was developed over 14 documented sessions with comprehensive planni
 **Enjoy playing Sumwords!** 🎮🧮
 
 If you find a bug or have suggestions, please open an issue on GitHub.
+
 
 
 
