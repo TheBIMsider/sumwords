@@ -5,6 +5,91 @@
 
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function () {
+  // ========================================
+  // THEME TOGGLE FUNCTIONALITY
+  // ========================================
+
+  const themeToggle = document.getElementById('theme-toggle');
+  const html = document.documentElement;
+  const THEME_KEY = 'sumwords_landing_theme';
+
+  /**
+   * Get the initial theme to apply
+   * Priority: 1) localStorage, 2) system preference, 3) light mode default
+   */
+  function getInitialTheme() {
+    // Check localStorage first
+    const savedTheme = localStorage.getItem(THEME_KEY);
+    if (savedTheme) {
+      return savedTheme;
+    }
+
+    // Check system preference
+    if (
+      window.matchMedia &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches
+    ) {
+      return 'dark';
+    }
+
+    // Default to light
+    return 'light';
+  }
+
+  /**
+   * Apply theme to the page
+   * @param {string} theme - 'light' or 'dark'
+   */
+  function applyTheme(theme) {
+    if (theme === 'dark') {
+      html.setAttribute('data-theme', 'dark');
+    } else {
+      html.removeAttribute('data-theme');
+    }
+    localStorage.setItem(THEME_KEY, theme);
+  }
+
+  /**
+   * Toggle between light and dark themes
+   */
+  function toggleTheme() {
+    const currentTheme = html.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    applyTheme(newTheme);
+
+    // Log theme change for debugging
+    console.log(`Theme switched to: ${newTheme}`);
+  }
+
+  // Apply initial theme immediately (before page renders)
+  const initialTheme = getInitialTheme();
+  applyTheme(initialTheme);
+  console.log(`Initial theme applied: ${initialTheme}`);
+
+  // Add click handler to toggle button
+  if (themeToggle) {
+    themeToggle.addEventListener('click', toggleTheme);
+  }
+
+  // Listen for system theme changes (if user changes OS setting while page is open)
+  if (window.matchMedia) {
+    window
+      .matchMedia('(prefers-color-scheme: dark)')
+      .addEventListener('change', (e) => {
+        // Only auto-switch if user hasn't manually set a preference
+        const savedTheme = localStorage.getItem(THEME_KEY);
+        if (!savedTheme) {
+          const newTheme = e.matches ? 'dark' : 'light';
+          applyTheme(newTheme);
+          console.log(`System theme changed, applied: ${newTheme}`);
+        }
+      });
+  }
+
+  // ========================================
+  // EXISTING FUNCTIONALITY
+  // ========================================
+
   // Smooth scroll for anchor links (if any added in future)
   document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
     anchor.addEventListener('click', function (e) {
