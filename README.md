@@ -197,7 +197,7 @@ This project is licensed under the **BSD 3-Clause License** - see the [LICENSE](
 
 ## 👤 Author (Vibe Coder)
 
-**Carl Storms (The BIMsider)** With the help of his AI Buddy 🤖 **Claude AI Sonnet 4.5**
+**Carl Storms (The BIMsider)** With the help of his AI Buddy 🤖 **Claude AI: Sonnet 4.5**
 
 - Role: Technical Success Manager, AECO Software
 - Experience: 25+ years in AECO technology and BIM
@@ -252,6 +252,7 @@ This project was developed (Vibe Coded) over 20 documented sessions with compreh
 **Enjoy playing Sumwords!** 🎮🧮
 
 If you find a bug or have suggestions, please open an issue on GitHub.
+
 
 
 
