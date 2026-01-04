@@ -708,6 +708,21 @@ body {
   box-shadow: 0 0 0 3px var(--selection-shadow);
 }
 
+.pool-number.used {
+  background-color: var(--bg-card);
+  color: var(--text-secondary);
+  border-color: var(--border-light);
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.pool-number.used:hover {
+  transform: none;
+  border-color: var(--border-light);
+  background-color: var(--bg-card);
+}
+
 /* ===================================
    CONTROLS
    =================================== */
