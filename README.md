@@ -197,11 +197,11 @@ This project is licensed under the **BSD 3-Clause License** - see the [LICENSE](
 
 ## 👤 Author
 
-**Carl Storms (The BIMsider)**
+**Carl Storms (The BIMsider)** With the help of his AI Buddy 🤖 **Claude AI Sonnet 4.5**
 
 - Role: Technical Success Manager, AECO Software
 - Experience: 25+ years in AECO technology and BIM
-- Project Start: December 25, 2024
+- Project Start: December 25, 2025
 
 ## 🙏 Acknowledgments
 
@@ -212,7 +212,7 @@ This project is licensed under the **BSD 3-Clause License** - see the [LICENSE](
 
 ## 📝 Development
 
-This project was developed over 20 documented sessions with comprehensive planning:
+This project was developed (Vibe Coded) over 20 documented sessions with comprehensive planning:
 
 - Session recaps track all development decisions
 - Roadmap documents evolution from concept to launch
@@ -252,4 +252,5 @@ This project was developed over 20 documented sessions with comprehensive planni
 **Enjoy playing Sumwords!** 🎮🧮
 
 If you find a bug or have suggestions, please open an issue on GitHub.
+
 
