@@ -53,6 +53,7 @@ Plus an **"Everything"** category that combines all questions for maximum variet
 
 ### Game Features
 
+- **Interactive Tutorial:** First-time users see a helpful tutorial explaining gameplay with a "Don't show again" option
 - **Dark Mode:** Toggle between light and dark themes with persistent preference
 - **Hint System:** Three types of hints available
   - Reveal the answer to the trivia question
@@ -247,10 +248,10 @@ This project was developed (Vibe Coded) over 20 documented sessions with compreh
 - Professional logo and branding
 - Dark mode with theme toggle
 - Landing page with animations
+- Interactive tutorial for first-time users
 
 ### Potential Future Enhancements
 
-- Tutorial/onboarding for new players
 - Keyboard navigation support
 - Daily puzzle mode
 - Social sharing (Wordle-style score sharing)
@@ -258,18 +259,10 @@ This project was developed (Vibe Coded) over 20 documented sessions with compreh
 - Additional question categories
 - Leaderboards
 - Progressive Web App (PWA) support
+- Advanced tutorial with interactive walkthrough
 
 ---
 
 **Enjoy playing Sumwords!** 🎮🧮
 
 If you find a bug or have suggestions, please open an issue on GitHub.
-
-
-
-
-
-
-
-
-
