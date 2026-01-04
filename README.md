@@ -6,11 +6,11 @@
 
 A constraint-based math puzzle game that combines trivia knowledge with equation solving. Answer trivia questions by placing numbers from a limited pool into mathematical equations while satisfying column sum constraints.
 
-**Landing Page:** [Sumwords](https://thebimsider.github.io/sumwords/landing/)     
+**Landing Page:** [🏠 Home of Sumwords](https://thebimsider.github.io/sumwords/landing/)
 
 ## 🎮 Play Now
 
-**Play Game:** [Launch Game](https://thebimsider.github.io/sumwords/V01/)
+**Play Game:** [🎲 Play Game](https://thebimsider.github.io/sumwords/V01/)
 
 ## ✨ Features
 
@@ -41,6 +41,7 @@ Plus an **"Everything"** category that combines all questions for maximum variet
 
 ### Game Features
 
+- **Dark Mode:** Toggle between light and dark themes with persistent preference
 - **Hint System:** Three types of hints available
   - Reveal the answer to the trivia question
   - Reveal which numbers to place in the equation
@@ -48,10 +49,12 @@ Plus an **"Everything"** category that combines all questions for maximum variet
 - **Smart Resume:** Automatically saves progress and offers to resume unfinished puzzles
 - **Statistics Tracking:** Track completed puzzles, attempts, hints used, perfect games, and win streaks
 - **Mobile-Optimized:** Fully responsive design works great on phones and tablets
-- **Persistent Storage:** Game state, preferences, and stats saved locally
+- **Persistent Storage:** Game state, preferences, stats, and theme saved locally
 
 ### Visual Polish
 
+- Professional logo and branding
+- Dark mode with smooth theme transitions
 - Confetti animation on puzzle completion
 - Color-coded validation feedback
 - Emoji markers show which hints have been used
@@ -83,9 +86,9 @@ Place numbers from the number pool into the equation blanks to make valid equati
 ## 🛠️ Technology Stack
 
 - **HTML5** - Semantic structure
-- **CSS3** - Responsive design with mobile-first approach
+- **CSS3** - Responsive design with CSS custom properties for theming
 - **Vanilla JavaScript** - No frameworks or dependencies
-- **localStorage API** - Persistent data storage
+- **localStorage API** - Persistent data storage for game state and preferences
 
 ## 📦 Installation (Local Development)
 
@@ -122,11 +125,17 @@ Then navigate to `http://localhost:8000`
 
 ```
 sumwords/
-├── index.html          # Main HTML structure
-├── styles.css          # All styling and responsive design
-├── game.js             # Game logic and 500 trivia questions
-├── README.md           # This file
-└── LICENSE             # BSD 3-Clause License
+├── V01/
+│   ├── index.html          # Game HTML structure
+│   ├── styles.css          # Game styling with dark mode
+│   ├── game.js             # Game logic and 500 trivia questions
+│   └── Sumwords_Logo.png   # Game logo
+├── landing/
+│   ├── index.html          # Landing page HTML
+│   ├── styles.css          # Landing page styling with dark mode
+│   └── script.js           # Landing page theme switcher
+├── README.md               # This file
+└── LICENSE                 # BSD 3-Clause License
 ```
 
 ## 🎲 Game Design
@@ -199,16 +208,17 @@ This project is licensed under the **BSD 3-Clause License** - see the [LICENSE](
 - Inspired by constraint-based puzzle games
 - Built with vanilla JavaScript for maximum maintainability
 - Designed mobile-first for modern web users
-- 14 development sessions documented from concept to deployment
+- 20 development sessions documented from concept to deployment
 
 ## 📝 Development
 
-This project was developed over 14 documented sessions with comprehensive planning:
+This project was developed over 20 documented sessions with comprehensive planning:
 
 - Session recaps track all development decisions
 - Roadmap documents evolution from concept to launch
 - Beginner-friendly code for long-term maintainability
 - Systematic testing and bug fixes
+- CSS variable architecture for maintainable theming
 
 ## 🚀 Roadmap
 
@@ -222,6 +232,9 @@ This project was developed over 14 documented sessions with comprehensive planni
 - Statistics tracking
 - Mobile-responsive design
 - Cross-browser compatibility
+- Professional logo and branding
+- Dark mode with theme toggle
+- Landing page with animations
 
 ### Potential Future Enhancements
 
@@ -230,19 +243,12 @@ This project was developed over 14 documented sessions with comprehensive planni
 - Daily puzzle mode
 - Social sharing (Wordle-style score sharing)
 - Sound effects (optional)
-- Dark mode theme
 - Additional question categories
 - Leaderboards
+- Progressive Web App (PWA) support
 
 ---
 
 **Enjoy playing Sumwords!** 🎮🧮
 
 If you find a bug or have suggestions, please open an issue on GitHub.
-
-
-
-
-
-
-
