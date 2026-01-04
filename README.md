@@ -2,6 +2,12 @@
 
 # Sumwords
 
+[![Release](https://img.shields.io/github/v/release/thebimsider/sumwords?display_name=tag&sort=semver)](https://github.com/thebimsider/somwords/releases/latest)
+[![License](https://img.shields.io/github/license/thebimsider/somwords)](https://github.com/thebimsider/somwords/blob/main/LICENSE)
+[![Open Source](https://img.shields.io/badge/Open%20Source-Yes-brightgreen)](LICENSE)
+![Tech](https://img.shields.io/badge/Tech-HTML%20%7C%20CSS%20%7C%20JavaScript-informational)
+[![GitHub Pages](https://img.shields.io/badge/Hosted_on-GitHub_Pages-brightgreen)](https://thebimsider.github.io/sumwords/)
+
 **"Know the Facts, Do the Math"**
 
 A constraint-based math puzzle game that combines trivia knowledge with equation solving. Answer trivia questions by placing numbers from a limited pool into mathematical equations while satisfying column sum constraints.
@@ -252,6 +258,7 @@ This project was developed (Vibe Coded) over 20 documented sessions with compreh
 **Enjoy playing Sumwords!** 🎮🧮
 
 If you find a bug or have suggestions, please open an issue on GitHub.
+
 
 
 
