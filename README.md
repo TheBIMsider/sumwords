@@ -16,6 +16,8 @@ A constraint-based math puzzle game that combines trivia knowledge with equation
 
 ## 🎮 Play Now
 
+<img width="837" height="897" alt="Sumwords_in_Action" src="https://github.com/user-attachments/assets/d4c2aae7-f06b-4c45-868c-b1d20394c08a" />
+
 **Sumwords:** [🎲 Play Game](https://thebimsider.github.io/sumwords/V01/)
 
 ## ✨ Features
@@ -258,6 +260,7 @@ This project was developed (Vibe Coded) over 20 documented sessions with compreh
 **Enjoy playing Sumwords!** 🎮🧮
 
 If you find a bug or have suggestions, please open an issue on GitHub.
+
 
 
 
