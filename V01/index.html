@@ -468,6 +468,59 @@
       <!-- Confetti Container -->
       <div class="confetti-container" id="confetti-container"></div>
     </div>
+
+    <!-- Tutorial Overlay -->
+    <div id="tutorial-overlay" class="modal hidden">
+      <div class="modal-content tutorial-content">
+        <div class="modal-header">
+          <h2>🎓 Welcome to Sumwords!</h2>
+        </div>
+        <div class="modal-body tutorial-body">
+          <div class="tutorial-section">
+            <h3>📝 How to Play</h3>
+            <ol class="tutorial-list">
+              <li>
+                <strong>Read the trivia question</strong> - The answer is always
+                a number
+              </li>
+              <li>
+                <strong>Place numbers in blanks</strong> - Click a number from
+                the pool, then click a blank
+              </li>
+              <li>
+                <strong>Match column totals</strong> - Numbers in each column
+                must add up to the target shown
+              </li>
+              <li>
+                <strong>Complete all equations</strong> - Make sure each
+                equation is mathematically correct
+              </li>
+            </ol>
+          </div>
+
+          <div class="tutorial-section">
+            <h3>💡 Tips</h3>
+            <ul class="tutorial-list">
+              <li>Start by placing the trivia answer in its equation</li>
+              <li>Use the column targets to narrow down number choices</li>
+              <li>Click the hint buttons (?, #, *) if you get stuck</li>
+              <li>Check your stats to track your progress!</li>
+            </ul>
+          </div>
+
+          <div class="tutorial-footer">
+            <label class="tutorial-checkbox">
+              <input type="checkbox" id="tutorial-dont-show" />
+              <span>Don't show this again</span>
+            </label>
+            <button class="btn-primary" id="tutorial-close">
+              Got It! Let's Play
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script src="game.js"></script>
   </body>
 </html>

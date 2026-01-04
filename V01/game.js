@@ -3238,10 +3238,16 @@ function handleResetStats() {
     // Clear statistics from localStorage
     localStorage.removeItem('sumwords_statistics');
 
+    // Also reset tutorial flag so user can see it again if they want
+    localStorage.removeItem('sumwords_tutorial_seen');
+
     // Reload the stats modal to show zeros
     showStatsModal();
 
-    showFeedback('Statistics reset successfully', 'success');
+    showFeedback(
+      'Statistics reset successfully. Tutorial will show on next page load.',
+      'success'
+    );
     console.log('Statistics reset');
   }
 }
@@ -3283,4 +3289,61 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Initialize hint button states
   updateHintButtonStates();
+
+  // Tutorial system
+  showTutorialIfFirstVisit();
 });
+
+// ===================================
+// TUTORIAL SYSTEM
+// ===================================
+
+/**
+ * Shows tutorial overlay on first visit
+ * Uses localStorage to track if user has seen it
+ */
+function showTutorialIfFirstVisit() {
+  const tutorialSeen = localStorage.getItem('sumwords_tutorial_seen');
+
+  // If tutorial hasn't been seen, show it
+  if (!tutorialSeen) {
+    const tutorialOverlay = document.getElementById('tutorial-overlay');
+    if (tutorialOverlay) {
+      tutorialOverlay.classList.remove('hidden');
+    }
+  }
+
+  // Setup tutorial close button
+  const tutorialClose = document.getElementById('tutorial-close');
+  if (tutorialClose) {
+    tutorialClose.addEventListener('click', closeTutorial);
+  }
+
+  // Setup tutorial overlay click (close on background click)
+  const tutorialOverlay = document.getElementById('tutorial-overlay');
+  if (tutorialOverlay) {
+    tutorialOverlay.addEventListener('click', function (e) {
+      if (e.target === tutorialOverlay) {
+        closeTutorial();
+      }
+    });
+  }
+}
+
+/**
+ * Closes tutorial and optionally saves preference
+ */
+function closeTutorial() {
+  const tutorialOverlay = document.getElementById('tutorial-overlay');
+  const dontShowCheckbox = document.getElementById('tutorial-dont-show');
+
+  // Hide the overlay
+  if (tutorialOverlay) {
+    tutorialOverlay.classList.add('hidden');
+  }
+
+  // Save preference if checkbox is checked
+  if (dontShowCheckbox && dontShowCheckbox.checked) {
+    localStorage.setItem('sumwords_tutorial_seen', 'true');
+  }
+}

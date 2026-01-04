@@ -836,6 +836,114 @@ body {
 }
 
 /* ===================================
+   TUTORIAL OVERLAY
+   =================================== */
+
+.tutorial-content {
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.tutorial-body {
+  padding: 0;
+}
+
+.tutorial-section {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.tutorial-section:last-of-type {
+  border-bottom: none;
+}
+
+.tutorial-section h3 {
+  margin: 0 0 16px 0;
+  color: var(--text-heading);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.tutorial-list {
+  margin: 0;
+  padding-left: 24px;
+  color: var(--text-primary);
+  line-height: 1.8;
+}
+
+.tutorial-list li {
+  margin-bottom: 12px;
+}
+
+.tutorial-list li:last-child {
+  margin-bottom: 0;
+}
+
+.tutorial-list strong {
+  color: var(--text-heading);
+  font-weight: 600;
+}
+
+.tutorial-footer {
+  padding: 20px 24px;
+  background-color: var(--bg-card-alt);
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.tutorial-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text-secondary);
+  user-select: none;
+}
+
+.tutorial-checkbox input[type='checkbox'] {
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+}
+
+.tutorial-checkbox span {
+  line-height: 1;
+}
+
+#tutorial-close {
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Mobile adjustments */
+@media (max-width: 600px) {
+  .tutorial-content {
+    max-width: 95vw;
+  }
+
+  .tutorial-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .tutorial-checkbox {
+    justify-content: center;
+  }
+
+  #tutorial-close {
+    width: 100%;
+  }
+}
+
+/* ===================================
    RESPONSIVE ADJUSTMENTS
    =================================== */
 
