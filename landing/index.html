@@ -3,31 +3,180 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
-      name="description"
-      content="Sumwords - A math puzzle game combining trivia knowledge with equation solving"
-    />
     <title>Sumwords - Know the Facts, Do the Math</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <!-- Resume Prompt Modal -->
+    <div id="resume-modal" class="modal hidden">
+      <div class="modal-content">
+        <h2>Welcome Back!</h2>
+        <p>You have an unfinished puzzle. Would you like to continue?</p>
+        <div class="modal-buttons">
+          <button id="resume-btn" class="btn btn-primary">Resume Puzzle</button>
+          <button id="new-game-btn" class="btn btn-secondary">
+            New Puzzle
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Statistics Modal -->
+    <div id="stats-modal" class="modal hidden">
+      <div class="modal-content stats-modal">
+        <div class="modal-header">
+          <h2>Statistics</h2>
+          <button id="close-stats-btn" class="close-btn">&times;</button>
+        </div>
+
+        <div class="stats-section">
+          <h3>Overall</h3>
+          <div class="stats-grid">
+            <div class="stat-item">
+              <div class="stat-value" id="total-completed">0</div>
+              <div class="stat-label">Completed</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value" id="total-attempts">0</div>
+              <div class="stat-label">Total Attempts</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value" id="total-hints">0</div>
+              <div class="stat-label">Total Hints</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value" id="perfect-games">0</div>
+              <div class="stat-label">Perfect Games</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value" id="current-streak">0</div>
+              <div class="stat-label">Current Streak</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value" id="best-streak">0</div>
+              <div class="stat-label">Best Streak</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stats-section">
+          <h3>By Difficulty</h3>
+
+          <div class="difficulty-stats">
+            <h4>Easy</h4>
+            <div class="stats-row">
+              <span>Completed:</span>
+              <span id="easy-completed">0</span>
+            </div>
+            <div class="stats-row">
+              <span>Attempts:</span>
+              <span id="easy-attempts">0</span>
+            </div>
+            <div class="stats-row">
+              <span>Hints Used:</span>
+              <span id="easy-hints">0</span>
+            </div>
+            <div class="stats-row">
+              <span>Perfect Games:</span>
+              <span id="easy-perfect">0</span>
+            </div>
+            <div class="stats-row">
+              <span>Avg Attempts:</span>
+              <span id="easy-avg">0.0</span>
+            </div>
+          </div>
+
+          <div class="difficulty-stats">
+            <h4>Medium</h4>
+            <div class="stats-row">
+              <span>Completed:</span>
+              <span id="medium-completed">0</span>
+            </div>
+            <div class="stats-row">
+              <span>Attempts:</span>
+              <span id="medium-attempts">0</span>
+            </div>
+            <div class="stats-row">
+              <span>Hints Used:</span>
+              <span id="medium-hints">0</span>
+            </div>
+            <div class="stats-row">
+              <span>Perfect Games:</span>
+              <span id="medium-perfect">0</span>
+            </div>
+            <div class="stats-row">
+              <span>Avg Attempts:</span>
+              <span id="medium-avg">0.0</span>
+            </div>
+          </div>
+
+          <div class="difficulty-stats">
+            <h4>Hard</h4>
+            <div class="stats-row">
+              <span>Completed:</span>
+              <span id="hard-completed">0</span>
+            </div>
+            <div class="stats-row">
+              <span>Attempts:</span>
+              <span id="hard-attempts">0</span>
+            </div>
+            <div class="stats-row">
+              <span>Hints Used:</span>
+              <span id="hard-hints">0</span>
+            </div>
+            <div class="stats-row">
+              <span>Perfect Games:</span>
+              <span id="hard-perfect">0</span>
+            </div>
+            <div class="stats-row">
+              <span>Avg Attempts:</span>
+              <span id="hard-avg">0.0</span>
+            </div>
+          </div>
+
+          <div class="difficulty-stats">
+            <h4>Random</h4>
+            <div class="stats-row">
+              <span>Completed:</span>
+              <span id="random-completed">0</span>
+            </div>
+            <div class="stats-row">
+              <span>Attempts:</span>
+              <span id="random-attempts">0</span>
+            </div>
+            <div class="stats-row">
+              <span>Hints Used:</span>
+              <span id="random-hints">0</span>
+            </div>
+            <div class="stats-row">
+              <span>Perfect Games:</span>
+              <span id="random-perfect">0</span>
+            </div>
+            <div class="stats-row">
+              <span>Avg Attempts:</span>
+              <span id="random-avg">0.0</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button id="reset-stats-btn" class="btn btn-secondary">
+            Reset Statistics
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Theme Toggle Button -->
-    <button
-      id="theme-toggle"
-      class="theme-toggle"
-      aria-label="Toggle dark mode"
-    >
+    <button id="theme-toggle" aria-label="Toggle dark mode">
       <svg
         class="sun-icon"
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
+        width="20"
+        height="20"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
         stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
       >
         <circle cx="12" cy="12" r="5"></circle>
         <line x1="12" y1="1" x2="12" y2="3"></line>
@@ -41,250 +190,337 @@
       </svg>
       <svg
         class="moon-icon"
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
+        width="20"
+        height="20"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
         stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
       >
         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
       </svg>
     </button>
 
-    <!-- Hero Section -->
-    <section class="hero">
-      <div class="container">
+    <!-- Game Container -->
+    <div class="game-container">
+      <!-- Header -->
+      <!-- Header -->
+      <header class="game-header">
         <img
           src="Sumwords_Logo.png"
           alt="Sumwords - Know the Facts, Do the Math"
-          class="logo-image"
+          class="game-logo"
         />
-        <p class="subtitle">
-          A constraint-based math puzzle game combining trivia knowledge with
-          equation solving
-        </p>
-        <div class="cta-buttons">
+        <div class="puzzle-info">
+          <select id="category-select" class="puzzle-select">
+            <option value="sports">Sports</option>
+            <option value="history">History</option>
+            <option value="geography">Geography</option>
+            <option value="popculture">Pop Culture</option>
+            <option value="science">Science</option>
+            <option value="moviestv">Movies & TV</option>
+            <option value="fooddrink">Food & Drink</option>
+            <option value="technology">Technology</option>
+            <option value="gamesliterature">Games & Literature</option>
+            <option value="animalsnature">Animals & Nature</option>
+            <option value="everything">Everything</option>
+          </select>
+          <select id="difficulty-select" class="puzzle-select">
+            <option value="random">Random</option>
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+          </select>
+        </div>
+        <div class="header-controls">
           <a
-            href="https://thebimsider.github.io/sumwords/V01/"
-            class="btn btn-primary"
-            >Play Now</a
+            href="https://thebimsider.github.io/sumwords/landing/"
+            class="btn-header btn-home"
+            >🏠 Home</a
           >
-          <a
-            href="https://github.com/TheBIMsider/sumwords"
-            class="btn btn-secondary"
-            target="_blank"
-            >View on GitHub</a
-          >
+          <button class="btn-header" id="stats-btn">📊 Stats</button>
+          <button class="btn-header" id="new-puzzle-btn">🎲 New Puzzle</button>
+          <button class="btn-header" id="reset-btn">↺ Reset</button>
+        </div>
+      </header>
+
+      <!-- Column Targets -->
+      <div class="column-targets">
+        <div class="target">
+          <span class="label">Column 1</span>
+          <span class="current" id="col1-current">0</span>
+          <span class="separator">/</span>
+          <span class="goal" id="col1-goal">36</span>
+        </div>
+        <div class="target">
+          <span class="label">Column 2</span>
+          <span class="current" id="col2-current">0</span>
+          <span class="separator">/</span>
+          <span class="goal" id="col2-goal">17</span>
         </div>
       </div>
-    </section>
 
-    <!-- Stats Section -->
-    <section class="stats">
-      <div class="container">
-        <div class="stat-grid">
-          <div class="stat-item">
-            <div class="stat-number">500</div>
-            <div class="stat-label">Trivia Questions</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-number">10</div>
-            <div class="stat-label">Categories</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-number">3</div>
-            <div class="stat-label">Difficulty Levels</div>
-          </div>
-        </div>
-      </div>
-    </section>
+      <!-- Assigned Difficulty (shows when Random is selected) -->
+      <div
+        id="assigned-difficulty"
+        class="assigned-difficulty"
+        style="display: none"
+      ></div>
 
-    <!-- How to Play Section -->
-    <section class="how-to-play">
-      <div class="container">
-        <h2>How to Play</h2>
-        <div class="steps">
-          <div class="step">
-            <div class="step-number">1</div>
-            <h3>Read the Trivia Question</h3>
-            <p>
-              Each equation has a trivia question. The answer is always a number
-              that you need to place in the equation.
-            </p>
-          </div>
-          <div class="step">
-            <div class="step-number">2</div>
-            <h3>Place Numbers in Blanks</h3>
-            <p>
-              Click a number from the pool at the bottom, then click a blank
-              space in an equation to place it.
-            </p>
-          </div>
-          <div class="step">
-            <div class="step-number">3</div>
-            <h3>Match Column Totals</h3>
-            <p>
-              Numbers in each column must add up to the target shown at the top.
-              This is the key constraint!
-            </p>
-          </div>
-          <div class="step">
-            <div class="step-number">4</div>
-            <h3>Complete All Equations</h3>
-            <p>
-              Make sure each equation is mathematically correct, then submit to
-              win and see the confetti!
-            </p>
-          </div>
-        </div>
-
-        <!-- Tips Section -->
-        <div class="tips-section">
-          <h3>💡 Pro Tips</h3>
-          <div class="tips-grid">
-            <div class="tip-card">
-              <strong>Start with the answer:</strong> Place the trivia answer in
-              its equation first to anchor your strategy.
+      <!-- Equations List -->
+      <div class="equations-container">
+        <!-- Equation 1 -->
+        <div class="equation" data-equation="1">
+          <div class="question">Super Bowls won by Tom Brady</div>
+          <div class="equation-row">
+            <button class="blank operand" data-position="op1-1"></button>
+            <div class="operator-container" data-equation="1">
+              <span class="operator">+</span>
+              <select class="operator-select">
+                <option value="">?</option>
+                <option value="+">+</option>
+                <option value="-">-</option>
+                <option value="×">×</option>
+                <option value="÷">÷</option>
+              </select>
             </div>
-            <div class="tip-card">
-              <strong>Use column targets:</strong> The column totals help you
-              narrow down which numbers can go where.
+            <button class="blank operand" data-position="op2-1"></button>
+            <span class="equals">=</span>
+            <input
+              type="text"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              class="blank solution"
+              data-position="sol-1"
+              placeholder="?"
+              maxlength="3"
+            />
+          </div>
+        </div>
+
+        <!-- Equation 2 -->
+        <div class="equation" data-equation="2">
+          <div class="question">Players on a basketball team</div>
+          <div class="equation-row">
+            <button class="blank operand" data-position="op1-2"></button>
+            <div class="operator-container" data-equation="2">
+              <span class="operator">+</span>
+              <select class="operator-select">
+                <option value="">?</option>
+                <option value="+">+</option>
+                <option value="-">-</option>
+                <option value="×">×</option>
+                <option value="÷">÷</option>
+              </select>
             </div>
-            <div class="tip-card">
-              <strong>Need help?</strong> Use the hint buttons (?, #, *) to
-              reveal answers, numbers, or operators.
+            <button class="blank operand" data-position="op2-2"></button>
+            <span class="equals">=</span>
+            <input
+              type="text"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              class="blank solution"
+              data-position="sol-2"
+              placeholder="?"
+              maxlength="3"
+            />
+          </div>
+        </div>
+
+        <!-- Equation 3 -->
+        <div class="equation" data-equation="3">
+          <div class="question">Innings in a baseball game</div>
+          <div class="equation-row">
+            <button class="blank operand" data-position="op1-3"></button>
+            <div class="operator-container" data-equation="3">
+              <span class="operator">+</span>
+              <select class="operator-select">
+                <option value="">?</option>
+                <option value="+">+</option>
+                <option value="-">-</option>
+                <option value="×">×</option>
+                <option value="÷">÷</option>
+              </select>
             </div>
-            <div class="tip-card">
-              <strong>Track progress:</strong> Check your stats to see completed
-              puzzles, streaks, and perfect games.
+            <button class="blank operand" data-position="op2-3"></button>
+            <span class="equals">=</span>
+            <input
+              type="text"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              class="blank solution"
+              data-position="sol-3"
+              placeholder="?"
+              maxlength="3"
+            />
+          </div>
+        </div>
+
+        <!-- Equation 4 -->
+        <div class="equation" data-equation="4">
+          <div class="question">Points for an NFL touchdown</div>
+          <div class="equation-row">
+            <button class="blank operand" data-position="op1-4"></button>
+            <div class="operator-container" data-equation="4">
+              <span class="operator">+</span>
+              <select class="operator-select">
+                <option value="">?</option>
+                <option value="+">+</option>
+                <option value="-">-</option>
+                <option value="×">×</option>
+                <option value="÷">÷</option>
+              </select>
             </div>
+            <button class="blank operand" data-position="op2-4"></button>
+            <span class="equals">=</span>
+            <input
+              type="text"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              class="blank solution"
+              data-position="sol-4"
+              placeholder="?"
+              maxlength="3"
+            />
+          </div>
+        </div>
+
+        <!-- Equation 5 -->
+        <div class="equation" data-equation="5">
+          <div class="question">Frames in a game of bowling</div>
+          <div class="equation-row">
+            <button class="blank operand" data-position="op1-5"></button>
+            <div class="operator-container" data-equation="5">
+              <span class="operator">+</span>
+              <select class="operator-select">
+                <option value="">?</option>
+                <option value="+">+</option>
+                <option value="-">-</option>
+                <option value="×">×</option>
+                <option value="÷">÷</option>
+              </select>
+            </div>
+            <button class="blank operand" data-position="op2-5"></button>
+            <span class="equals">=</span>
+            <input
+              type="text"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              class="blank solution"
+              data-position="sol-5"
+              placeholder="?"
+              maxlength="3"
+            />
+          </div>
+        </div>
+
+        <!-- Number Pool (bottom of screen) -->
+        <div class="number-pool">
+          <div class="pool-label">Number Pool</div>
+          <div class="pool-numbers" id="number-pool">
+            <!-- Numbers will be added by JavaScript -->
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="controls">
+          <button class="btn-submit" id="submit-btn">Submit Answer</button>
+          <div class="hint-buttons">
+            <button
+              class="btn-hint"
+              id="reveal-answer-btn"
+              disabled
+              title="Reveal the answer for selected equation"
+            >
+              ? Answer
+            </button>
+            <button
+              class="btn-hint"
+              id="reveal-numbers-btn"
+              disabled
+              title="Reveal both numbers for selected equation"
+            >
+              # Numbers
+            </button>
+            <button
+              class="btn-hint"
+              id="reveal-operator-btn"
+              disabled
+              title="Reveal the operator for selected equation"
+            >
+              * Operator
+            </button>
+          </div>
+          <div class="game-stats">
+            <div class="attempts">
+              Attempts: <span id="attempt-count">0</span>
+            </div>
+            <div class="hints">Hints: <span id="hint-count">0</span></div>
+          </div>
+        </div>
+
+        <!-- Feedback Area -->
+        <div class="feedback" id="feedback">
+          <!-- Validation messages appear here -->
+        </div>
+      </div>
+
+      <!-- Confetti Container -->
+      <div class="confetti-container" id="confetti-container"></div>
+    </div>
+
+    <!-- Tutorial Overlay -->
+    <div id="tutorial-overlay" class="modal hidden">
+      <div class="modal-content tutorial-content">
+        <div class="modal-header">
+          <h2>🎓 Welcome to Sumwords!</h2>
+        </div>
+        <div class="modal-body tutorial-body">
+          <div class="tutorial-section">
+            <h3>📝 How to Play</h3>
+            <ol class="tutorial-list">
+              <li>
+                <strong>Read the trivia question</strong> - The answer is always
+                a number
+              </li>
+              <li>
+                <strong>Place numbers in blanks</strong> - Click a number from
+                the pool, then click a blank
+              </li>
+              <li>
+                <strong>Match column totals</strong> - Numbers in each column
+                must add up to the target shown
+              </li>
+              <li>
+                <strong>Complete all equations</strong> - Make sure each
+                equation is mathematically correct
+              </li>
+            </ol>
+          </div>
+
+          <div class="tutorial-section">
+            <h3>💡 Tips</h3>
+            <ul class="tutorial-list">
+              <li>Start by placing the trivia answer in its equation</li>
+              <li>Use the column targets to narrow down number choices</li>
+              <li>Click the hint buttons (?, #, *) if you get stuck</li>
+              <li>Check your stats to track your progress!</li>
+            </ul>
+          </div>
+
+          <div class="tutorial-footer">
+            <label class="tutorial-checkbox">
+              <input type="checkbox" id="tutorial-dont-show" />
+              <span>Don't show this again</span>
+            </label>
+            <button class="btn-primary" id="tutorial-close">
+              Got It! Let's Play
+            </button>
           </div>
         </div>
       </div>
-    </section>
+    </div>
 
-    <!-- Features Section -->
-    <section class="features">
-      <div class="container">
-        <h2>Features</h2>
-        <div class="feature-grid">
-          <div class="feature-card">
-            <div class="feature-icon">🎯</div>
-            <h3>Three Difficulty Modes</h3>
-            <p>
-              Easy, Medium, and Hard modes with increasing complexity. Plus a
-              Random mode that automatically selects a difficulty level for you.
-            </p>
-          </div>
-          <div class="feature-card">
-            <div class="feature-icon">💡</div>
-            <h3>Hint System</h3>
-            <p>
-              Three types of hints available: reveal answers, reveal numbers, or
-              reveal operators.
-            </p>
-          </div>
-          <div class="feature-card">
-            <div class="feature-icon">📊</div>
-            <h3>Statistics Tracking</h3>
-            <p>
-              Track your progress with detailed stats on completed puzzles,
-              streaks, and perfect games.
-            </p>
-          </div>
-          <div class="feature-card">
-            <div class="feature-icon">📱</div>
-            <h3>Mobile Optimized</h3>
-            <p>
-              Fully responsive design works great on phones, tablets, and
-              desktop.
-            </p>
-          </div>
-          <div class="feature-card">
-            <div class="feature-icon">💾</div>
-            <h3>Auto-Save Progress</h3>
-            <p>
-              Game automatically saves your progress. Resume unfinished puzzles
-              anytime.
-            </p>
-          </div>
-          <div class="feature-card">
-            <div class="feature-icon">🎨</div>
-            <h3>Clean Interface</h3>
-            <p>
-              Modern, intuitive design with color-coded feedback and visual
-              polish.
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Categories Section -->
-    <section class="categories">
-      <div class="container">
-        <h2>Question Categories</h2>
-        <p
-          style="
-            text-align: center;
-            margin-bottom: 30px;
-            color: #666;
-            font-size: 1.1rem;
-          "
-        >
-          Choose from 10 specialized categories, or select
-          <strong>Everything</strong> to mix questions from all categories for
-          maximum variety.
-        </p>
-        <div class="category-list">
-          <span class="category-tag">Sports</span>
-          <span class="category-tag">History</span>
-          <span class="category-tag">Geography</span>
-          <span class="category-tag">Pop Culture</span>
-          <span class="category-tag">Science</span>
-          <span class="category-tag">Movies & TV</span>
-          <span class="category-tag">Food & Drink</span>
-          <span class="category-tag">Technology</span>
-          <span class="category-tag">Games & Literature</span>
-          <span class="category-tag">Animals & Nature</span>
-          <span class="category-tag everything-tag">Everything</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- CTA Section -->
-    <section class="cta">
-      <div class="container">
-        <h2>Ready to Play?</h2>
-        <p>Test your trivia knowledge and math skills</p>
-        <a
-          href="https://thebimsider.github.io/sumwords/V01/"
-          class="btn btn-primary btn-large"
-          >Start Playing Now</a
-        >
-      </div>
-    </section>
-
-    <!-- Footer -->
-    <footer>
-      <div class="container">
-        <p>
-          &copy; 2025 Carl Storms (The BIMsider). Licensed under BSD 3-Clause.
-        </p>
-        <p>
-          <a href="https://github.com/TheBIMsider/sumwords" target="_blank"
-            >GitHub</a
-          >
-          |
-          <a href="https://thebimsider.github.io/sumwords/V01/">Play Game</a>
-        </p>
-      </div>
-    </footer>
-
-    <script src="script.js"></script>
+    <script src="game.js"></script>
   </body>
 </html>
