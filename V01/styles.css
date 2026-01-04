@@ -356,6 +356,23 @@ body {
   transform: translateY(0);
 }
 
+/* Home link specific styling */
+.btn-home {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-home:hover {
+  background-color: var(--button-primary-hover);
+  transform: translateY(-1px);
+}
+
+.btn-home:active {
+  transform: translateY(0);
+}
+
 /* ===================================
    COLUMN TARGETS
    =================================== */
