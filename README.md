@@ -195,7 +195,7 @@ Example:
 
 This project is licensed under the **BSD 3-Clause License** - see the [LICENSE](LICENSE) file for details.
 
-## 👤 Author
+## 👤 Author (Vibe Coder)
 
 **Carl Storms (The BIMsider)** With the help of his AI Buddy 🤖 **Claude AI Sonnet 4.5**
 
@@ -252,5 +252,6 @@ This project was developed (Vibe Coded) over 20 documented sessions with compreh
 **Enjoy playing Sumwords!** 🎮🧮
 
 If you find a bug or have suggestions, please open an issue on GitHub.
+
 
 
