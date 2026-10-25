@@ -42,3 +42,8 @@ docs/drafts/
 .env
 .env.local
 .env.*.local
+
+# Claude Code project files (repo is public)
+CLAUDE.md
+context/
+.claude/
