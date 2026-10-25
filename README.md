@@ -2,8 +2,8 @@
 
 # Sumwords
 
-[![Release](https://img.shields.io/github/v/release/thebimsider/sumwords?display_name=tag&sort=semver)](https://github.com/thebimsider/somwords/releases/latest)
-[![License](https://img.shields.io/github/license/thebimsider/sumwords)](https://github.com/thebimsider/somwords/blob/main/LICENSE)
+[![Release](https://img.shields.io/github/v/release/thebimsider/sumwords?display_name=tag&sort=semver)](https://github.com/thebimsider/sumwords/releases/latest)
+[![License](https://img.shields.io/github/license/thebimsider/sumwords)](https://github.com/thebimsider/sumwords/blob/main/LICENSE)
 [![Open Source](https://img.shields.io/badge/Open%20Source-Yes-brightgreen)](LICENSE)
 ![Tech](https://img.shields.io/badge/Tech-HTML%20%7C%20CSS%20%7C%20JavaScript-informational)
 [![GitHub Pages](https://img.shields.io/badge/Hosted_on-GitHub_Pages-brightgreen)](https://thebimsider.github.io/sumwords/)
@@ -188,20 +188,15 @@ Contributions are welcome! This is a personal learning project, but feel free to
 
 ### Adding Trivia Questions
 
-Questions are stored in `game.js` in the `triviaQuestions` object. Each question needs:
+Questions are stored in `V01/game.js` in the `questionBanks` object, one array per category (`sports`, `history`, `geography`, `popculture`, `science`, `moviestv`, `fooddrink`, `technology`, `gamesliterature`, `animalsnature`). Each question needs:
 
 - `question`: The trivia question text
 - `answer`: Numeric answer (whole number, 0-2000 range works best)
-- `category`: One of the 10 existing categories
 
-Example:
+Add it to the array for its category. Example, added to `science`:
 
 ```javascript
-{
-  question: "How many keys are on a standard piano?",
-  answer: 88,
-  category: "Music & Arts"
-}
+{ question: 'Bones in the adult human body', answer: 206 },
 ```
 
 ## 📄 License
@@ -221,11 +216,11 @@ This project is licensed under the **BSD 3-Clause License** - see the [LICENSE](
 - Inspired by constraint-based puzzle games
 - Built with vanilla JavaScript for maximum maintainability
 - Designed mobile-first for modern web users
-- 20 development sessions documented from concept to deployment
+- 21 development sessions documented from concept to deployment
 
 ## 📝 Development
 
-This project was developed (Vibe Coded) over 20 documented sessions with comprehensive planning:
+This project was developed (Vibe Coded) over 21 documented sessions with comprehensive planning:
 
 - Session recaps track all development decisions
 - Roadmap documents evolution from concept to launch
