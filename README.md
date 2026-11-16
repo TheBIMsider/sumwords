@@ -19,7 +19,7 @@ A constraint-based math puzzle game that combines trivia knowledge with equation
 **Sumwords:** [🎲 Play Game](https://thebimsider.github.io/sumwords/V01/)
 
 <p align="center">
-  <img width="837" height="893" alt="Sumwords_in_Action" src="https://github.com/user-attachments/assets/e41bede5-2c7f-4498-8a6c-b3973879f29b" />
+  <img width="600" alt="Sumwords_in_Action" src="landing/Sumwords_in_Action.png" />
   <br />
   <em>Sumwords in action</em>
 </p>
