@@ -920,6 +920,112 @@ const questionBanks = {
    =================================== */
 
 /**
+ * Where the generator gets its random numbers. Normal play uses Math.random.
+ * A daily build swaps in a seeded generator and always puts Math.random back.
+ */
+let random = Math.random;
+
+// Fixed salt mixed into every daily seed. Changing it changes every daily.
+const DAILY_SALT = 'sumwords-daily';
+
+// The daily series. Bump it by hand (and set a new DAILY_EPOCH) whenever a
+// change alters the dailies: adding or editing questions, or a generator
+// change. The pinned-date test in tests/daily.test.js fails when that happens.
+// Dailies are numbered "series-day", for example #1-1, then #2-1 after a bump.
+const DAILY_SERIES = 1;
+
+// Day 1 of the current series: its first daily's local calendar date (YYYY-MM-DD)
+const DAILY_EPOCH = '2026-11-17';
+
+// Fixed settings for every daily, so all players compare the same puzzle
+const DAILY_CATEGORY = 'everything';
+const DAILY_DIFFICULTY = 'medium';
+
+/**
+ * FNV-1a 32-bit hash of a string (a small, readable hash for the daily seed)
+ * @param {string} text - Any string
+ * @returns {number} Unsigned 32-bit integer
+ */
+function fnv1a(text) {
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < text.length; i++) {
+    hash ^= text.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return hash >>> 0;
+}
+
+/**
+ * mulberry32: a small seeded generator returning floats in [0, 1)
+ * @param {number} seed - Unsigned 32-bit seed
+ * @returns {function(): number} Next random number each time it is called
+ */
+function mulberry32(seed) {
+  let state = seed >>> 0;
+  return function () {
+    state = (state + 0x6d2b79f5) >>> 0;
+    let t = state;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/**
+ * Build the daily puzzle for a date. Same date in, same puzzle out.
+ * Uses the normal generator (Everything, Medium) with a seeded random source.
+ * Math.random is restored even if generation throws.
+ * @param {string} dateString - Local calendar date, YYYY-MM-DD
+ * @returns {object|null} Puzzle object, or null if generation failed
+ */
+function generateDailyPuzzle(dateString) {
+  try {
+    random = mulberry32(fnv1a(`${DAILY_SALT}|${DAILY_SERIES}|${dateString}`));
+    const puzzle = generatePuzzle(DAILY_CATEGORY, DAILY_DIFFICULTY);
+    if (puzzle) puzzle.id = `daily_${DAILY_SERIES}_${dateString}`;
+    return puzzle;
+  } finally {
+    random = Math.random;
+  }
+}
+
+/**
+ * Today's local calendar date from the browser clock
+ * @param {Date} [now=new Date()] - Clock to read (injectable for tests)
+ * @returns {string} YYYY-MM-DD
+ */
+function getDailyDate(now = new Date()) {
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+/**
+ * Daily number: days since DAILY_EPOCH, where the epoch itself is 1.
+ * Counted from calendar dates in UTC so daylight-saving changes cannot shift it.
+ * @param {string} dateString - YYYY-MM-DD
+ * @returns {number} Daily number, never below 1
+ */
+function getDailyNumber(dateString) {
+  const toUtcDay = (ymd) => {
+    const [y, m, d] = ymd.split('-').map(Number);
+    return Date.UTC(y, m - 1, d) / 86400000;
+  };
+  const days = Math.round(toUtcDay(dateString) - toUtcDay(DAILY_EPOCH));
+  return Math.max(1, days + 1);
+}
+
+/**
+ * The daily's displayed number: series and day, for example "1-12"
+ * @param {string} dateString - YYYY-MM-DD
+ * @returns {string} "series-day"
+ */
+function getDailyLabel(dateString) {
+  return `${DAILY_SERIES}-${getDailyNumber(dateString)}`;
+}
+
+/**
  * Generate a random puzzle for given category and difficulty
  * @param {string} category - Category name (sports, history, geography, popculture, science)
  * @param {string} difficulty - Difficulty level (easy, medium, hard)
@@ -930,8 +1036,7 @@ function generatePuzzle(category, difficulty = 'easy') {
   let actualDifficulty = difficulty;
   if (difficulty === 'random') {
     const difficulties = ['easy', 'medium', 'hard'];
-    actualDifficulty =
-      difficulties[Math.floor(Math.random() * difficulties.length)];
+    actualDifficulty = difficulties[Math.floor(random() * difficulties.length)];
     gameState.assignedDifficulty = actualDifficulty;
   } else {
     gameState.assignedDifficulty = null;
@@ -967,7 +1072,7 @@ function generatePuzzle(category, difficulty = 'easy') {
   // First pass: one random operator per question, skip questions that do not fit
   while (equations.length < 5 && nextQuestion < shuffled.length) {
     const q = shuffled[nextQuestion++];
-    const operator = operators[Math.floor(Math.random() * operators.length)];
+    const operator = operators[Math.floor(random() * operators.length)];
     const operands = generateOperands(q.answer, operator, actualDifficulty);
     if (operands) {
       equations.push(buildEquation(equations.length + 1, q, operator, operands));
@@ -1100,7 +1205,7 @@ function removeDuplicateQuestions(questions) {
 function shuffleArray(items) {
   const copy = [...items];
   for (let i = copy.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
+    const j = Math.floor(random() * (i + 1));
     [copy[i], copy[j]] = [copy[j], copy[i]];
   }
   return copy;
@@ -1184,7 +1289,7 @@ function pickOperands(answer, operator, difficulty) {
     }
     if (factors.length === 0) return null;
 
-    const [op1, op2] = factors[Math.floor(Math.random() * factors.length)];
+    const [op1, op2] = factors[Math.floor(random() * factors.length)];
     return { op1, op2 };
   }
 
@@ -1196,7 +1301,7 @@ function pickOperands(answer, operator, difficulty) {
     }
     if (validDivisors.length === 0) return null;
 
-    const op2 = validDivisors[Math.floor(Math.random() * validDivisors.length)];
+    const op2 = validDivisors[Math.floor(random() * validDivisors.length)];
     return { op1: answer * op2, op2 };
   }
 
@@ -1211,7 +1316,7 @@ function pickOperands(answer, operator, difficulty) {
  * @returns {number} Random integer
  */
 function randomInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+  return Math.floor(random() * (max - min + 1)) + min;
 }
 
 /**
@@ -1263,6 +1368,8 @@ const gameState = {
   hintedEquations: {}, // Object: { equationId: ['?', '#'] } tracks hint types used
   assignedDifficulty: null, // Stores actual difficulty when "random" is selected
   attemptHistory: [], // One entry per Submit press, used for the share result
+  mode: 'normal', // 'normal' or 'daily'
+  dailyDate: null, // YYYY-MM-DD of the daily being played (daily mode only)
 };
 
 /* ===================================
@@ -1299,6 +1406,9 @@ function savePuzzleState() {
         currentDifficulty: gameState.currentDifficulty,
         assignedDifficulty: gameState.assignedDifficulty,
         attemptHistory: gameState.attemptHistory,
+        mode: gameState.mode,
+        dailyDate: gameState.dailyDate,
+        dailySeries: gameState.mode === 'daily' ? DAILY_SERIES : null,
       },
       timestamp: new Date().toISOString(),
     };
@@ -1378,6 +1488,33 @@ function clearPuzzleState() {
 }
 
 /**
+ * Save a finished daily. Kept under its own key because handleWin clears the
+ * current puzzle, and the finished result must survive a refresh.
+ * @param {{date: string, number: number, attempts: number, hints: number, history: object[]}} result
+ */
+function saveDailyResult(result) {
+  try {
+    localStorage.setItem('sumwords_daily', JSON.stringify(result));
+  } catch (error) {
+    console.error('Failed to save daily result:', error);
+  }
+}
+
+/**
+ * Load the finished daily, if any
+ * @returns {object|null} The saved result, or null when none exists or it cannot be read
+ */
+function loadDailyResult() {
+  try {
+    const saved = localStorage.getItem('sumwords_daily');
+    return saved ? JSON.parse(saved) : null;
+  } catch (error) {
+    console.error('Failed to load daily result:', error);
+    return null;
+  }
+}
+
+/**
  * Save user preferences (category, difficulty)
  */
 function savePreferences() {
@@ -1449,6 +1586,12 @@ function getDefaultStats() {
       hints: 0,
       perfectGames: 0,
     },
+    daily: {
+      completed: 0,
+      attempts: 0,
+      hints: 0,
+      perfectGames: 0,
+    },
   };
 }
 
@@ -1487,8 +1630,9 @@ function saveStatistics(stats) {
  * @param {string} difficulty - Difficulty level (easy/medium/hard) - the ACTUAL difficulty played
  * @param {number} attempts - Number of attempts taken
  * @param {number} hints - Number of hints used
+ * @param {boolean} [isDaily=false] - True for a daily puzzle: it counts as a normal win of its difficulty AND in the daily totals
  */
-function updateStatistics(difficulty, attempts, hints) {
+function updateStatistics(difficulty, attempts, hints, isDaily = false) {
   const stats = loadStatistics();
   const isPerfect = attempts === 1 && hints === 0;
   const selectedDifficulty = gameState.currentDifficulty; // This might be "random"
@@ -1533,6 +1677,15 @@ function updateStatistics(difficulty, attempts, hints) {
     stats.random.attempts += attempts;
     stats.random.hints += hints;
     if (isPerfect) stats.random.perfectGames++;
+  }
+
+  // A daily is ALSO tracked on its own (saves from before the daily have no bucket)
+  if (isDaily) {
+    stats.daily = stats.daily || getDefaultStats().daily;
+    stats.daily.completed++;
+    stats.daily.attempts += attempts;
+    stats.daily.hints += hints;
+    if (isPerfect) stats.daily.perfectGames++;
   }
 
   saveStatistics(stats);
@@ -1586,11 +1739,20 @@ function initializeGame() {
   // Set up event listeners FIRST (before showing any modals)
   setupEventListeners();
   setupStatsModalListeners();
+  refreshDailyUi();
 
   // Check for saved puzzle state
   const savedPuzzle = loadPuzzleState();
 
-  if (savedPuzzle && hasMeaningfulProgress(savedPuzzle)) {
+  if (savedPuzzle && isStaleDaily(savedPuzzle)) {
+    // A daily from an earlier date is discarded; today's is started from the Daily button
+    clearPuzzleState();
+    startNewGame();
+    showFeedback(
+      `Your daily puzzle from ${savedPuzzle.gameState.dailyDate} was discarded. Press Daily for today's puzzle.`,
+      'success'
+    );
+  } else if (savedPuzzle && hasMeaningfulProgress(savedPuzzle)) {
     // Show resume modal only if user made progress
     showResumeModal(savedPuzzle);
   } else {
@@ -1684,6 +1846,10 @@ function resumeSavedGame(savedPuzzle) {
   gameState.attemptHistory = Array.isArray(saved.attemptHistory)
     ? saved.attemptHistory
     : []; // Saves from before share results have no history
+  // Saves from before the Daily puzzle have no mode, so they resume as normal
+  gameState.mode = saved.mode === 'daily' ? 'daily' : 'normal';
+  gameState.dailyDate = saved.mode === 'daily' ? saved.dailyDate || null : null;
+  refreshDailyUi(); // Locks the selectors and shows the banner for a daily
 
   // Restore user inputs to UI (also sets gameState.userInputs)
   restoreUserInputs(saved);
@@ -1866,6 +2032,7 @@ function resetGameState() {
 
   // Reset buttons
   document.getElementById('submit-btn').disabled = false;
+  document.getElementById('reset-btn').disabled = false;
   closeHintChoices();
   updateHintControls();
 
@@ -1980,6 +2147,9 @@ function setupEventListeners() {
   document
     .getElementById('stats-btn')
     .addEventListener('click', showStatsModal);
+  document
+    .getElementById('daily-btn')
+    .addEventListener('click', handleDailyClick);
   document
     .getElementById('new-puzzle-btn')
     .addEventListener('click', handleNewPuzzle);
@@ -2414,8 +2584,22 @@ function handleWin() {
   updateStatistics(
     gameState.currentDifficulty,
     gameState.attempts,
-    gameState.hintsUsed
+    gameState.hintsUsed,
+    gameState.mode === 'daily'
   );
+
+  // A finished daily is remembered under its own key (see saveDailyResult)
+  if (gameState.mode === 'daily') {
+    saveDailyResult({
+      series: DAILY_SERIES,
+      date: gameState.dailyDate,
+      number: getDailyNumber(gameState.dailyDate),
+      attempts: gameState.attempts,
+      hints: gameState.hintsUsed,
+      history: gameState.attemptHistory,
+    });
+    document.getElementById('reset-btn').disabled = true; // No replaying the daily
+  }
 
   // Clear saved puzzle (completed)
   clearPuzzleState();
@@ -2500,6 +2684,7 @@ function buildAttemptEntry(equations, columnTargets, userInputs, hintedEquations
  * @param {number} result.attempts - True attempt count (may exceed history length)
  * @param {number} result.hints - Hints used
  * @param {{equations: string[], columns: boolean[], hinted?: boolean[]}[]} result.history - One entry per Submit (hinted is absent in older saves)
+ * @param {number|string} [result.dailyNumber] - Daily puzzle number (the "series-day" label, for example "1-12"). When present the header shows it instead of the difficulty
  * @returns {string} Share text with no trivia or puzzle numbers
  */
 function buildShareText({
@@ -2510,14 +2695,19 @@ function buildShareText({
   attempts,
   hints,
   history,
+  dailyNumber,
 }) {
   const difficultyKey = assignedDifficulty || currentDifficulty;
   const difficulty =
     difficultyKey.charAt(0).toUpperCase() + difficultyKey.slice(1);
   const perfect = attempts === 1 && hints === 0;
+  // A daily is always Medium, so its header names the daily number instead
+  const header = dailyNumber
+    ? `Sumwords v${version} · Daily #${dailyNumber}`
+    : `Sumwords v${version} · ${difficulty}`;
 
   const lines = [
-    `Sumwords v${version} · ${difficulty}`,
+    header,
     `${countWord(attempts, 'attempt')} · ${countWord(hints, 'hint')}${perfect ? ' ⭐' : ''}`,
     '',
   ];
@@ -2569,6 +2759,8 @@ function showWinPanel() {
   document.getElementById('win-streak').textContent =
     loadStatistics().overall.currentStreak;
 
+  document.getElementById('win-next-daily').hidden =
+    gameState.mode !== 'daily';
   document.getElementById('feedback').hidden = true;
   document.getElementById('win-panel').hidden = false;
 }
@@ -2584,6 +2776,7 @@ function hideWinPanel() {
   document.getElementById('share-fallback-text').value = '';
 
   document.getElementById('win-panel').hidden = true;
+  document.getElementById('win-next-daily').hidden = true;
   document.getElementById('feedback').hidden = false;
 }
 
@@ -2600,6 +2793,10 @@ async function handleShare() {
     attempts: gameState.attempts,
     hints: gameState.hintsUsed,
     history: gameState.attemptHistory,
+    dailyNumber:
+      gameState.mode === 'daily'
+        ? getDailyLabel(gameState.dailyDate)
+        : undefined,
   });
 
   try {
@@ -2693,6 +2890,159 @@ function confirmDiscardProgress(message) {
   return confirm(message);
 }
 
+/* ===================================
+  DAILY PUZZLE
+  =================================== */
+
+/**
+ * True when a saved puzzle is a daily that is no longer today's: from another
+ * date, or from an earlier series (the dailies were changed since)
+ * @param {object} puzzleState - Saved puzzle state
+ * @returns {boolean}
+ */
+function isStaleDaily(puzzleState) {
+  const saved = puzzleState.gameState;
+  return (
+    !!saved &&
+    saved.mode === 'daily' &&
+    (saved.dailyDate !== getDailyDate() || saved.dailySeries !== DAILY_SERIES)
+  );
+}
+
+/**
+ * Daily button: start today's daily. Does nothing while today's daily is
+ * already loaded, so the current progress is never replaced by accident.
+ */
+function handleDailyClick() {
+  const today = getDailyDate();
+  if (gameState.mode === 'daily' && gameState.dailyDate === today) return;
+
+  if (
+    !confirmDiscardProgress(
+      "Start today's daily puzzle? Your progress on this one will be lost."
+    )
+  ) {
+    return;
+  }
+
+  // Already won today: show the saved result instead of a new puzzle
+  const finished = loadDailyResult();
+  if (finished && finished.date === today && finished.series === DAILY_SERIES) {
+    showFinishedDaily(finished);
+  } else {
+    startDailyPuzzle(today);
+  }
+}
+
+/**
+ * Show a finished daily: today's board with the win panel, the saved
+ * attempts and hints, Share result and "Next puzzle tomorrow". The daily
+ * cannot be played again, so Submit and the hints are turned off.
+ * @param {{date: string, attempts: number, hints: number, history: object[]}} result - From loadDailyResult
+ */
+function showFinishedDaily(result) {
+  if (!loadDailyBoard(result.date)) return;
+
+  gameState.attempts = result.attempts || 0;
+  gameState.hintsUsed = result.hints || 0;
+  gameState.attemptHistory = Array.isArray(result.history) ? result.history : [];
+  gameState.completed = true;
+  document.getElementById('attempt-count').textContent = gameState.attempts;
+  document.getElementById('hint-count').textContent = gameState.hintsUsed;
+  document.getElementById('submit-btn').disabled = true;
+  document.getElementById('reset-btn').disabled = true;
+  document.querySelectorAll('.btn-hint-equation').forEach((button) => {
+    button.disabled = true;
+  });
+
+  clearPuzzleState(); // Nothing to resume: the daily is done
+  showWinPanel();
+}
+
+/**
+ * Start today's (unfinished) daily
+ * @param {string} dateString - Local calendar date, YYYY-MM-DD
+ */
+function startDailyPuzzle(dateString) {
+  if (!loadDailyBoard(dateString)) return;
+
+  showFeedback(
+    `Daily puzzle #${getDailyLabel(dateString)} loaded!`,
+    'success'
+  );
+  savePuzzleState();
+}
+
+/**
+ * Load the daily puzzle for a date onto the board and switch the game into
+ * daily mode (selectors locked, banner shown)
+ * @param {string} dateString - Local calendar date, YYYY-MM-DD
+ * @returns {boolean} False if the puzzle could not be generated
+ */
+function loadDailyBoard(dateString) {
+  const puzzle = generateDailyPuzzle(dateString);
+  if (!puzzle) {
+    showFeedback('Failed to generate puzzle. Please try again.', 'error');
+    return false;
+  }
+
+  currentPuzzle = puzzle;
+  gameState.currentCategory = DAILY_CATEGORY;
+  gameState.currentDifficulty = DAILY_DIFFICULTY;
+  gameState.mode = 'daily';
+  gameState.dailyDate = dateString;
+  document.getElementById('category-select').value = DAILY_CATEGORY;
+  document.getElementById('difficulty-select').value = DAILY_DIFFICULTY;
+
+  loadPuzzle(currentPuzzle); // Resets the play state; mode and date are kept
+  refreshDailyUi();
+  return true;
+}
+
+/**
+ * Leave daily mode: restore the player's own category and difficulty and
+ * re-enable the selectors. Does nothing outside daily mode.
+ */
+function leaveDaily() {
+  if (gameState.mode !== 'daily') return;
+
+  const prefs = loadPreferences() || {
+    category: 'sports',
+    difficulty: 'random',
+  }; // Same defaults as the first dropdown options
+  gameState.mode = 'normal';
+  gameState.dailyDate = null;
+  gameState.currentCategory = prefs.category;
+  gameState.currentDifficulty = prefs.difficulty;
+  document.getElementById('category-select').value = prefs.category;
+  document.getElementById('difficulty-select').value = prefs.difficulty;
+  refreshDailyUi();
+}
+
+/**
+ * Show the daily state in the header and banner: the Daily button label,
+ * the daily banner, and the category and difficulty selectors (locked in daily mode)
+ */
+function refreshDailyUi() {
+  const inDaily = gameState.mode === 'daily';
+
+  document.getElementById('category-select').disabled = inDaily;
+  document.getElementById('difficulty-select').disabled = inDaily;
+  document.getElementById('daily-btn').textContent = `📅 Daily #${getDailyLabel(
+    getDailyDate()
+  )}`;
+
+  const banner = document.getElementById('daily-banner');
+  if (inDaily) {
+    banner.textContent = `Daily puzzle #${getDailyLabel(
+      gameState.dailyDate
+    )} · Medium · Everything`;
+    banner.style.display = 'block';
+  } else {
+    banner.style.display = 'none';
+  }
+}
+
 /**
  * Generate and load a completely new puzzle
  */
@@ -2704,6 +3054,8 @@ function handleNewPuzzle() {
   ) {
     return;
   }
+
+  leaveDaily(); // New Puzzle always leaves daily mode
 
   // Generate new puzzle
   currentPuzzle = generatePuzzle(
@@ -2727,6 +3079,9 @@ function handleNewPuzzle() {
  * Reset current puzzle (clear all inputs, keep same puzzle)
  */
 function handleReset() {
+  // A finished daily cannot be replayed, so there is nothing to reset
+  if (gameState.mode === 'daily' && gameState.completed) return;
+
   // Only a played puzzle (Submit or hint) breaks the win streak
   const breaksStreak = hasPlayed();
 
@@ -3281,6 +3636,9 @@ function showStatsModal() {
 
   // Update Random stats
   updateDifficultyStats('random', stats.random);
+
+  // Update Daily stats
+  updateDifficultyStats('daily', stats.daily);
 
   // Show modal
   modal.classList.remove('hidden');

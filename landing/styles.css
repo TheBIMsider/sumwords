@@ -381,13 +381,30 @@ body {
   color: var(--text-primary);
 }
 
+/* Six columns, each card spans two (3 across); a lone last card is centered */
 .feature-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(6, 1fr);
   gap: 30px;
 }
 
+.feature-card:last-child:nth-child(3n + 1) {
+  grid-column: 3 / span 2;
+}
+
+@media (max-width: 960px) {
+  /* Two across; a lone last card is centered */
+  .feature-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .feature-card:last-child:nth-child(odd) {
+    grid-column: 2 / span 2;
+  }
+}
+
 .feature-card {
+  grid-column: span 2;
   background-color: var(--bg-card);
   padding: 30px;
   border-radius: 12px;
@@ -646,6 +663,11 @@ footer a:hover {
 
   .feature-grid {
     grid-template-columns: 1fr;
+  }
+
+  .feature-card,
+  .feature-card:last-child:nth-child(odd) {
+    grid-column: auto;
   }
 }
 
