@@ -950,6 +950,97 @@ body {
   .header-controls .btn-home {
     justify-content: flex-start;
   }
+
+  /* The fixed theme toggle would cover the sticky targets, so it scrolls away */
+  #theme-toggle {
+    position: absolute;
+  }
+
+  /* Column targets stay at the top while scrolling the equations */
+  .column-targets {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    margin: 0 -16px 12px;
+    padding: 8px 16px;
+    background-color: var(--bg-container);
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .target {
+    padding: 6px 8px;
+  }
+
+  .target .current {
+    font-size: 20px;
+  }
+
+  /* Number pool stays at the bottom, compact so it covers less of the equations */
+  .number-pool {
+    position: sticky;
+    bottom: 0;
+    z-index: 50;
+    margin: 0 -16px 12px;
+    padding: 8px 16px;
+    border-radius: 0;
+    border-width: 2px 0 0 0;
+  }
+
+  /* Label stays for screen readers only */
+  .pool-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+
+  /* Flex wrap (not grid) so a short last row, such as Hard's 4 tiles, is centered.
+     max-width = columns x tile width + gaps, so rows wrap at 5, 6 and 6 tiles. */
+  .pool-numbers {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+  }
+
+  .pool-numbers[data-difficulty='easy'] {
+    max-width: 244px; /* 5 x 44 + 4 x 6 */
+  }
+
+  .pool-numbers[data-difficulty='medium'] {
+    max-width: 282px; /* 6 x 42 + 5 x 6 */
+  }
+
+  /* Hard: 16 tiles as 6, 6 and 4 (centered) */
+  .pool-numbers[data-difficulty='hard'] {
+    max-width: 270px; /* 6 x 40 + 5 x 6 */
+  }
+
+  .pool-numbers .pool-number {
+    flex: none;
+  }
+
+  .pool-numbers[data-difficulty='easy'] .pool-number {
+    width: 44px;
+    height: 44px;
+    font-size: 18px;
+  }
+
+  .pool-numbers[data-difficulty='medium'] .pool-number {
+    width: 42px;
+    height: 42px;
+    font-size: 18px;
+  }
+
+  .pool-numbers[data-difficulty='hard'] .pool-number {
+    width: 40px;
+    height: 40px;
+    font-size: 17px;
+  }
 }
 
 /* Mobile adjustments */
@@ -1002,16 +1093,19 @@ body {
     font-size: 24px;
   }
 
-  /* Medium difficulty: 3×4 grid on mobile */
-  .pool-numbers[data-difficulty='medium'] {
-    grid-template-columns: repeat(3, 1fr);
-    max-width: 210px;
+  /* Sticky strips span the narrower container padding */
+  .column-targets {
+    margin-left: -12px;
+    margin-right: -12px;
+    padding-left: 12px;
+    padding-right: 12px;
   }
 
-  /* Hard difficulty: 4×4 grid on mobile */
-  .pool-numbers[data-difficulty='hard'] {
-    grid-template-columns: repeat(4, 1fr);
-    max-width: 280px;
+  .number-pool {
+    margin-left: -12px;
+    margin-right: -12px;
+    padding-left: 12px;
+    padding-right: 12px;
   }
 }
 
