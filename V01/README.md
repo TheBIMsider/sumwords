@@ -54,6 +54,7 @@ Plus an **"Everything"** category that combines all questions for maximum variet
   - Reveal which numbers to place in the equation
 - **Smart Resume:** Automatically saves progress and offers to resume unfinished puzzles
 - **Statistics Tracking:** Track completed puzzles, attempts, hints used, perfect games, and win streaks
+- **Share Results:** After a win, copy a spoiler-free, Wordle-style grid of your attempts to the clipboard
 - **Mobile-Optimized:** Fully responsive design works great on phones and tablets
 - **Persistent Storage:** Game state, preferences, stats, and theme saved locally
 
@@ -142,6 +143,7 @@ sumwords/
 ├── tests/
 │   ├── generator.test.js   # Checks every generated puzzle is solvable, plus question bank rules
 │   ├── play-polish.test.js # Checks the Reset/New Puzzle confirm rules and auto-advance lookup
+│   ├── share.test.js       # Checks the share text and per-attempt results
 │   └── validation.test.js  # Checks Submit validation messages
 ├── README.md               # This file
 └── LICENSE                 # BSD 3-Clause License
@@ -245,12 +247,12 @@ This project was developed (Vibe Coded) over 21 sessions with Claude Chat and co
 - Landing page with animations
 - Interactive tutorial for first-time users
 - v1.1.0: 5 equations and visible operators on every level, audited question bank, automated puzzle and validation tests, version shown in the game
+- Share results: win panel with a spoiler-free, Wordle-style grid copied to the clipboard
 
 ### Potential Future Enhancements
 
 - Keyboard navigation support
 - Daily puzzle mode
-- Social sharing (Wordle-style score sharing)
 - Sound effects (optional)
 - Additional question categories
 - Leaderboards
