@@ -1049,17 +1049,11 @@ function generatePuzzle(category, difficulty = 'easy') {
   });
 
   // Step 5: Add decoy numbers based on difficulty
-  const decoyCount =
-    actualDifficulty === 'medium' ? 2 : actualDifficulty === 'hard' ? 6 : 0;
+  const { decoys: decoyCount, maxOperand } = DIFFICULTY_CONFIG[actualDifficulty];
 
-  if (decoyCount > 0) {
-    const maxOperand = actualDifficulty === 'medium' ? 100 : 200;
-
-    for (let i = 0; i < decoyCount; i++) {
-      // Generate random decoy in valid range
-      const decoy = randomInt(1, maxOperand);
-      numberPool.push(decoy);
-    }
+  for (let i = 0; i < decoyCount; i++) {
+    // Generate random decoy in valid range
+    numberPool.push(randomInt(1, maxOperand));
   }
 
   // Step 6: Build puzzle object
@@ -1078,12 +1072,24 @@ function generatePuzzle(category, difficulty = 'easy') {
 }
 
 /**
+ * Everything that differs between difficulty levels, in one place.
+ * maxOperand: largest operand (and decoy) value
+ * decoys: extra pool numbers that belong to no equation
+ * operators: operators the generator may use (all are shown to the player)
+ */
+const DIFFICULTY_CONFIG = {
+  easy: { maxOperand: 50, decoys: 0, operators: ['+', '-'] },
+  medium: { maxOperand: 100, decoys: 2, operators: ['+', '-'] },
+  hard: { maxOperand: 200, decoys: 6, operators: ['+', '-', '×', '÷'] },
+};
+
+/**
  * Operators allowed for a difficulty
  * @param {string} difficulty - easy, medium or hard
  * @returns {array} Operator characters
  */
 function getOperatorsForDifficulty(difficulty) {
-  return difficulty === 'hard' ? ['+', '-', '×', '÷'] : ['+', '-'];
+  return DIFFICULTY_CONFIG[difficulty].operators;
 }
 
 /**
@@ -1181,8 +1187,7 @@ function generateOperands(answer, operator, difficulty = 'easy') {
  * @returns {object|null} { op1, op2 }, or null if none fits the range
  */
 function pickOperands(answer, operator, difficulty) {
-  const maxOperand =
-    difficulty === 'easy' ? 50 : difficulty === 'medium' ? 100 : 200;
+  const maxOperand = DIFFICULTY_CONFIG[difficulty].maxOperand;
 
   // Answers must be whole numbers of at least 1
   if (!Number.isInteger(answer) || answer < 1) return null;
@@ -1287,7 +1292,6 @@ const gameState = {
   selectedNumberElement: null,
   selectedBlank: null, // Selected blank waiting for pool number
   userInputs: {}, // Will store: { '0-0': 5, '0-1': 2, 'sol-0': 7, etc. }
-  userOperators: {}, // Will store: { '0': '+', '1': '-', etc. }
   poolNumbersUsed: [], // Array of used numbers
   attempts: 0,
   completed: false,
@@ -1295,7 +1299,7 @@ const gameState = {
   currentDifficulty: 'easy', // Currently selected difficulty
   hintsUsed: 0, // Number of hints used
   selectedEquationForHint: null, // Currently selected equation for hint
-  hintedEquations: {}, // Object: { equationId: ['?', '#', '*'] } tracks hint types used
+  hintedEquations: {}, // Object: { equationId: ['?', '#'] } tracks hint types used
   assignedDifficulty: null, // Stores actual difficulty when "random" is selected
 };
 
@@ -1317,11 +1321,6 @@ function savePuzzleState() {
         hintRevealedInputs.push(el.dataset.position);
       } else if (el.classList.contains('operand')) {
         hintRevealedInputs.push(el.dataset.position);
-      } else if (el.classList.contains('operator-select')) {
-        const container = el.closest('.operator-container');
-        if (container) {
-          hintRevealedInputs.push(`operator-${container.dataset.equation}`);
-        }
       }
     });
 
@@ -1329,7 +1328,6 @@ function savePuzzleState() {
       puzzle: currentPuzzle,
       gameState: {
         userInputs: gameState.userInputs,
-        userOperators: gameState.userOperators,
         poolNumbersUsed: gameState.poolNumbersUsed,
         attempts: gameState.attempts,
         hintsUsed: gameState.hintsUsed,
@@ -1391,11 +1389,6 @@ function hasMeaningfulProgress(puzzleState) {
       (key) => key.startsWith('sol') && state.userInputs[key] !== undefined
     );
     if (hasAnswers) return true;
-  }
-
-  // Check if any operators were selected (Medium/Hard)
-  if (state.userOperators && Object.keys(state.userOperators).length > 0) {
-    return true;
   }
 
   // Check if any hints were used
@@ -1735,11 +1728,12 @@ function resumeSavedGame(savedPuzzle) {
 
   // Restore game state
   gameState.userInputs = savedPuzzle.gameState.userInputs || {}; // FIXED: was userAnswers
-  gameState.userOperators = savedPuzzle.gameState.userOperators || {};
   gameState.poolNumbersUsed = savedPuzzle.gameState.poolNumbersUsed || [];
   gameState.attempts = savedPuzzle.gameState.attempts || 0;
   gameState.hintsUsed = savedPuzzle.gameState.hintsUsed || 0;
-  gameState.hintedEquations = savedPuzzle.gameState.hintedEquations || {};
+  gameState.hintedEquations = withoutOperatorMarkers(
+    savedPuzzle.gameState.hintedEquations
+  );
   gameState.currentCategory = savedPuzzle.gameState.currentCategory;
   gameState.currentDifficulty = savedPuzzle.gameState.currentDifficulty;
   gameState.assignedDifficulty =
@@ -1762,6 +1756,22 @@ function resumeSavedGame(savedPuzzle) {
 
   showFeedback('Puzzle resumed!', 'success');
   console.log('Game resumed from saved state');
+}
+
+/**
+ * Drop the old '*' (Operator hint) marker from saved hint markers, so a save
+ * made before the Operator hint was removed does not show a stale marker.
+ * @param {object} hinted - Saved { equationId: ['?', '#', '*'] } (may be missing)
+ * @returns {object} Same shape without '*' (equations left with no markers are dropped)
+ */
+function withoutOperatorMarkers(hinted) {
+  const clean = {};
+  Object.keys(hinted || {}).forEach((equationId) => {
+    const markers = (hinted[equationId] || []).filter((m) => m !== '*');
+    // An equation whose only hint was the Operator hint is no longer hinted
+    if (markers.length > 0) clean[equationId] = markers;
+  });
+  return clean;
 }
 
 /**
@@ -1809,52 +1819,20 @@ function restoreUserInputs(savedGameState) {
     });
   });
 
-  // Restore operator selections (Medium/Hard)
-  Object.keys(savedGameState.userOperators || {}).forEach((equationId) => {
-    const operator = savedGameState.userOperators[equationId];
-    const select = document.querySelector(
-      `[data-equation="${equationId}"] .operator-select`
-    );
-    if (select) {
-      select.value = operator;
-    }
-  });
-
   // Restore hinted equations and hint markers
   Object.keys(savedGameState.hintedEquations || {}).forEach((equationId) => {
     const equation = document.querySelector(`[data-equation="${equationId}"]`);
     if (equation) {
       equation.classList.add('hinted');
-
-      // Restore hint marker emojis
-      const markers = savedGameState.hintedEquations[equationId] || [];
-      if (markers.length > 0) {
-        const equationNumber = equation.querySelector('.equation-number');
-        if (equationNumber) {
-          const baseNumber = parseInt(equationId) + 1;
-          equationNumber.textContent = `${baseNumber}. ${markers.join(' ')}`;
-        }
-      }
     }
   });
 
   // Restore hint-revealed styling
   (savedGameState.hintRevealedInputs || []).forEach((position) => {
-    if (position.startsWith('operator-')) {
-      // Operator dropdown
-      const equationId = position.replace('operator-', '');
-      const select = document.querySelector(
-        `[data-equation="${equationId}"] .operator-select`
-      );
-      if (select) {
-        select.classList.add('hint-revealed');
-      }
-    } else {
-      // Operand or solution
-      const element = document.querySelector(`[data-position="${position}"]`);
-      if (element) {
-        element.classList.add('hint-revealed');
-      }
+    // Operand or solution (old 'operator-N' entries match nothing and are skipped)
+    const element = document.querySelector(`[data-position="${position}"]`);
+    if (element) {
+      element.classList.add('hint-revealed');
     }
   });
 
@@ -1899,61 +1877,11 @@ function loadPuzzle(puzzle) {
     const equationDiv = document.querySelector(`[data-equation="${eq.id}"]`);
     equationDiv.querySelector('.question').textContent = eq.question;
 
-    // Handle operator display based on difficulty
-    const operatorContainer = equationDiv.querySelector('.operator-container');
-    console.log(
-      `  Operator container found:`,
-      operatorContainer ? 'YES' : 'NO'
+    // Every level shows the operator as plain text
+    const visibleOperator = equationDiv.querySelector(
+      '.operator-container .operator'
     );
-
-    const visibleOperator = operatorContainer.querySelector('.operator');
-    console.log(
-      `  Static operator element found:`,
-      visibleOperator ? 'YES' : 'NO'
-    );
-
-    const operatorSelect = operatorContainer.querySelector('.operator-select');
-    console.log(`  Operator dropdown found:`, operatorSelect ? 'YES' : 'NO');
-
-    console.log(`  Puzzle difficulty check: '${puzzle.difficulty}'`);
-
-    if (puzzle.difficulty === 'Easy') {
-      console.log('  Setting EASY visibility');
-      // Easy: show operator, hide select
-      visibleOperator.textContent = eq.operator;
-      visibleOperator.classList.remove('hidden');
-      visibleOperator.classList.add('visible');
-      operatorSelect.classList.remove('visible');
-      operatorSelect.classList.add('hidden');
-    } else {
-      console.log('  Setting MEDIUM/HARD visibility');
-      // Medium/Hard: hide operator, show select
-      visibleOperator.classList.remove('visible');
-      visibleOperator.classList.add('hidden');
-      operatorSelect.classList.remove('hidden');
-      operatorSelect.classList.add('visible');
-
-      // Limit options based on difficulty
-      const options = operatorSelect.querySelectorAll('option');
-      if (puzzle.difficulty === 'Medium') {
-        // Medium: only + and -
-        options.forEach((opt) => {
-          if (opt.value === '×' || opt.value === '÷') {
-            opt.style.display = 'none';
-          } else {
-            opt.style.display = '';
-          }
-        });
-      } else {
-        // Hard: all operators
-        options.forEach((opt) => {
-          opt.style.display = '';
-        });
-      }
-
-      // Reset to placeholder
-      operatorSelect.value = '';
-    }
+    visibleOperator.textContent = eq.operator;
   });
 
   // Clear any previous state
@@ -1981,7 +1909,6 @@ function resetGameState() {
   gameState.selectedNumber = null;
   gameState.selectedNumberElement = null;
   gameState.userInputs = {};
-  gameState.userOperators = {};
   gameState.poolNumbersUsed = [];
   gameState.attempts = 0;
   gameState.completed = false;
@@ -2002,22 +1929,9 @@ function resetGameState() {
     input.classList.remove('hint-revealed');
   });
 
-  // Clear UI - operator selections
-  document.querySelectorAll('.operator-select').forEach((select) => {
-    select.value = '';
-    select.classList.remove('hint-revealed');
-  });
-
   // Clear UI - equations
   document.querySelectorAll('.equation').forEach((eq) => {
     eq.classList.remove('error', 'hinted', 'selected-for-hint');
-
-    // Reset equation numbers (remove hint markers)
-    const equationNumber = eq.querySelector('.equation-number');
-    if (equationNumber) {
-      const equationId = parseInt(eq.dataset.equation);
-      equationNumber.textContent = `${equationId + 1}.`;
-    }
   });
 
   // Reset counters
@@ -2106,21 +2020,13 @@ function setupEventListeners() {
     .getElementById('difficulty-select')
     .addEventListener('change', handleDifficultyChange);
 
-  // Hint system - three separate reveal buttons
+  // Hint system - two separate reveal buttons
   document
     .getElementById('reveal-answer-btn')
     .addEventListener('click', revealAnswer);
   document
     .getElementById('reveal-numbers-btn')
     .addEventListener('click', revealNumbers);
-  document
-    .getElementById('reveal-operator-btn')
-    .addEventListener('click', revealOperator);
-
-  // Operator selection for Medium/Hard
-  document.querySelectorAll('.operator-select').forEach((select) => {
-    select.addEventListener('change', handleOperatorSelect);
-  });
 
   // Equation selection for hints
   document.querySelectorAll('.equation').forEach((equation) => {
@@ -2462,17 +2368,17 @@ function equationLabel(ids) {
 }
 
 /**
- * Sorts every equation that isn't right yet into one of three groups, so
+ * Sorts every equation that isn't right yet into one of two groups, so
  * Submit can tell the player what kind of problem each one has.
+ * The operator is part of the puzzle and always shown, so only the numbers
+ * are checked, against the equation's own operator.
  *
- * @returns {{incompleteEquations: number[], wrongOperatorEquations: number[], wrongNumberEquations: number[], badEquationIds: number[]}}
- *   Equation ids: still has an empty blank or no operator, uses the wrong
- *   operator, or has numbers that don't work out (an equation can be in both
- *   of the last two). badEquationIds lists every problem equation once.
+ * @returns {{incompleteEquations: number[], wrongNumberEquations: number[], badEquationIds: number[]}}
+ *   Equation ids: still has an empty blank, or has numbers that don't work
+ *   out. badEquationIds lists every problem equation once.
  */
 function findBadEquations() {
   const incompleteEquations = [];
-  const wrongOperatorEquations = [];
   const wrongNumberEquations = [];
 
   currentPuzzle.equations.forEach((eq) => {
@@ -2485,32 +2391,6 @@ function findBadEquations() {
       return;
     }
 
-    // Get operator - either from puzzle (Easy) or user selection (Medium/Hard)
-    let operator;
-    if (currentPuzzle.difficulty === 'Easy') {
-      operator = eq.operator;
-    } else {
-      operator = gameState.userOperators[eq.id];
-
-      // No operator chosen yet counts as incomplete
-      if (!operator) {
-        incompleteEquations.push(eq.id);
-        return;
-      }
-    }
-
-    // An equation that works with the operator in place is fine, even if it
-    // is not the operator the puzzle was built with (e.g. 2 + 2 = 2 × 2).
-    if (applyOperator(operator, op1, op2) === sol) {
-      return;
-    }
-
-    // It doesn't work, so say why. The operator is wrong if it isn't the
-    // puzzle's own. The numbers are wrong if they fail even with the puzzle's
-    // own operator. Both can be true, and both get reported.
-    if (operator !== eq.operator) {
-      wrongOperatorEquations.push(eq.id);
-    }
     if (applyOperator(eq.operator, op1, op2) !== sol) {
       wrongNumberEquations.push(eq.id);
     }
@@ -2518,19 +2398,10 @@ function findBadEquations() {
 
   // Every equation with any problem (once each), for highlighting
   const badEquationIds = [
-    ...new Set([
-      ...incompleteEquations,
-      ...wrongOperatorEquations,
-      ...wrongNumberEquations,
-    ]),
+    ...new Set([...incompleteEquations, ...wrongNumberEquations]),
   ];
 
-  return {
-    incompleteEquations,
-    wrongOperatorEquations,
-    wrongNumberEquations,
-    badEquationIds,
-  };
+  return { incompleteEquations, wrongNumberEquations, badEquationIds };
 }
 
 /**
@@ -2542,12 +2413,12 @@ function findBadEquations() {
 function validatePuzzle() {
   const errors = [];
 
-  // Check 1: All pool numbers used
-  // Pool size comes from the puzzle (10 / 12 / 16), not a fixed number
-  const poolSize = currentPuzzle.numberPool.length;
-  if (gameState.poolNumbersUsed.length !== poolSize) {
+  // Check 1: Every operand blank is filled from the pool. Decoys are never
+  // placed, so the count needed is 2 per equation, not the whole pool size.
+  const numbersNeeded = currentPuzzle.equations.length * 2;
+  if (gameState.poolNumbersUsed.length !== numbersNeeded) {
     errors.push(
-      `Only ${gameState.poolNumbersUsed.length}/${poolSize} pool numbers used`
+      `Only ${gameState.poolNumbersUsed.length}/${numbersNeeded} pool numbers used`
     );
   }
 
@@ -2567,22 +2438,13 @@ function validatePuzzle() {
     );
   }
 
-  // Check 4: Every equation is complete, has the right operator and works.
-  const {
-    incompleteEquations,
-    wrongOperatorEquations,
-    wrongNumberEquations,
-    badEquationIds,
-  } = findBadEquations();
+  // Check 4: Every equation is complete and works.
+  const { incompleteEquations, wrongNumberEquations, badEquationIds } =
+    findBadEquations();
 
   if (incompleteEquations.length > 0) {
     errors.push(
-      `${equationLabel(incompleteEquations)}: a number or operator is missing`
-    );
-  }
-  if (wrongOperatorEquations.length > 0) {
-    errors.push(
-      `${equationLabel(wrongOperatorEquations)}: wrong operator`
+      `${equationLabel(incompleteEquations)}: a number is missing`
     );
   }
   if (wrongNumberEquations.length > 0) {
@@ -2692,7 +2554,6 @@ function handleNewPuzzle() {
 function handleReset() {
   // Clear all user inputs
   gameState.userInputs = {};
-  gameState.userOperators = {};
   gameState.poolNumbersUsed = [];
   gameState.selectedNumber = null;
   gameState.selectedNumberElement = null;
@@ -2715,22 +2576,9 @@ function handleReset() {
     input.classList.remove('hint-revealed');
   });
 
-  // Clear UI - operator selections
-  document.querySelectorAll('.operator-select').forEach((select) => {
-    select.value = '';
-    select.classList.remove('hint-revealed');
-  });
-
   // Clear UI - equations
   document.querySelectorAll('.equation').forEach((eq) => {
     eq.classList.remove('error', 'hinted', 'selected-for-hint');
-
-    // Reset equation numbers (remove hint markers)
-    const equationNumber = eq.querySelector('.equation-number');
-    if (equationNumber) {
-      const equationId = parseInt(eq.dataset.equation);
-      equationNumber.textContent = `${equationId + 1}.`;
-    }
   });
 
   // Clear UI - pool numbers
@@ -3036,83 +2884,9 @@ function revealNumbers() {
 }
 
 /**
- * Reveal the operator for the selected equation
- */
-function revealOperator() {
-  console.log('=== REVEAL OPERATOR START ===');
-
-  if (gameState.selectedEquationForHint === null) {
-    showFeedback('Please select an equation first (click on it)', 'warning');
-    return;
-  }
-
-  const equationId = gameState.selectedEquationForHint;
-  console.log('Selected equation ID:', equationId);
-
-  const equation = currentPuzzle.equations.find((eq) => eq.id === equationId);
-  console.log('Found equation:', equation);
-
-  if (!equation) {
-    console.warn('Equation not found in puzzle!');
-    return;
-  }
-
-  console.log('Equation operator:', equation.operator);
-
-  // Find the operator container for this equation
-  const operatorContainer = document.querySelector(
-    `.operator-container[data-equation="${equationId}"]`
-  );
-
-  console.log('Operator container:', operatorContainer);
-
-  if (!operatorContainer) {
-    console.warn(
-      `Could not find operator container for equation ${equationId}`
-    );
-    return;
-  }
-
-  const operatorSelect = operatorContainer.querySelector('.operator-select');
-  console.log('Operator select element:', operatorSelect);
-  console.log(
-    'Operator select visible?',
-    operatorSelect ? window.getComputedStyle(operatorSelect).display : 'N/A'
-  );
-
-  if (!operatorSelect) {
-    showFeedback('No operator to reveal for this difficulty', 'warning');
-    return;
-  }
-
-  // Set the operator
-  console.log(`Setting operator value to: ${equation.operator}`);
-  operatorSelect.value = equation.operator;
-  operatorSelect.classList.add('hint-revealed');
-
-  // Store in userOperators
-  gameState.userOperators[equationId] = equation.operator;
-  console.log('Updated gameState.userOperators:', gameState.userOperators);
-
-  // Track hint usage
-  gameState.hintsUsed++;
-  addHintMarker(equationId, '*');
-
-  // Update displays
-  updateHintCounter();
-  markEquationAsHinted(equationId);
-
-  // Save state
-  savePuzzleState();
-
-  showFeedback('Operator revealed!', 'success');
-  console.log('=== REVEAL OPERATOR END ===');
-}
-
-/**
- * Add hint marker emoji to equation number
+ * Record which hint types were used on an equation (the 💡 is drawn by CSS)
  * @param {number} equationId - ID of equation
- * @param {string} markerType - Type of hint ('?', '#', or '*')
+ * @param {string} markerType - Type of hint ('?' or '#')
  */
 function addHintMarker(equationId, markerType) {
   // Initialize array for this equation if needed
@@ -3123,21 +2897,6 @@ function addHintMarker(equationId, markerType) {
   // Add marker if not already present
   if (!gameState.hintedEquations[equationId].includes(markerType)) {
     gameState.hintedEquations[equationId].push(markerType);
-  }
-
-  // Update visual marker in equation number
-  const equationElement = document.querySelector(
-    `.equation[data-equation="${equationId}"]`
-  );
-
-  if (equationElement) {
-    const equationNumber = equationElement.querySelector('.equation-number');
-    if (equationNumber) {
-      const markers = gameState.hintedEquations[equationId].join(' ');
-      // Note: HTML equation numbers are already 1-based (1., 2., 3., etc)
-      // equationId from puzzle is also 1-based (1, 2, 3, 4, 5)
-      equationNumber.textContent = `${equationId}. ${markers}`;
-    }
   }
 }
 
@@ -3171,10 +2930,8 @@ function updateHintCounter() {
 function updateHintButtonStates() {
   const revealAnswerBtn = document.getElementById('reveal-answer-btn');
   const revealNumbersBtn = document.getElementById('reveal-numbers-btn');
-  const revealOperatorBtn = document.getElementById('reveal-operator-btn');
 
   const hasSelection = gameState.selectedEquationForHint !== null;
-  const difficulty = currentPuzzle ? currentPuzzle.difficulty : null;
 
   // Enable answer and numbers buttons if equation is selected
   if (revealAnswerBtn) {
@@ -3182,14 +2939,6 @@ function updateHintButtonStates() {
   }
   if (revealNumbersBtn) {
     revealNumbersBtn.disabled = !hasSelection;
-  }
-
-  // Enable operator button only for Medium/Hard difficulty AND equation selected
-  // Note: Difficulty is capitalized ('Medium', 'Hard', 'Easy')
-  if (revealOperatorBtn) {
-    const canRevealOperator =
-      hasSelection && (difficulty === 'Medium' || difficulty === 'Hard');
-    revealOperatorBtn.disabled = !canRevealOperator;
   }
 }
 
@@ -3199,28 +2948,6 @@ function updateHintButtonStates() {
 function exitHintMode() {
   gameState.hintMode = false;
   document.getElementById('hint-btn').classList.remove('hint-mode-active');
-}
-
-/**
- * Handle operator selection for Medium/Hard difficulties
- */
-function handleOperatorSelect(event) {
-  const select = event.target;
-  const operatorContainer = select.closest('.operator-container');
-  const equationId = parseInt(operatorContainer.dataset.equation);
-  const selectedOperator = select.value;
-
-  if (selectedOperator) {
-    gameState.userOperators[equationId] = selectedOperator;
-    console.log(
-      `Operator selected for equation ${equationId}:`,
-      selectedOperator
-    );
-  } else {
-    delete gameState.userOperators[equationId];
-  }
-
-  savePuzzleState(); // AUTO-SAVE after operator selection
 }
 
 /* ===================================
