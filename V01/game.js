@@ -2251,7 +2251,8 @@ function handleSubmit() {
     buildAttemptEntry(
       currentPuzzle.equations,
       currentPuzzle.columnTargets,
-      gameState.userInputs
+      gameState.userInputs,
+      gameState.hintedEquations
     )
   );
 
@@ -2443,7 +2444,7 @@ function showFeedback(message, type) {
 
 const SHARE_URL = 'https://thebimsider.github.io/sumwords/V01/';
 const SHARE_MAX_ROWS = 8; // Grid shows only the last rows of a very long game
-const SHARE_SQUARES = { correct: '🟩', wrong: '🟥', empty: '⬜' };
+const SHARE_SQUARES = { correct: '🟩', hinted: '🟨', wrong: '🟥', empty: '⬜' };
 let shareLabelTimer = null;
 
 /**
@@ -2452,13 +2453,16 @@ let shareLabelTimer = null;
  * An equation is 'correct' when its numbers work out AND the solution matches
  * the trivia answer, 'empty' when any blank is unfilled, otherwise 'wrong'.
  * A column is true only when all its blanks are filled and the total matches.
+ * `hinted` is a snapshot: true for each equation with any hint used on it at
+ * the moment of this Submit, so later hints do not change earlier rows.
  *
  * @param {object[]} equations - currentPuzzle.equations
  * @param {{column1: number, column2: number}} columnTargets - currentPuzzle.columnTargets
  * @param {object} userInputs - gameState.userInputs
- * @returns {{equations: string[], columns: boolean[]}} One attempt's result
+ * @param {object} [hintedEquations={}] - gameState.hintedEquations ({ equationId: ['?', '#'] })
+ * @returns {{equations: string[], columns: boolean[], hinted: boolean[]}} One attempt's result
  */
-function buildAttemptEntry(equations, columnTargets, userInputs) {
+function buildAttemptEntry(equations, columnTargets, userInputs, hintedEquations = {}) {
   const equationResults = equations.map((eq) => {
     const op1 = userInputs[`op1-${eq.id}`];
     const op2 = userInputs[`op2-${eq.id}`];
@@ -2481,6 +2485,7 @@ function buildAttemptEntry(equations, columnTargets, userInputs) {
       columnComplete('op1', columnTargets.column1),
       columnComplete('op2', columnTargets.column2),
     ],
+    hinted: equations.map((eq) => (hintedEquations[eq.id] || []).length > 0),
   };
 }
 
@@ -2494,7 +2499,7 @@ function buildAttemptEntry(equations, columnTargets, userInputs) {
  * @param {string|null} result.assignedDifficulty - Actual level when random was chosen
  * @param {number} result.attempts - True attempt count (may exceed history length)
  * @param {number} result.hints - Hints used
- * @param {{equations: string[], columns: boolean[]}[]} result.history - One entry per Submit
+ * @param {{equations: string[], columns: boolean[], hinted?: boolean[]}[]} result.history - One entry per Submit (hinted is absent in older saves)
  * @returns {string} Share text with no trivia or puzzle numbers
  */
 function buildShareText({
@@ -2518,8 +2523,15 @@ function buildShareText({
   ];
 
   history.slice(-SHARE_MAX_ROWS).forEach((entry) => {
+    // Yellow only replaces green: a wrong or empty hinted equation keeps its square.
+    // Entries saved before `hinted` existed have no flags, so they render as before.
     const equationRow = entry.equations
-      .map((status) => SHARE_SQUARES[status] || SHARE_SQUARES.empty)
+      .map((status, i) => {
+        if (status === 'correct' && entry.hinted && entry.hinted[i]) {
+          return SHARE_SQUARES.hinted;
+        }
+        return SHARE_SQUARES[status] || SHARE_SQUARES.empty;
+      })
       .join('');
     const columnRow = entry.columns
       .map((ok) => (ok ? SHARE_SQUARES.correct : SHARE_SQUARES.wrong))
