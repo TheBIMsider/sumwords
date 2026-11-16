@@ -776,6 +776,14 @@ body {
    FEEDBACK
    =================================== */
 
+/* Version label at the bottom of the game (uses theme text colour) */
+.game-version {
+  margin-top: 12px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
 .feedback {
   min-height: 60px;
   padding: 12px;

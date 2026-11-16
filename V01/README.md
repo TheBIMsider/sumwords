@@ -23,9 +23,9 @@ A constraint-based math puzzle game that combines trivia knowledge with equation
 ### Core Gameplay
 
 - **Three Difficulty Levels**
-  - **Easy:** Addition/subtraction with 10 numbers
-  - **Medium:** Addition/subtraction with hidden operators, 12 numbers and 2 decoys
-  - **Hard:** All four operators (+, −, ×, ÷) with 16 numbers and 6 decoys
+  - **Easy:** Addition/subtraction with numbers up to 50, 10 numbers, no decoys
+  - **Medium:** Addition/subtraction with numbers up to 100, 12 numbers and 2 decoys
+  - **Hard:** All four operators (+, −, ×, ÷) with numbers up to 200, 16 numbers and 6 decoys
 - **Random Difficulty Mode:** Game randomly selects difficulty for variety
 - **500 Trivia Questions** across 10 diverse categories
 - **Constraint-Based Puzzles:** Numbers must satisfy both equations AND column totals
@@ -49,10 +49,9 @@ Plus an **"Everything"** category that combines all questions for maximum variet
 
 - **Interactive Tutorial:** First-time users see a helpful tutorial explaining gameplay with a "Don't show again" option
 - **Dark Mode:** Toggle between light and dark themes with persistent preference
-- **Hint System:** Three types of hints available
+- **Hint System:** Two types of hints available
   - Reveal the answer to the trivia question
   - Reveal which numbers to place in the equation
-  - Reveal the operator (Medium/Hard only)
 - **Smart Resume:** Automatically saves progress and offers to resume unfinished puzzles
 - **Statistics Tracking:** Track completed puzzles, attempts, hints used, perfect games, and win streaks
 - **Mobile-Optimized:** Fully responsive design works great on phones and tablets
@@ -71,17 +70,16 @@ Plus an **"Everything"** category that combines all questions for maximum variet
 
 ### Goal
 
-Place numbers from the number pool into the equation blanks to make valid equations. The sum of each column must match the target shown at the bottom.
+Place numbers from the number pool into the equation blanks to make valid equations. The sum of each column must match the target shown at the top.
 
 ### Rules
 
 1. **Answer the trivia question** to learn which number is the solution
-2. **Place numbers** from the pool into equation blanks by clicking the pool number, then clicking a blank
-3. **Select operators** (Medium/Hard) from dropdowns between operands
-4. **Satisfy constraints:**
+2. **Place numbers** from the pool into equation blanks by clicking the pool number, then clicking a blank. Operators are shown in every equation and are never blanks.
+3. **Satisfy constraints:**
    - Each equation must be mathematically correct
-   - Column totals must match the targets at the bottom
-5. **Submit** when all blanks are filled to check your solution
+   - Column totals must match the targets at the top
+4. **Submit** when all blanks are filled to check your solution
 
 ### Tips
 
@@ -141,6 +139,9 @@ sumwords/
 │   ├── index.html          # Landing page HTML
 │   ├── styles.css          # Landing page styling with dark mode
 │   └── script.js           # Landing page theme switcher
+├── tests/
+│   ├── generator.test.js   # Checks every generated puzzle is solvable, plus question bank rules
+│   └── validation.test.js  # Checks Submit validation messages
 ├── README.md               # This file
 └── LICENSE                 # BSD 3-Clause License
 ```
@@ -156,9 +157,11 @@ sumwords/
 
 ### Difficulty Scaling
 
-- **Easy:** 5 equations, 10 numbers, 5×2 grid, addition/subtraction only
-- **Medium:** 6 equations, 12 numbers (2 decoys), 6×2 grid (3×4 mobile), hidden operators (+ or −)
-- **Hard:** 8 equations, 16 numbers (6 decoys), 8×2 grid (4×4 mobile), all operators (+, −, ×, ÷)
+Every level has 5 equations. Operators are always visible.
+
+- **Easy:** Numbers up to 50, addition/subtraction only, 10 numbers in a 5×2 pool grid, no decoys
+- **Medium:** Numbers up to 100, addition/subtraction only, 12 numbers (2 decoys) in a 6×2 pool grid (3×4 mobile)
+- **Hard:** Numbers up to 200, all operators (+, −, ×, ÷), 16 numbers (6 decoys) in an 8×2 pool grid (4×4 mobile)
 
 ## 📊 Statistics
 
@@ -182,20 +185,15 @@ Contributions are welcome! This is a personal learning project, but feel free to
 
 ### Adding Trivia Questions
 
-Questions are stored in `game.js` in the `triviaQuestions` object. Each question needs:
+Questions are stored in `game.js` in the `questionBanks` object, one array per category (`sports`, `history`, `geography`, `popculture`, `science`, `moviestv`, `fooddrink`, `technology`, `gamesliterature`, `animalsnature`). Each question needs:
 
 - `question`: The trivia question text
-- `answer`: Numeric answer (whole number, 0-2000 range works best)
-- `category`: One of the 10 existing categories
+- `answer`: Whole number answer. The existing bank uses answers from 2 to 400; the rules are enforced by `tests/generator.test.js`
 
-Example:
+Add it to the array for its category. There is no `category` field; the array name sets the category. Example, added to `science`:
 
 ```javascript
-{
-  question: "How many keys are on a standard piano?",
-  answer: 88,
-  category: "Music & Arts"
-}
+{ question: 'How many keys are on a standard piano?', answer: 88 },
 ```
 
 ## 📄 License
@@ -204,7 +202,7 @@ This project is licensed under the **BSD 3-Clause License** - see the [LICENSE](
 
 ## 👤 Author (Vibe Coder)
 
-**Carl Storms (The BIMsider)** With the help of his AI Buddy 🤖 **Claude AI: Sonnet 4.5**
+**Carl Storms (The BIMsider)** With the help of his AI Buddy 🤖 **Claude Code**
 
 - Role: Technical Success Manager, AECO Software
 - Experience: 25+ years in AECO technology and BIM
@@ -215,7 +213,7 @@ This project is licensed under the **BSD 3-Clause License** - see the [LICENSE](
 - Inspired by constraint-based puzzle games
 - Built with vanilla JavaScript for maximum maintainability
 - Designed mobile-first for modern web users
-- 20 development sessions documented from concept to deployment
+- 21 development sessions documented from concept to deployment
 
 ## 📝 Development
 
@@ -234,7 +232,7 @@ This project was developed (Vibe Coded) over 20 documented sessions with compreh
 - Core game mechanics
 - Three difficulty levels plus random mode
 - 500 trivia questions across 10 categories
-- Hint system with three hint types
+- Hint system with two hint types (answer and numbers)
 - localStorage persistence
 - Statistics tracking
 - Mobile-responsive design
@@ -243,6 +241,7 @@ This project was developed (Vibe Coded) over 20 documented sessions with compreh
 - Dark mode with theme toggle
 - Landing page with animations
 - Interactive tutorial for first-time users
+- v1.1.0: 5 equations and visible operators on every level, audited question bank, automated puzzle and validation tests, version shown in the game
 
 ### Potential Future Enhancements
 
