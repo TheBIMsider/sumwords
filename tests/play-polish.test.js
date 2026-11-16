@@ -60,6 +60,11 @@ check('a Submit is progress', hasProgress({ ...fresh(), attempts: 1 }), true);
 check('a hint is progress', hasProgress({ ...fresh(), hintsUsed: 1 }), true);
 check('a typed 0 solution is progress', hasProgress({ ...fresh(), userInputs: { 'sol-1': 0 } }), true);
 
+// A solved puzzle has nothing to lose: no confirm, and Reset keeps the streak
+const solved = { ...fresh(), completed: true, attempts: 2, hintsUsed: 1, poolNumbersUsed: [4], userInputs: { 'sol-1': 7 } };
+check('a solved puzzle is not played', hasPlayed(solved), false);
+check('a solved puzzle has no progress', hasProgress(solved), false);
+
 // findNextEmptyPosition
 const positions = ['op1-1', 'op2-1', 'op1-2', 'op2-2'];
 check('next empty after the first', findNextEmptyPosition(positions, { 'op1-1': 3 }, 'op1-1'), 'op2-1');

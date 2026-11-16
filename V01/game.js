@@ -2483,20 +2483,24 @@ function showFeedback(message, type) {
   =================================== */
 
 /**
- * True if the player has made a Submit or used a hint (breaks the win streak on Reset)
+ * True if the player has made a Submit or used a hint on a puzzle they have not
+ * solved yet (breaks the win streak on Reset). A solved puzzle never counts:
+ * its win is already recorded.
  */
 function hasPlayed(state = gameState) {
-  return state.attempts > 0 || state.hintsUsed > 0;
+  return !state.completed && (state.attempts > 0 || state.hintsUsed > 0);
 }
 
 /**
- * True if the player has any progress that a new puzzle or reset would discard
+ * True if the player has progress that a new puzzle or reset would discard.
+ * A solved puzzle has nothing left to lose.
  */
 function hasProgress(state = gameState) {
   return (
-    hasPlayed(state) ||
-    state.poolNumbersUsed.length > 0 ||
-    Object.keys(state.userInputs).some((key) => key.startsWith('sol'))
+    !state.completed &&
+    (hasPlayed(state) ||
+      state.poolNumbersUsed.length > 0 ||
+      Object.keys(state.userInputs).some((key) => key.startsWith('sol')))
   );
 }
 
