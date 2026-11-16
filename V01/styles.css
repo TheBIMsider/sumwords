@@ -221,6 +221,8 @@
 /* Mobile Responsive */
 @media (max-width: 768px) {
   #theme-toggle {
+    /* Scrolls with the page here: a fixed toggle would cover the sticky targets */
+    position: absolute;
     width: 45px;
     height: 45px;
     top: 15px;
@@ -383,10 +385,19 @@ body {
    =================================== */
 
 .column-targets {
+  /* Sticks to the top of the screen while the equations scroll past it.
+     Full width of the container (negative margins cancel its padding) so
+     equations do not show in the side gutters. */
+  position: sticky;
+  top: 0;
+  z-index: 50;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-  margin-bottom: 24px;
+  margin: 0 -16px 12px;
+  padding: 8px 16px;
+  background-color: var(--bg-container);
+  border-bottom: 1px solid var(--border-light);
 }
 
 .target {
@@ -598,11 +609,16 @@ body {
    =================================== */
 
 .number-pool {
+  /* Sticks to the bottom of the screen while the equations scroll past it */
+  position: sticky;
+  bottom: 0;
+  z-index: 50;
   background-color: var(--bg-card-alt);
   padding: 16px;
-  border-radius: 8px;
+  border-radius: 8px 8px 0 0;
   border: 2px solid var(--border-medium);
   margin-bottom: 20px;
+  box-shadow: var(--shadow-md);
 }
 
 .pool-label {
@@ -951,22 +967,7 @@ body {
     justify-content: flex-start;
   }
 
-  /* The fixed theme toggle would cover the sticky targets, so it scrolls away */
-  #theme-toggle {
-    position: absolute;
-  }
-
-  /* Column targets stay at the top while scrolling the equations */
-  .column-targets {
-    position: sticky;
-    top: 0;
-    z-index: 50;
-    margin: 0 -16px 12px;
-    padding: 8px 16px;
-    background-color: var(--bg-container);
-    border-bottom: 1px solid var(--border-light);
-  }
-
+  /* Targets are sticky on every screen size (see COLUMN TARGETS); smaller here */
   .target {
     padding: 6px 8px;
   }
@@ -975,11 +976,9 @@ body {
     font-size: 20px;
   }
 
-  /* Number pool stays at the bottom, compact so it covers less of the equations */
+  /* Number pool (sticky on every screen size, see NUMBER POOL): full width and
+     compact here so it covers less of the equations */
   .number-pool {
-    position: sticky;
-    bottom: 0;
-    z-index: 50;
     margin: 0 -16px 12px;
     padding: 8px 16px;
     border-radius: 0;

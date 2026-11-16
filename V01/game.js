@@ -1831,6 +1831,7 @@ function loadPuzzle(puzzle) {
 function resetGameState() {
   gameState.selectedNumber = null;
   gameState.selectedNumberElement = null;
+  gameState.selectedBlank = null; // Avoid a stale selection surviving a new puzzle
   gameState.userInputs = {};
   gameState.poolNumbersUsed = [];
   gameState.attempts = 0;
@@ -1964,8 +1965,9 @@ function setupEventListeners() {
   });
 
   // Solution input changes (with validation)
-  document.querySelectorAll('.blank.solution').forEach((input, index) => {
+  document.querySelectorAll('.blank.solution').forEach((input) => {
     input.addEventListener('input', validateSolutionInput);
+    input.addEventListener('keydown', handleSolutionKeydown);
   });
 
   // Submit button
@@ -2027,11 +2029,8 @@ function handlePoolClick(event) {
     gameState.selectedNumber = parseInt(clickedNumber.dataset.number);
     gameState.selectedNumberElement = clickedNumber;
 
-    // Place in blank
+    // Place in blank (this also moves the selection to the next empty blank)
     placeNumberInBlank(blank, position);
-
-    // Deselect blank
-    deselectBlank();
 
     return;
   }
@@ -2113,6 +2112,9 @@ function handleOperandClick(event) {
   // If blank is filled, return number to pool
   if (blank.classList.contains('filled')) {
     returnNumberToPool(blank, position);
+    // The player is fixing this number: the next tile goes back into this blank,
+    // not into the blank auto-advance had selected
+    if (gameState.selectedNumber === null) selectBlankForPlacement(blank);
     return;
   }
 
@@ -2165,8 +2167,28 @@ function placeNumberInBlank(blank, position) {
   // Deselect pool number, blank, and update totals
   deselectPoolNumber();
   deselectBlank();
+  selectNextEmptyBlank(position); // Auto-advance to the next empty blank
   updateColumnTotals();
   savePuzzleState(); // AUTO-SAVE after number placement
+}
+
+/**
+ * Select the next empty operand blank after `fromPosition` (wraps around).
+ * Selects nothing when every blank is filled. The selection is not saved.
+ * @param {string} fromPosition - Position of the blank just filled
+ */
+function selectNextEmptyBlank(fromPosition) {
+  const blanks = Array.from(document.querySelectorAll('.blank.operand'));
+  const nextPosition = findNextEmptyPosition(
+    blanks.map((b) => b.dataset.position),
+    gameState.userInputs,
+    fromPosition
+  );
+  deselectBlank();
+  if (nextPosition === null) return;
+
+  const nextBlank = blanks.find((b) => b.dataset.position === nextPosition);
+  selectBlankForPlacement(nextBlank);
 }
 
 function returnNumberToPool(blank, position) {
@@ -2463,19 +2485,35 @@ function showFeedback(message, type) {
 /**
  * True if the player has made a Submit or used a hint (breaks the win streak on Reset)
  */
-function hasPlayed() {
-  return gameState.attempts > 0 || gameState.hintsUsed > 0;
+function hasPlayed(state = gameState) {
+  return state.attempts > 0 || state.hintsUsed > 0;
 }
 
 /**
  * True if the player has any progress that a new puzzle or reset would discard
  */
-function hasProgress() {
+function hasProgress(state = gameState) {
   return (
-    hasPlayed() ||
-    gameState.poolNumbersUsed.length > 0 ||
-    Object.keys(gameState.userInputs).some((key) => key.startsWith('sol'))
+    hasPlayed(state) ||
+    state.poolNumbersUsed.length > 0 ||
+    Object.keys(state.userInputs).some((key) => key.startsWith('sol'))
   );
+}
+
+/**
+ * Find the next empty operand position after `fromPosition`, wrapping around
+ * @param {string[]} positions - Operand positions in play order (op1-1, op2-1, op1-2, ...)
+ * @param {object} userInputs - gameState.userInputs
+ * @param {string} fromPosition - Position just filled
+ * @returns {string|null} Next empty position, or null if every blank is filled
+ */
+function findNextEmptyPosition(positions, userInputs, fromPosition) {
+  const start = positions.indexOf(fromPosition);
+  for (let i = 1; i <= positions.length; i++) {
+    const candidate = positions[(start + i) % positions.length];
+    if (userInputs[candidate] === undefined) return candidate;
+  }
+  return null;
 }
 
 /**
@@ -2702,6 +2740,36 @@ function validateSolutionInput(event) {
   }
 
   savePuzzleState(); // AUTO-SAVE after solution input
+
+  // Third digit typed: move on (fewer digits never advance, so the answer's
+  // length is not revealed). The last input stays focused.
+  if (value.length === 3) focusNextSolutionInput(input, false);
+}
+
+/**
+ * Enter moves to the next solution input; Enter on the last one focuses Submit
+ * @param {KeyboardEvent} event
+ */
+function handleSolutionKeydown(event) {
+  if (event.key !== 'Enter') return;
+  event.preventDefault();
+  focusNextSolutionInput(event.target, true);
+}
+
+/**
+ * Focus the solution input after `input`, selecting its text so typing replaces it
+ * @param {HTMLInputElement} input - Current solution input
+ * @param {boolean} submitAtEnd - Focus the Submit button when there is no next input
+ */
+function focusNextSolutionInput(input, submitAtEnd) {
+  const inputs = Array.from(document.querySelectorAll('.blank.solution'));
+  const next = inputs[inputs.indexOf(input) + 1];
+  if (next) {
+    next.focus();
+    next.select();
+  } else if (submitAtEnd) {
+    document.getElementById('submit-btn').focus();
+  }
 }
 
 /* ===================================
@@ -2850,6 +2918,11 @@ function revealNumbers() {
     // Store in userInputs (using the HTML position format)
     gameState.userInputs[position] = number;
   });
+
+  // If the hint filled the selected blank, move the selection on
+  if (gameState.selectedBlank && gameState.selectedBlank.classList.contains('filled')) {
+    selectNextEmptyBlank(gameState.selectedBlank.dataset.position);
+  }
 
   // Update column totals
   updateColumnTotals();
