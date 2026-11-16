@@ -121,7 +121,7 @@ const questionBanks = {
     { question: 'Regulation periods in hockey', answer: 3 },
     { question: 'Bases on a baseball diamond', answer: 4 },
     { question: 'Sets to win a tennis match (men)', answer: 3 },
-    { question: 'Points for a free throw (basketball)', answer: 1 },
+    { question: 'Players on a rugby union team on the field', answer: 15 },
     { question: 'Strikes for a strikeout', answer: 3 },
     { question: 'Balls for a walk (baseball)', answer: 4 },
     { question: 'Outs per inning (baseball)', answer: 3 },
@@ -170,11 +170,11 @@ const questionBanks = {
     { question: 'Stars on U.S. flag', answer: 50 },
     { question: 'World Wars in 20th century', answer: 2 },
     { question: 'Branches of U.S. government', answer: 3 },
-    { question: 'Continents on Earth', answer: 7 },
+    { question: 'Permanent members of the UN Security Council', answer: 5 },
     { question: 'Years in a century', answer: 100 },
     { question: 'Musketeers in Dumas novel', answer: 3 },
-    { question: 'Days Julius Caesar was warned about', answer: 15 },
-    { question: 'Ring of power in Tolkien', answer: 1 },
+    { question: "Years of the Hundred Years' War", answer: 116 },
+    { question: "Ships on Columbus's first voyage", answer: 3 },
     { question: 'Horsemen of the Apocalypse', answer: 4 },
     { question: 'Wars of the Roses roses (colors)', answer: 2 },
     { question: 'Plagues of Egypt', answer: 10 },
@@ -191,13 +191,13 @@ const questionBanks = {
     { question: 'Signers of the US Declaration of Independence', answer: 56 },
     { question: 'Crusades traditionally numbered', answer: 9 },
     { question: 'Years between Olympic Games', answer: 4 },
-    { question: 'Dynasties in ancient Egypt', answer: 31 },
+    { question: 'Justices on the U.S. Supreme Court', answer: 9 },
     { question: 'Days in the French Revolutionary week', answer: 10 },
     { question: 'Years of the Vietnam War for the US', answer: 20 },
     { question: 'Ancient Wonders of the World', answer: 7 },
     { question: 'Years of the First Punic War', answer: 23 },
     { question: 'Months in the Gregorian calendar', answer: 12 },
-    { question: 'Years of the Cold War', answer: 44 },
+    { question: 'Years of Prohibition in the United States', answer: 13 },
     { question: 'Republics in the Soviet Union', answer: 15 },
     { question: 'Commandments in the Bible', answer: 10 },
     { question: 'Stations of the Cross', answer: 14 },
@@ -301,7 +301,7 @@ const questionBanks = {
     { question: "Members of Destiny's Child classic lineup", answer: 3 }, // escaped
     { question: 'Books in the Hunger Games series', answer: 4 },
     { question: 'Letters in the word Pokémon', answer: 7 },
-    { question: 'Hobbits in The Hobbit (main group)', answer: 1 },
+    { question: 'Members of the Fellowship of the Ring', answer: 9 },
     { question: "Musketeers plus D'Artagnan", answer: 4 },
     { question: 'Horsemen of Notre Dame', answer: 4 },
     { question: 'Stages of grief', answer: 5 },
@@ -361,7 +361,7 @@ const questionBanks = {
     { question: 'Atomic number of carbon', answer: 6 },
     { question: 'Atomic number of oxygen', answer: 8 },
     { question: 'Atomic number of nitrogen', answer: 7 },
-    { question: 'Atomic number of hydrogen', answer: 1 },
+    { question: 'Colors in a rainbow (traditional)', answer: 7 },
     { question: 'Atomic number of helium', answer: 2 },
     { question: 'Moons of Mars', answer: 2 },
     { question: 'Permanent teeth in adult human', answer: 32 },
@@ -369,7 +369,7 @@ const questionBanks = {
     { question: 'Baby teeth in children', answer: 20 },
     { question: 'Lungs in human body', answer: 2 },
     { question: 'Kidneys in human body', answer: 2 },
-    { question: 'Chambers in insect heart', answer: 1 },
+    { question: 'Days in a leap year', answer: 366 },
     { question: 'Wings on a bee', answer: 4 },
   ],
   moviestv: [
@@ -436,7 +436,6 @@ const questionBanks = {
       question: 'How many Mission Impossible movies have been released?',
       answer: 7,
     },
-    { question: 'How many Avengers movies are in the MCU?', answer: 4 },
     { question: 'How many Avengers movies are in the MCU?', answer: 4 },
     { question: 'How many seasons of Seinfeld were there?', answer: 9 },
     {
@@ -558,7 +557,7 @@ const questionBanks = {
       answer: 5,
     },
     { question: 'How many main food groups are there?', answer: 5 },
-    { question: 'How manyounces are in a pound?', answer: 16 },
+    { question: 'How many teaspoons are in one cup?', answer: 48 },
     { question: 'How many ounces are in a pound?', answer: 16 },
     { question: 'How many cups are in one quart?', answer: 4 },
     { question: 'How many pints are in one gallon?', answer: 8 },
@@ -574,8 +573,8 @@ const questionBanks = {
       answer: 31,
     },
     {
-      question: 'How many kernels of corn are typically on one cob?',
-      answer: 800,
+      question: 'How many cups are in one gallon?',
+      answer: 16,
     },
     { question: 'How many calories are in one gram of protein?', answer: 4 },
     {
@@ -607,13 +606,13 @@ const questionBanks = {
       question: "How many chicken nuggets are in a McDonald's 20-piece?",
       answer: 20,
     },
-    { question: 'How many grams are in one kilogram?', answer: 1000 },
-    { question: 'How many milliliters are in one liter?', answer: 1000 },
+    { question: 'How many fluid ounces are in a quart?', answer: 32 },
+    { question: 'How many fluid ounces are in a gallon?', answer: 128 },
     {
       question: 'How many regions are recognized for French wine?',
       answer: 12,
     },
-    { question: 'How many major types of pasta shapes exist?', answer: 350 },
+    { question: 'How many pints are in a quart?', answer: 2 },
   ],
   technology: [
     { question: 'How many bits are in one byte?', answer: 8 },
@@ -637,7 +636,7 @@ const questionBanks = {
       question: 'How many function keys are on a standard PC keyboard?',
       answer: 12,
     },
-    { question: 'How many megabytes are in one gigabyte?', answer: 1024 },
+    { question: 'How many ink colors are in the CMYK printing model?', answer: 4 },
     {
       question: 'How many pins does a standard Ethernet RJ45 connector have?',
       answer: 8,
@@ -673,10 +672,10 @@ const questionBanks = {
       answer: 6,
     },
     { question: 'How many cells are in a standard 9V battery?', answer: 6 },
-    { question: 'How many cells are in a standard 9V battery?', answer: 6 },
+    { question: 'How many bits are in a standard IPv6 address?', answer: 128 },
     { question: 'How many pins does a DVI connector have?', answer: 24 },
     { question: 'How many contacts are in a USB-C connector?', answer: 24 },
-    { question: 'How many bits are in a kilobit?', answer: 1024 },
+    { question: 'How many symbols does the hexadecimal system use?', answer: 16 },
     {
       question: 'How many processor cores does an octa-core chip have?',
       answer: 8,
@@ -713,13 +712,12 @@ const questionBanks = {
       answer: 40,
     },
     {
-      question: 'How many pixels wide is 4K resolution (rounded to thousands)?',
-      answer: 4,
+      question: 'How many bits are in two bytes?',
+      answer: 16,
     },
     {
-      question:
-        'How many pixels wide is Full HD resolution (rounded to thousands)?',
-      answer: 2,
+      question: 'How many keys are on a standard full-size numeric keypad?',
+      answer: 17,
     },
     { question: 'How many channels does stereo audio have?', answer: 2 },
     { question: 'How many channels does surround sound 5.1 have?', answer: 6 },
@@ -796,10 +794,10 @@ const questionBanks = {
       answer: 8,
     },
     {
-      question: 'How many pawns does each chess player start with?',
-      answer: 8,
+      question: 'How many tiles are in a standard Scrabble set?',
+      answer: 100,
     },
-    { question: 'How many hours are in a Monopoly game property?', answer: 22 },
+    { question: 'How many squares are on a Monopoly board?', answer: 40 },
     {
       question: "How many cards are dealt in a game of poker (Texas Hold'em)?",
       answer: 2,
@@ -887,7 +885,7 @@ const questionBanks = {
     },
     { question: 'How many legs does a spider have?', answer: 8 },
     { question: 'How many humps does a Bactrian camel have?', answer: 2 },
-    { question: 'How many bones do sharks have?', answer: 0 },
+    { question: 'How many legs does a scorpion have?', answer: 8 },
     { question: 'How many eyes does a honeybee have?', answer: 5 },
     { question: 'How many legs does a lobster have?', answer: 10 },
     { question: 'How many chambers does a human heart have?', answer: 4 },
@@ -911,10 +909,9 @@ const questionBanks = {
     { question: 'How many legs does a typical millipede have?', answer: 80 },
     { question: 'How many neck vertebrae does a giraffe have?', answer: 7 },
     { question: 'How many toes does a cat have on its front paws?', answer: 5 },
-    { question: 'How many toes does a cat have on its front paws?', answer: 5 },
     { question: 'How many toes does a cat have on its back paws?', answer: 4 },
     { question: 'How many toes does a dog have on each paw?', answer: 5 },
-    { question: 'How many humps does a dromedary camel have?', answer: 1 },
+    { question: 'How many days does a chicken egg take to hatch?', answer: 21 },
     { question: 'How many legs does a butterfly have?', answer: 6 },
     {
       question: 'How many legs does a centipede have per body segment?',
@@ -924,13 +921,13 @@ const questionBanks = {
     { question: 'How many teeth does a dog have?', answer: 42 },
     { question: 'How many arms does a squid have (not tentacles)?', answer: 8 },
     {
-      question: 'How many brain cells does a honeybee have (in thousands)?',
-      answer: 960,
+      question: 'How many bones are in one human hand (including the wrist)?',
+      answer: 27,
     },
     { question: "How many days is a cat's gestation period?", answer: 63 },
     { question: "How many days is a dog's gestation period?", answer: 63 },
     { question: "How many days is a rabbit's gestation period?", answer: 31 },
-    { question: 'How many eggs can a queen bee lay per day?', answer: 2000 },
+    { question: 'How many arms does an octopus have?', answer: 8 },
     { question: 'How many antennae does an insect have?', answer: 2 },
     { question: 'How many body segments does an insect have?', answer: 3 },
     { question: 'How many wings does a mosquito have?', answer: 2 },
@@ -938,11 +935,11 @@ const questionBanks = {
     { question: 'How many legs does a crab have?', answer: 10 },
     { question: 'How many legs does a shrimp have?', answer: 10 },
     { question: 'How many eyes does a common housefly have?', answer: 5 },
-    { question: 'How many nostrils does a dolphin have?', answer: 1 },
-    { question: 'How many toes does a horse have on each foot?', answer: 1 },
+    { question: 'How many toes does an ostrich have on each foot?', answer: 2 },
+    { question: "How many chambers does a bird's heart have?", answer: 4 },
     { question: 'How many toes does a pig have on each foot?', answer: 4 },
     { question: 'How many toes does a chicken have?', answer: 4 },
-    { question: 'How many moons does Earth have?', answer: 1 },
+    { question: 'How many legs does a horse have?', answer: 4 },
   ],
 };
 
@@ -964,80 +961,74 @@ function generatePuzzle(category, difficulty = 'easy') {
     actualDifficulty =
       difficulties[Math.floor(Math.random() * difficulties.length)];
     gameState.assignedDifficulty = actualDifficulty;
-    console.log(`Random difficulty assigned: ${actualDifficulty}`);
   } else {
     gameState.assignedDifficulty = null;
     gameState.hintMode = false; // Reset hint mode
   }
 
-  console.log(
-    `Generating ${actualDifficulty} puzzle for category: ${category}`
-  );
-
   // Step 1: Get questions from selected category
   let questions;
   if (category.toLowerCase() === 'everything') {
     // Combine all categories for maximum variety
-    questions = [
-      ...questionBanks.sports,
-      ...questionBanks.history,
-      ...questionBanks.geography,
-      ...questionBanks.popculture,
-      ...questionBanks.science,
-    ];
-    console.log(
-      `Everything category: ${questions.length} total questions available`
-    );
+    questions = Object.values(questionBanks).flat();
   } else {
     // Single category
     questions = questionBanks[category.toLowerCase()];
-    if (!questions || questions.length < 5) {
-      console.error(`Not enough questions in category: ${category}`);
-      return null;
-    }
+  }
+  if (!questions || questions.length < 5) {
+    console.error(`Not enough questions in category: ${category}`);
+    return null;
   }
 
-  // Step 2: Select 5 random questions (no duplicates)
-  const selectedQuestions = selectRandomQuestions(questions, 5);
+  // Step 2: Remove repeated question text (the same question can sit in two banks)
+  questions = removeDuplicateQuestions(questions);
 
-  // Step 3: Generate equations for selected difficulty
+  // Step 3: Build 5 equations. Each slot takes the next shuffled question that
+  // can be built with the chosen operator inside the range cap.
   const equations = [];
   const numberPool = [];
   let puzzleId = `${category}_${Date.now()}`;
 
-  selectedQuestions.forEach((q, index) => {
-    const eqId = index + 1;
-    const answer = q.answer;
+  const shuffled = shuffleArray(questions);
+  const operators = getOperatorsForDifficulty(actualDifficulty);
+  let nextQuestion = 0;
 
-    // Choose operator based on difficulty
-    let operator;
-    if (actualDifficulty === 'hard') {
-      // Hard: all 4 operators
-      const operators = ['+', '-', 'Ã—', 'Ã·'];
-      operator = operators[Math.floor(Math.random() * operators.length)];
-    } else {
-      // Easy/Medium: only + and -
-      operator = Math.random() < 0.5 ? '+' : '-';
+  // First pass: one random operator per question, skip questions that do not fit
+  while (equations.length < 5 && nextQuestion < shuffled.length) {
+    const q = shuffled[nextQuestion++];
+    const operator = operators[Math.floor(Math.random() * operators.length)];
+    const operands = generateOperands(q.answer, operator, actualDifficulty);
+    if (operands) {
+      equations.push(buildEquation(equations.length + 1, q, operator, operands));
     }
+  }
 
-    // Generate valid operand pair (pass difficulty for range limits)
-    const operands = generateOperands(answer, operator, actualDifficulty);
+  // Fallback (very unlikely): try every operator on every unused question
+  for (
+    let i = 0;
+    equations.length < 5 && i < shuffled.length;
+    i++
+  ) {
+    const q = shuffled[i];
+    if (equations.some((eq) => eq.question === q.question)) continue;
+    for (const operator of shuffleArray(operators)) {
+      const operands = generateOperands(q.answer, operator, actualDifficulty);
+      if (operands) {
+        equations.push(
+          buildEquation(equations.length + 1, q, operator, operands)
+        );
+        break;
+      }
+    }
+  }
 
-    // Store equation
-    equations.push({
-      id: eqId,
-      question: q.question,
-      answer: answer,
-      operator: operator,
-      solution: {
-        operand1: operands.op1,
-        operand2: operands.op2,
-        result: answer,
-      },
-    });
+  if (equations.length < 5) {
+    console.error(`Could not build a solvable puzzle for: ${category}`);
+    return null;
+  }
 
-    // Add operands to number pool
-    numberPool.push(operands.op1, operands.op2);
+  equations.forEach((eq) => {
+    numberPool.push(eq.solution.operand1, eq.solution.operand2);
   });
 
   // Step 4: Calculate column targets from generated operands
@@ -1064,7 +1055,7 @@ function generatePuzzle(category, difficulty = 'easy') {
   }
 
   // Step 6: Build puzzle object
-  const puzzle = {
+  return {
     id: puzzleId,
     category: category.charAt(0).toUpperCase() + category.slice(1),
     difficulty:
@@ -1076,9 +1067,66 @@ function generatePuzzle(category, difficulty = 'easy') {
     },
     equations: equations,
   };
+}
 
-  console.log('Generated puzzle:', puzzle);
-  return puzzle;
+/**
+ * Operators allowed for a difficulty
+ * @param {string} difficulty - easy, medium or hard
+ * @returns {array} Operator characters
+ */
+function getOperatorsForDifficulty(difficulty) {
+  return difficulty === 'hard' ? ['+', '-', '×', '÷'] : ['+', '-'];
+}
+
+/**
+ * Build one equation object
+ * @param {number} id - Equation number (1-5)
+ * @param {object} q - Question { question, answer }
+ * @param {string} operator - Operator shown on the equation
+ * @param {object} operands - { op1, op2 }
+ * @returns {object} Equation
+ */
+function buildEquation(id, q, operator, operands) {
+  return {
+    id: id,
+    question: q.question,
+    answer: q.answer,
+    operator: operator,
+    solution: {
+      operand1: operands.op1,
+      operand2: operands.op2,
+      result: q.answer,
+    },
+  };
+}
+
+/**
+ * Remove questions whose text repeats (case-insensitive)
+ * @param {array} questions - Source question array
+ * @returns {array} Questions with unique text
+ */
+function removeDuplicateQuestions(questions) {
+  const seen = new Set();
+  return questions.filter((q) => {
+    const key = q.question.trim().toLowerCase();
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+/**
+ * Fisher-Yates shuffle (returns a new array)
+ * @param {array} items - Source array
+ * @returns {array} Shuffled copy
+ */
+function shuffleArray(items) {
+  const copy = [...items];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
 }
 
 /**
@@ -1088,149 +1136,73 @@ function generatePuzzle(category, difficulty = 'easy') {
  * @returns {array} Selected questions
  */
 function selectRandomQuestions(questions, count) {
-  const shuffled = [...questions].sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, count);
+  return shuffleArray(questions).slice(0, count);
 }
 
 /**
- * Generate valid operand pair for given answer and operator
+ * Generate a valid operand pair for the given answer and operator.
+ * Both operands are whole numbers from 1 to the difficulty's range cap.
  * @param {number} answer - The equation result
- * @param {string} operator - Either '+', '-', '×', or '÷'
+ * @param {string} operator - '+', '-', '×' or '÷'
  * @param {string} difficulty - Difficulty level (easy, medium, hard)
- * @returns {object} { op1, op2 } operand pair
+ * @returns {object|null} { op1, op2 }, or null if this answer cannot be built
+ *   with this operator inside the range (the caller picks another question)
  */
 function generateOperands(answer, operator, difficulty = 'easy') {
-  // Determine max operand value based on difficulty
   const maxOperand =
     difficulty === 'easy' ? 50 : difficulty === 'medium' ? 100 : 200;
 
-  // Normalize operator to handle different character encodings
-  // Check for addition
-  if (operator === '+' || operator === 'plus') {
-    // For addition: op1 + op2 = answer
-    const maxOp1 = Math.min(answer - 1, maxOperand);
+  // Answers must be whole numbers of at least 1
+  if (!Number.isInteger(answer) || answer < 1) return null;
+
+  if (operator === '+') {
+    // op1 + op2 = answer, both between 1 and maxOperand
     const minOp1 = Math.max(1, answer - maxOperand);
+    const maxOp1 = Math.min(answer - 1, maxOperand);
+    if (minOp1 > maxOp1) return null;
 
     const op1 = randomInt(minOp1, maxOp1);
-    const op2 = answer - op1;
-
-    return { op1, op2 };
+    return { op1, op2: answer - op1 };
   }
 
-  // Check for subtraction
-  else if (operator === '-' || operator === 'minus') {
-    // For subtraction: op1 - op2 = answer
+  if (operator === '-') {
+    // op1 - op2 = answer, op1 up to maxOperand and op2 at least 1
     const minOp1 = answer + 1;
-    const maxOp1 = maxOperand;
+    if (minOp1 > maxOperand) return null;
 
-    // Check if answer is too large for this difficulty
-    if (answer >= maxOperand) {
-      console.warn(
-        `Answer ${answer} too large for subtraction in range 1-${maxOperand}, using addition instead`
-      );
-
-      // Fall back to addition
-      const maxOp1 = Math.min(answer - 1, maxOperand);
-      const minOp1 = Math.max(1, answer - maxOperand);
-      const op1 = randomInt(minOp1, maxOp1);
-      const op2 = answer - op1;
-
-      return { op1, op2 };
-    }
-
-    const op1 = randomInt(minOp1, maxOp1);
-    const op2 = op1 - answer;
-
-    return { op1, op2 };
+    const op1 = randomInt(minOp1, maxOperand);
+    return { op1, op2: op1 - answer };
   }
 
-  // Check for multiplication (handle multiple character formats)
-  else if (
-    operator === 'Ã—' ||
-    operator === '×' ||
-    operator === '*' ||
-    operator === 'multiply'
-  ) {
-    // For multiplication: op1 Ã— op2 = answer
-    // Find factors of answer that fit in range
+  if (operator === '×') {
+    // op1 × op2 = answer: collect factor pairs that fit in range
     const factors = [];
-
     for (let i = 1; i <= Math.min(answer, maxOperand); i++) {
-      if (answer % i === 0) {
-        const other = answer / i;
-        if (other >= 1 && other <= maxOperand) {
-          factors.push([i, other]);
-        }
+      const other = answer / i;
+      if (Number.isInteger(other) && other <= maxOperand) {
+        factors.push([i, other]);
       }
     }
+    if (factors.length === 0) return null;
 
-    // If no valid factors found, fall back to addition
-    if (factors.length === 0) {
-      console.warn(
-        `Answer ${answer} has no valid factors in range 1-${maxOperand}, using addition instead`
-      );
-
-      const maxOp1 = Math.min(answer - 1, maxOperand);
-      const minOp1 = Math.max(1, answer - maxOperand);
-      const op1 = randomInt(minOp1, maxOp1);
-      const op2 = answer - op1;
-
-      return { op1, op2 };
-    }
-
-    // Pick random factor pair
     const [op1, op2] = factors[Math.floor(Math.random() * factors.length)];
     return { op1, op2 };
   }
 
-  // Check for division (handle multiple character formats)
-  else if (
-    operator === 'Ã·' ||
-    operator === '÷' ||
-    operator === '/' ||
-    operator === 'divide'
-  ) {
-    // For division: op1 Ã· op2 = answer
-    // op1 = answer Ã— op2, where op2 is a random divisor
-
-    // Find valid divisors (op2) where result (op1) stays in range
+  if (operator === '÷') {
+    // op1 ÷ op2 = answer, so op1 = answer × op2 (op2 of at least 2)
     const validDivisors = [];
-
-    for (let divisor = 2; divisor <= maxOperand; divisor++) {
-      const op1 = answer * divisor;
-      if (op1 >= 1 && op1 <= maxOperand) {
-        validDivisors.push(divisor);
-      }
+    for (let divisor = 2; answer * divisor <= maxOperand; divisor++) {
+      validDivisors.push(divisor);
     }
+    if (validDivisors.length === 0) return null;
 
-    // If no valid divisors found, fall back to addition
-    if (validDivisors.length === 0) {
-      console.warn(
-        `Answer ${answer} has no valid divisors in range 1-${maxOperand}, using addition instead`
-      );
-
-      const maxOp1 = Math.min(answer - 1, maxOperand);
-      const minOp1 = Math.max(1, answer - maxOperand);
-      const op1 = randomInt(minOp1, maxOp1);
-      const op2 = answer - op1;
-
-      return { op1, op2 };
-    }
-
-    // Pick random divisor
     const op2 = validDivisors[Math.floor(Math.random() * validDivisors.length)];
-    const op1 = answer * op2;
-
-    return { op1, op2 };
+    return { op1: answer * op2, op2 };
   }
 
-  // Fallback: if operator not recognized, use addition
-  console.warn(`Unknown operator: "${operator}", falling back to addition`);
-  const maxOp1 = Math.min(answer - 1, maxOperand);
-  const minOp1 = Math.max(1, answer - maxOperand);
-  const op1 = randomInt(minOp1, maxOp1);
-  const op2 = answer - op1;
-  return { op1, op2 };
+  // Unknown operator: never guess
+  return null;
 }
 
 /**
@@ -2433,7 +2405,8 @@ function validatePuzzle() {
     const op2 = gameState.userInputs[`op2-${eq.id}`];
     const sol = gameState.userInputs[`sol-${eq.id}`];
 
-    if (!op1 || !op2 || !sol) {
+    // Compare with null so a value of 0 is not treated as empty
+    if (op1 == null || op2 == null || sol == null) {
       invalidEquations.push(eq.id);
       return;
     }
