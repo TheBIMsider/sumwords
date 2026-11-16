@@ -2989,24 +2989,25 @@ function revealNumbers() {
       return;
     }
 
+    // Leave a blank the player already filled alone. Its pool tile was
+    // marked when it was placed, so counting it again would double count.
+    if (gameState.userInputs[position] !== undefined) return;
+
     // Fill the blank
     blank.textContent = number;
     blank.classList.add('filled', 'hint-revealed');
 
-    // Mark number as used in pool
-    if (!gameState.poolNumbersUsed.includes(number)) {
-      gameState.poolNumbersUsed.push(number);
-
-      // Find and mark the first matching unused pool number
-      const poolNumbers = document.querySelectorAll('.pool-number');
-      for (let poolNum of poolNumbers) {
-        if (
-          parseInt(poolNum.dataset.number) === number &&
-          !poolNum.classList.contains('used')
-        ) {
-          poolNum.classList.add('used');
-          break;
-        }
+    // Mark one unused pool tile with this value. Duplicate values each have
+    // their own tile, so every revealed operand takes one tile.
+    const poolNumbers = document.querySelectorAll('.pool-number');
+    for (let poolNum of poolNumbers) {
+      if (
+        parseInt(poolNum.dataset.number) === number &&
+        !poolNum.classList.contains('used')
+      ) {
+        poolNum.classList.add('used');
+        gameState.poolNumbersUsed.push(number);
+        break;
       }
     }
 
