@@ -221,6 +221,8 @@
 /* Mobile Responsive */
 @media (max-width: 768px) {
   #theme-toggle {
+    /* Scrolls with the page here: a fixed toggle would cover the sticky targets */
+    position: absolute;
     width: 45px;
     height: 45px;
     top: 15px;
@@ -260,9 +262,10 @@ body {
    =================================== */
 
 .game-container {
+  --gutter: 16px; /* Side padding; the sticky strips use it to span the full width */
   max-width: 600px;
   margin: 0 auto;
-  padding: 16px;
+  padding: var(--gutter);
   background-color: var(--bg-container);
   min-height: 100vh;
   display: flex;
@@ -335,6 +338,11 @@ body {
   margin-top: 12px;
 }
 
+/* Menu button is only used on small screens (see the 600px rules below) */
+.menu-toggle {
+  display: none;
+}
+
 .btn-header {
   padding: 8px 16px;
   font-size: 14px;
@@ -378,10 +386,19 @@ body {
    =================================== */
 
 .column-targets {
+  /* Sticks to the top of the screen while the equations scroll past it.
+     Full width of the container (negative margins cancel its padding) so
+     equations do not show in the side gutters. */
+  position: sticky;
+  top: 0;
+  z-index: 50;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-  margin-bottom: 24px;
+  margin: 0 calc(var(--gutter) * -1) 12px;
+  padding: 8px var(--gutter);
+  background-color: var(--bg-container);
+  border-bottom: 1px solid var(--border-light);
 }
 
 .target {
@@ -593,11 +610,16 @@ body {
    =================================== */
 
 .number-pool {
+  /* Sticks to the bottom of the screen while the equations scroll past it */
+  position: sticky;
+  bottom: 0;
+  z-index: 50;
   background-color: var(--bg-card-alt);
   padding: 16px;
-  border-radius: 8px;
+  border-radius: 8px 8px 0 0;
   border: 2px solid var(--border-medium);
   margin-bottom: 20px;
+  box-shadow: var(--shadow-md);
 }
 
 .pool-label {
@@ -899,6 +921,118 @@ body {
   white-space: nowrap;
 }
 
+/* Mobile header: Home, Stats, New Puzzle and Reset move into a dropdown panel */
+@media (max-width: 600px) {
+  .header-menu {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    margin-top: 12px;
+  }
+
+  .menu-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+  }
+
+  .header-controls {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 200px;
+    margin-top: 6px;
+    padding: 8px;
+    flex-direction: column;
+    gap: 6px;
+    background-color: var(--bg-card);
+    border: 2px solid var(--border-medium);
+    border-radius: 8px;
+    box-shadow: var(--shadow-lg);
+    z-index: 100;
+  }
+
+  .header-controls.open {
+    display: flex;
+  }
+
+  .header-controls .btn-header {
+    min-height: 44px;
+    text-align: left;
+  }
+
+  .header-controls .btn-home {
+    justify-content: flex-start;
+  }
+
+  /* Targets are sticky on every screen size (see COLUMN TARGETS); smaller here */
+  .target {
+    padding: 6px 8px;
+  }
+
+  .target .current {
+    font-size: 20px;
+  }
+
+  /* Number pool (sticky on every screen size, see NUMBER POOL): full width and
+     compact here so it covers less of the equations */
+  .number-pool {
+    margin: 0 calc(var(--gutter) * -1) 12px;
+    padding: 8px var(--gutter);
+    border-radius: 0;
+    border-width: 2px 0 0 0;
+  }
+
+  /* Label stays for screen readers only */
+  .pool-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+
+  /* Tiles per row and tile size for each difficulty (Hard: 16 tiles as 6, 6, 4) */
+  .pool-numbers[data-difficulty='easy'] {
+    --cols: 5;
+    --tile: 44px;
+  }
+
+  .pool-numbers[data-difficulty='medium'] {
+    --cols: 6;
+    --tile: 42px;
+  }
+
+  .pool-numbers[data-difficulty='hard'] {
+    --cols: 6;
+    --tile: 40px;
+  }
+
+  /* Flex wrap (not grid) so a short last row is centered. max-width is exactly
+     --cols tiles plus their gaps, so rows wrap after --cols tiles. */
+  .pool-numbers[data-difficulty] {
+    --gap: 6px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap);
+    justify-content: center;
+    max-width: calc(var(--cols) * var(--tile) + (var(--cols) - 1) * var(--gap));
+  }
+
+  .pool-numbers .pool-number {
+    flex: none;
+    width: var(--tile);
+    height: var(--tile);
+    font-size: calc(var(--tile) * 0.42);
+  }
+}
+
 /* Mobile adjustments */
 @media (max-width: 600px) {
   .tutorial-content {
@@ -925,7 +1059,7 @@ body {
 
 @media (max-width: 480px) {
   .game-container {
-    padding: 12px;
+    --gutter: 12px;
   }
 
   /* Mobile logo sizing */
@@ -947,18 +1081,6 @@ body {
   .operator,
   .equals {
     font-size: 24px;
-  }
-
-  /* Medium difficulty: 3×4 grid on mobile */
-  .pool-numbers[data-difficulty='medium'] {
-    grid-template-columns: repeat(3, 1fr);
-    max-width: 210px;
-  }
-
-  /* Hard difficulty: 4×4 grid on mobile */
-  .pool-numbers[data-difficulty='hard'] {
-    grid-template-columns: repeat(4, 1fr);
-    max-width: 280px;
   }
 }
 

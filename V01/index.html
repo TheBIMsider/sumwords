@@ -232,15 +232,28 @@
             <option value="hard">Hard</option>
           </select>
         </div>
-        <div class="header-controls">
-          <a
-            href="https://thebimsider.github.io/sumwords/landing/"
-            class="btn-header btn-home"
-            >🏠 Home</a
+        <div class="header-menu">
+          <!-- Menu button: only shown at 600px and below -->
+          <button
+            class="btn-header menu-toggle"
+            id="menu-toggle"
+            aria-expanded="false"
+            aria-controls="header-controls"
           >
-          <button class="btn-header" id="stats-btn">📊 Stats</button>
-          <button class="btn-header" id="new-puzzle-btn">🎲 New Puzzle</button>
-          <button class="btn-header" id="reset-btn">↺ Reset</button>
+            ☰ Menu
+          </button>
+          <div class="header-controls" id="header-controls">
+            <a
+              href="https://thebimsider.github.io/sumwords/landing/"
+              class="btn-header btn-home"
+              >🏠 Home</a
+            >
+            <button class="btn-header" id="stats-btn">📊 Stats</button>
+            <button class="btn-header" id="new-puzzle-btn">
+              🎲 New Puzzle
+            </button>
+            <button class="btn-header" id="reset-btn">↺ Reset</button>
+          </div>
         </div>
       </header>
 

@@ -147,6 +147,7 @@ sumwords/
 │   └── Sumwords_in_Action.png  # Landing page screenshot
 ├── tests/
 │   ├── generator.test.js   # Checks every generated puzzle is solvable, plus question bank rules
+│   ├── play-polish.test.js # Checks the Reset/New Puzzle confirm rules and auto-advance lookup
 │   └── validation.test.js  # Checks Submit validation messages
 ├── README.md               # This file
 └── LICENSE                 # BSD 3-Clause License
