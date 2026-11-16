@@ -935,7 +935,6 @@ function generatePuzzle(category, difficulty = 'easy') {
     gameState.assignedDifficulty = actualDifficulty;
   } else {
     gameState.assignedDifficulty = null;
-    gameState.hintMode = false; // Reset hint mode
   }
 
   // Step 1: Get questions from selected category
@@ -1261,7 +1260,6 @@ const gameState = {
   currentCategory: 'sports', // Currently selected category
   currentDifficulty: 'easy', // Currently selected difficulty
   hintsUsed: 0, // Number of hints used
-  selectedEquationForHint: null, // Currently selected equation for hint
   hintedEquations: {}, // Object: { equationId: ['?', '#'] } tracks hint types used
   assignedDifficulty: null, // Stores actual difficulty when "random" is selected
   attemptHistory: [], // One entry per Submit press, used for the share result
@@ -1765,6 +1763,7 @@ function restoreUserInputs(savedGameState) {
       equation.classList.add('hinted');
     }
   });
+  updateHintControls();
 
   // Restore hint-revealed styling
   (savedGameState.hintRevealedInputs || []).forEach((position) => {
@@ -1826,9 +1825,6 @@ function loadPuzzle(puzzle) {
 
   // Update column totals (initially 0)
   updateColumnTotals();
-
-  // Initialize hint button states (disabled until equation selected)
-  updateHintButtonStates();
 }
 
 /**
@@ -1843,7 +1839,6 @@ function resetGameState() {
   gameState.attempts = 0;
   gameState.completed = false;
   gameState.hintsUsed = 0;
-  gameState.selectedEquationForHint = null;
   gameState.hintedEquations = {}; // Reset to empty object
   gameState.assignedDifficulty = null;
   gameState.attemptHistory = [];
@@ -1862,7 +1857,7 @@ function resetGameState() {
 
   // Clear UI - equations
   document.querySelectorAll('.equation').forEach((eq) => {
-    eq.classList.remove('error', 'hinted', 'selected-for-hint');
+    eq.classList.remove('error', 'hinted');
   });
 
   // Reset counters
@@ -1871,7 +1866,8 @@ function resetGameState() {
 
   // Reset buttons
   document.getElementById('submit-btn').disabled = false;
-  updateHintButtonStates(); // Disable hint buttons (no equation selected)
+  closeHintChoices();
+  updateHintControls();
 
   // Clear feedback
   document.getElementById('feedback').textContent = '';
@@ -2003,18 +1999,11 @@ function setupEventListeners() {
     .getElementById('difficulty-select')
     .addEventListener('change', handleDifficultyChange);
 
-  // Hint system - two separate reveal buttons
+  // Hints: one delegated listener for every equation's Hint button and choices
   document
-    .getElementById('reveal-answer-btn')
-    .addEventListener('click', revealAnswer);
-  document
-    .getElementById('reveal-numbers-btn')
-    .addEventListener('click', revealNumbers);
-
-  // Equation selection for hints
-  document.querySelectorAll('.equation').forEach((equation) => {
-    equation.addEventListener('click', handleEquationSelect);
-  });
+    .querySelector('.equations-container')
+    .addEventListener('click', handleHintClick);
+  document.addEventListener('keydown', handleHintKeydown);
 }
 /* ===================================
   POOL NUMBER CLICK HANDLER
@@ -2070,55 +2059,6 @@ function deselectPoolNumber() {
   =================================== */
 
 function handleOperandClick(event) {
-  // HINT MODE: Reveal the correct number for this blank
-  if (gameState.hintMode) {
-    const blank = event.target;
-    const position = blank.dataset.position;
-
-    // Parse position to get equation and operand index (e.g., "op1-3" -> equation 3, operand 1)
-    const matches = position.match(/op(\d)-(\d)/);
-    if (!matches) return;
-
-    const operandNum = parseInt(matches[1]);
-    const equationId = parseInt(matches[2]);
-    const operandIndex = operandNum - 1; // Convert to 0-based index
-
-    // Find the correct number for this blank
-    const equation = currentPuzzle.equations.find((eq) => eq.id === equationId);
-    if (!equation) return;
-
-    const correctNumber = equation.solution[`operand${operandNum}`];
-
-    // Set the correct number in gameState
-    gameState.userInputs[position] = correctNumber;
-
-    // Update visual
-    blank.textContent = correctNumber;
-    blank.classList.add('filled', 'hint-revealed');
-
-    // Track hint usage
-    gameState.hintsUsed++;
-    if (!gameState.hintedEquations.includes(equationId)) {
-      gameState.hintedEquations.push(equationId);
-    }
-
-    // Update hint counter display
-    document.getElementById('hint-count').textContent = gameState.hintsUsed;
-
-    // Mark equation as hinted
-    const equationElement = document.querySelector(
-      `[data-equation="${equationId}"]`
-    );
-    equationElement.classList.add('hinted');
-
-    updateColumnTotals();
-    savePuzzleState();
-
-    // Exit hint mode
-    exitHintMode();
-    showFeedback('Blank revealed!', 'success');
-    return; // Exit early, don't do normal operand click behavior
-  }
   const blank = event.currentTarget;
   const position = blank.dataset.position;
 
@@ -2467,6 +2407,7 @@ function validatePuzzle() {
 
 function handleWin() {
   gameState.completed = true;
+  closeHintChoices();
 
   // Update statistics
   updateStatistics(
@@ -2794,7 +2735,6 @@ function handleReset() {
   gameState.attempts = 0;
   gameState.completed = false;
   gameState.hintsUsed = 0;
-  gameState.selectedEquationForHint = null;
   gameState.hintedEquations = {}; // Reset to empty object
   gameState.attemptHistory = [];
   hideWinPanel();
@@ -2813,7 +2753,7 @@ function handleReset() {
 
   // Clear UI - equations
   document.querySelectorAll('.equation').forEach((eq) => {
-    eq.classList.remove('error', 'hinted', 'selected-for-hint');
+    eq.classList.remove('error', 'hinted');
   });
 
   // Clear UI - pool numbers
@@ -2827,7 +2767,8 @@ function handleReset() {
 
   // Reset buttons
   document.getElementById('submit-btn').disabled = false;
-  updateHintButtonStates(); // Disable hint buttons (no equation selected)
+  closeHintChoices();
+  updateHintControls();
 
   // Clear feedback
   document.getElementById('feedback').textContent = '';
@@ -2993,55 +2934,112 @@ function focusNextSolutionInput(input, submitAtEnd) {
   =================================== */
 
 /**
- * Handle equation selection for hint
+ * Has this hint type already been used on the equation?
+ * @param {number} equationId - ID of equation
+ * @param {string} markerType - '?' (answer) or '#' (numbers)
  */
-function handleEquationSelect(event) {
-  const equation = event.currentTarget;
-  const equationId = parseInt(equation.dataset.equation);
-
-  // If clicking already selected equation, deselect it
-  if (gameState.selectedEquationForHint === equationId) {
-    deselectEquation();
-    updateHintButtonStates(); // Update button states after deselection
-    return;
-  }
-
-  // Deselect previous selection
-  deselectEquation();
-
-  // Select this equation
-  equation.classList.add('selected-for-hint');
-  gameState.selectedEquationForHint = equationId;
-
-  // Update hint button states (enable buttons)
-  updateHintButtonStates();
+function hasHint(equationId, markerType) {
+  return (gameState.hintedEquations[equationId] || []).includes(markerType);
 }
 
 /**
- * Deselect equation for hint
+ * Delegated click handler for every equation's Hint button and choice row
  */
-function deselectEquation() {
-  if (gameState.selectedEquationForHint !== null) {
-    const equationElement = document.querySelector(
-      `[data-equation="${gameState.selectedEquationForHint}"]`
-    );
-    if (equationElement) {
-      equationElement.classList.remove('selected-for-hint');
+function handleHintClick(event) {
+  const toggle = event.target.closest('.btn-hint-equation');
+  if (toggle) {
+    if (gameState.completed) return;
+    const row = document.getElementById(`hint-choices-${toggle.dataset.equation}`);
+    if (row.hidden) {
+      openHintChoices(parseInt(toggle.dataset.equation));
+    } else {
+      closeHintChoices(true);
     }
-  }
-  gameState.selectedEquationForHint = null;
-}
-
-/**
- * Reveal the answer (solution) for the selected equation
- */
-function revealAnswer() {
-  if (gameState.selectedEquationForHint === null) {
-    showFeedback('Please select an equation first (click on it)', 'warning');
     return;
   }
 
-  const equationId = gameState.selectedEquationForHint;
+  const choice = event.target.closest('.btn-hint-choice');
+  if (choice) {
+    const equationId = parseInt(choice.dataset.equation);
+    if (choice.dataset.hint === 'answer') revealAnswer(equationId);
+    if (choice.dataset.hint === 'numbers') revealNumbers(equationId);
+    updateHintControls();
+    closeHintChoices(true);
+    return;
+  }
+
+  // Tapping a blank closes any open choice row (the blank still does its job)
+  if (event.target.closest('.blank')) closeHintChoices();
+}
+
+/**
+ * Escape closes the open choice row and returns focus to its Hint button
+ */
+function handleHintKeydown(event) {
+  if (event.key !== 'Escape') return;
+  if (document.querySelector('.hint-choices:not([hidden])')) {
+    closeHintChoices(true);
+  }
+}
+
+/**
+ * Open one equation's choice row (closing any other) and focus its first choice
+ * @param {number} equationId - ID of equation
+ */
+function openHintChoices(equationId) {
+  closeHintChoices();
+  const row = document.getElementById(`hint-choices-${equationId}`);
+  const toggle = document.querySelector(
+    `.btn-hint-equation[data-equation="${equationId}"]`
+  );
+  if (!row || !toggle) return;
+  row.hidden = false;
+  toggle.setAttribute('aria-expanded', 'true');
+  const first = row.querySelector('.btn-hint-choice:not(:disabled)');
+  if (first) first.focus();
+}
+
+/**
+ * Close every choice row
+ * @param {boolean} returnFocus - Move focus back to the Hint button that was open
+ */
+function closeHintChoices(returnFocus = false) {
+  // Only one row is ever open; its Hint button points at it via aria-controls
+  const openRow = document.querySelector('.hint-choices:not([hidden])');
+  const toggle =
+    openRow && document.querySelector(`[aria-controls="${openRow.id}"]`);
+
+  if (openRow) openRow.hidden = true;
+  document.querySelectorAll('.btn-hint-equation').forEach((button) => {
+    button.setAttribute('aria-expanded', 'false');
+  });
+  if (returnFocus && toggle && !toggle.disabled) toggle.focus();
+}
+
+/**
+ * Sync every Hint button and choice with the hints used so far: a used choice
+ * is disabled, and an equation with both hints used shows "Hinted"
+ */
+function updateHintControls() {
+  document.querySelectorAll('.btn-hint-equation').forEach((toggle) => {
+    const id = parseInt(toggle.dataset.equation);
+    const answerUsed = hasHint(id, '?');
+    const numbersUsed = hasHint(id, '#');
+    const row = document.getElementById(`hint-choices-${id}`);
+    row.querySelector('[data-hint="answer"]').disabled = answerUsed;
+    row.querySelector('[data-hint="numbers"]').disabled = numbersUsed;
+    toggle.disabled = answerUsed && numbersUsed;
+    toggle.textContent = toggle.disabled ? 'Hinted' : 'Hint';
+  });
+}
+
+/**
+ * Reveal the answer (solution) for an equation
+ * @param {number} equationId - ID of equation
+ */
+function revealAnswer(equationId) {
+  if (hasHint(equationId, '?')) return;
+
   const equation = currentPuzzle.equations.find((eq) => eq.id === equationId);
 
   if (!equation) return;
@@ -3079,15 +3077,12 @@ function revealAnswer() {
 }
 
 /**
- * Reveal both numbers (operands) for the selected equation
+ * Reveal both numbers (operands) for an equation
+ * @param {number} equationId - ID of equation
  */
-function revealNumbers() {
-  if (gameState.selectedEquationForHint === null) {
-    showFeedback('Please select an equation first (click on it)', 'warning');
-    return;
-  }
+function revealNumbers(equationId) {
+  if (hasHint(equationId, '#')) return;
 
-  const equationId = gameState.selectedEquationForHint;
   const equation = currentPuzzle.equations.find((eq) => eq.id === equationId);
 
   if (!equation) return;
@@ -3197,32 +3192,6 @@ function updateHintCounter() {
   if (hintCountElement) {
     hintCountElement.textContent = gameState.hintsUsed;
   }
-}
-
-/**
- * Enable or disable hint buttons based on game state
- */
-function updateHintButtonStates() {
-  const revealAnswerBtn = document.getElementById('reveal-answer-btn');
-  const revealNumbersBtn = document.getElementById('reveal-numbers-btn');
-
-  const hasSelection = gameState.selectedEquationForHint !== null;
-
-  // Enable answer and numbers buttons if equation is selected
-  if (revealAnswerBtn) {
-    revealAnswerBtn.disabled = !hasSelection;
-  }
-  if (revealNumbersBtn) {
-    revealNumbersBtn.disabled = !hasSelection;
-  }
-}
-
-/**
- * Exit hint mode and remove visual indicators
- */
-function exitHintMode() {
-  gameState.hintMode = false;
-  document.getElementById('hint-btn').classList.remove('hint-mode-active');
 }
 
 /* ===================================
@@ -3402,9 +3371,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (themeToggle) {
     themeToggle.addEventListener('click', toggleTheme);
   }
-
-  // Initialize hint button states
-  updateHintButtonStates();
 
   // Tutorial system
   showTutorialIfFirstVisit();
