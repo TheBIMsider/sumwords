@@ -159,6 +159,34 @@
           </div>
         </div>
 
+        <div class="stats-section">
+          <h3>Daily Puzzles</h3>
+
+          <div class="difficulty-stats">
+            <h4>Daily (also counted under Medium)</h4>
+            <div class="stats-row">
+              <span>Completed:</span>
+              <span id="daily-completed">0</span>
+            </div>
+            <div class="stats-row">
+              <span>Attempts:</span>
+              <span id="daily-attempts">0</span>
+            </div>
+            <div class="stats-row">
+              <span>Hints Used:</span>
+              <span id="daily-hints">0</span>
+            </div>
+            <div class="stats-row">
+              <span>Perfect Games:</span>
+              <span id="daily-perfect">0</span>
+            </div>
+            <div class="stats-row">
+              <span>Avg Attempts:</span>
+              <span id="daily-avg">0.0</span>
+            </div>
+          </div>
+        </div>
+
         <div class="modal-footer">
           <button id="reset-stats-btn" class="btn btn-secondary">
             Reset Statistics
@@ -249,6 +277,7 @@
               >🏠 Home</a
             >
             <button class="btn-header" id="stats-btn">📊 Stats</button>
+            <button class="btn-header" id="daily-btn">📅 Daily</button>
             <button class="btn-header" id="new-puzzle-btn">
               🎲 New Puzzle
             </button>
@@ -279,6 +308,9 @@
         class="assigned-difficulty"
         style="display: none"
       ></div>
+
+      <!-- Daily Puzzle banner (shows only in daily mode) -->
+      <div id="daily-banner" class="assigned-difficulty" style="display: none"></div>
 
       <!-- Equations List -->
       <div class="equations-container">
@@ -633,6 +665,9 @@
             <span id="win-attempts"></span> ·
             <span id="win-hints"></span> ·
             Win streak: <span id="win-streak"></span>
+          </p>
+          <p class="win-next" id="win-next-daily" hidden>
+            Next daily puzzle tomorrow
           </p>
           <div class="win-buttons">
             <button class="btn btn-primary" id="share-btn" type="button">

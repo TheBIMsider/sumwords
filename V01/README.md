@@ -55,6 +55,7 @@ Plus an **"Everything"** category that combines all questions for maximum variet
 - **Smart Resume:** Automatically saves progress and offers to resume unfinished puzzles
 - **Statistics Tracking:** Track completed puzzles, attempts, hints used, perfect games, and win streaks
 - **Share Results:** After a win, copy a spoiler-free, Wordle-style grid of your attempts to the clipboard; an equation solved with a hint shows as a yellow square
+- **Daily Puzzle:** One shared puzzle per day (Everything, Medium) from a seeded generator, so everyone gets the same puzzle with no server; play it once per day and share your result as `Daily #1-12`
 - **Mobile-Optimized:** Fully responsive design works great on phones and tablets
 - **Persistent Storage:** Game state, preferences, stats, and theme saved locally
 
@@ -141,6 +142,7 @@ sumwords/
 │   ├── Sumwords_Logo.png   # Landing page logo
 │   └── Sumwords_in_Action.png  # Landing page screenshot
 ├── tests/
+│   ├── daily.test.js       # Checks the daily puzzle: same date same puzzle, numbering, share header and daily stats
 │   ├── generator.test.js   # Checks every generated puzzle is solvable, plus question bank rules
 │   ├── hints.test.js       # Checks every equation has its Hint button and choice row, and old hint code is gone
 │   ├── play-polish.test.js # Checks the Reset/New Puzzle confirm rules and auto-advance lookup
@@ -167,6 +169,16 @@ Every level has 5 equations. Operators are always visible.
 - **Medium:** Numbers up to 100, addition/subtraction only, 12 numbers (2 decoys) in a 6×2 pool grid (3×4 mobile)
 - **Hard:** Numbers up to 200, all operators (+, −, ×, ÷), 16 numbers (6 decoys) in an 8×2 pool grid (4×4 mobile)
 
+### Daily Puzzle
+
+The 📅 Daily button in the header loads one puzzle per calendar day. Everyone who plays on the same date gets the same puzzle, with no server: the puzzle is built from a seed made from the date, so every device builds the same questions and numbers (the order of the tiles in the pool may differ).
+
+- Always Everything and Medium; the category and difficulty selectors are locked while a daily is loaded
+- Uses the player's local date, and is playable once per day. After a win the Daily button shows your result, Share result and "Next daily puzzle tomorrow"
+- Numbered `series-day`, for example `#1-12`. The series number only goes up when a change alters the dailies (new questions or a generator change), and the day count starts again at 1
+- Share text header is `Sumwords v1.1.0 · Daily #1-12`; the rest is the usual spoiler-free grid
+- A daily win counts as a normal Medium win and also shows in the Daily Puzzles block in Stats (there is no separate daily streak)
+
 ## 📊 Statistics
 
 The game tracks comprehensive statistics including:
@@ -177,6 +189,7 @@ The game tracks comprehensive statistics including:
 - Perfect games (no hints)
 - Current and best win streaks
 - Per-difficulty breakdowns
+- Daily puzzle totals (completed, attempts, hints, perfect games, average attempts)
 
 ## 🤝 Contributing
 
@@ -249,11 +262,11 @@ This project was developed (Vibe Coded) over 21 sessions with Claude Chat and co
 - Interactive tutorial for first-time users
 - v1.1.0: 5 equations and visible operators on every level, audited question bank, automated puzzle and validation tests, version shown in the game
 - Share results: win panel with a spoiler-free, Wordle-style grid copied to the clipboard
+- Daily puzzle: one shared puzzle per day from a seeded generator, with a daily number, finished-result view and daily statistics
 
 ### Potential Future Enhancements
 
 - Keyboard navigation support
-- Daily puzzle mode
 - Sound effects (optional)
 - Additional question categories
 - Leaderboards
