@@ -55,7 +55,7 @@ Plus an **"Everything"** category that combines all questions for maximum variet
 
 - **Interactive Tutorial:** First-time users see a helpful tutorial explaining gameplay with a "Don't show again" option
 - **Dark Mode:** Toggle between light and dark themes with persistent preference
-- **Hint System:** Two types of hints available
+- **Hint System:** Every equation has its own Hint button; tap it to choose one of two hints
   - Reveal the answer to the trivia question
   - Reveal which numbers to place in the equation
 - **Smart Resume:** Automatically saves progress and offers to resume unfinished puzzles
@@ -148,6 +148,7 @@ sumwords/
 │   └── Sumwords_in_Action.png  # Landing page screenshot
 ├── tests/
 │   ├── generator.test.js   # Checks every generated puzzle is solvable, plus question bank rules
+│   ├── hints.test.js       # Checks every equation has its Hint button and choice row, and old hint code is gone
 │   ├── play-polish.test.js # Checks the Reset/New Puzzle confirm rules and auto-advance lookup
 │   ├── share.test.js       # Checks the share text and per-attempt results
 │   └── validation.test.js  # Checks Submit validation messages
