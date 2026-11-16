@@ -335,6 +335,11 @@ body {
   margin-top: 12px;
 }
 
+/* Menu button is only used on small screens (see the 600px rules below) */
+.menu-toggle {
+  display: none;
+}
+
 .btn-header {
   padding: 8px 16px;
   font-size: 14px;
@@ -897,6 +902,54 @@ body {
   font-size: 16px;
   font-weight: 600;
   white-space: nowrap;
+}
+
+/* Mobile header: Home, Stats, New Puzzle and Reset move into a dropdown panel */
+@media (max-width: 600px) {
+  .header-menu {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    margin-top: 12px;
+  }
+
+  .menu-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+  }
+
+  .header-controls {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 200px;
+    margin-top: 6px;
+    padding: 8px;
+    flex-direction: column;
+    gap: 6px;
+    background-color: var(--bg-card);
+    border: 2px solid var(--border-medium);
+    border-radius: 8px;
+    box-shadow: var(--shadow-lg);
+    z-index: 100;
+  }
+
+  .header-controls.open {
+    display: flex;
+  }
+
+  .header-controls .btn-header {
+    min-height: 44px;
+    text-align: left;
+  }
+
+  .header-controls .btn-home {
+    justify-content: flex-start;
+  }
 }
 
 /* Mobile adjustments */

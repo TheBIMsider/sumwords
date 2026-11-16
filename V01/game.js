@@ -1906,7 +1906,53 @@ function renderNumberPool(puzzle) {
   EVENT LISTENERS
   =================================== */
 
+/**
+ * Mobile header menu: toggle button opens a dropdown panel of header actions.
+ * Closes on item click, outside click, Escape, or when the screen grows past 600px.
+ */
+function setupHeaderMenu() {
+  const toggle = document.getElementById('menu-toggle');
+  const panel = document.getElementById('header-controls');
+  const wideScreen = window.matchMedia('(min-width: 601px)');
+
+  function setMenuOpen(open) {
+    panel.classList.toggle('open', open);
+    toggle.setAttribute('aria-expanded', String(open));
+  }
+
+  toggle.addEventListener('click', () => {
+    const open = !panel.classList.contains('open');
+    setMenuOpen(open);
+    if (open) panel.querySelector('.btn-header').focus();
+  });
+
+  // Running an item closes the menu
+  panel.addEventListener('click', (event) => {
+    if (event.target.closest('.btn-header')) setMenuOpen(false);
+  });
+
+  // Outside click closes it
+  document.addEventListener('click', (event) => {
+    if (!event.target.closest('.header-menu')) setMenuOpen(false);
+  });
+
+  // Escape closes it and returns focus to the toggle
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && panel.classList.contains('open')) {
+      setMenuOpen(false);
+      toggle.focus();
+    }
+  });
+
+  // Growing past the mobile breakpoint resets the menu
+  wideScreen.addEventListener('change', (event) => {
+    if (event.matches) setMenuOpen(false);
+  });
+}
+
 function setupEventListeners() {
+  setupHeaderMenu();
+
   // Number pool clicks
   document
     .getElementById('number-pool')
