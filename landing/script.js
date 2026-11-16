@@ -56,15 +56,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const currentTheme = html.getAttribute('data-theme');
     const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
     applyTheme(newTheme);
-
-    // Log theme change for debugging
-    console.log(`Theme switched to: ${newTheme}`);
   }
 
   // Apply initial theme immediately (before page renders)
   const initialTheme = getInitialTheme();
   applyTheme(initialTheme);
-  console.log(`Initial theme applied: ${initialTheme}`);
 
   // Add click handler to toggle button
   if (themeToggle) {
@@ -81,7 +77,6 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!savedTheme) {
           const newTheme = e.matches ? 'dark' : 'light';
           applyTheme(newTheme);
-          console.log(`System theme changed, applied: ${newTheme}`);
         }
       });
   }
@@ -183,8 +178,4 @@ document.addEventListener('DOMContentLoaded', function () {
       this.style.transform = 'translateY(0) scale(1)';
     });
   });
-
-  // Log page load for analytics (placeholder for future tracking)
-  console.log('Sumwords landing page loaded');
-  console.log('Ready to play at:', new Date().toISOString());
 });

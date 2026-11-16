@@ -49,63 +49,27 @@ function toggleTheme() {
 // Initialize theme on page load (before DOM content loads to prevent flash)
 initializeTheme();
 
+// Game version shown at the bottom of the game. Change it only here.
+const GAME_VERSION = '1.1.0';
+
+/**
+ * Show the game version in the footer label
+ */
+function showGameVersion() {
+  const versionLabel = document.getElementById('game-version');
+  if (versionLabel) {
+    versionLabel.textContent = `Sumwords v${GAME_VERSION}`;
+  }
+}
+
 // ==========================================
 // QUESTION LIBRARY
 // ==========================================
-
-const testPuzzle = {
-  id: 'puzzle_001',
-  category: 'Sports',
-  difficulty: 'Easy',
-  numberPool: [1, 1, 2, 3, 4, 5, 6, 7, 11, 13],
-  columnTargets: {
-    column1: 36,
-    column2: 17,
-  },
-  equations: [
-    {
-      id: 1,
-      question: 'Super Bowls won by Tom Brady',
-      answer: 7,
-      operator: '+',
-      solution: { operand1: 6, operand2: 1, result: 7 },
-    },
-    {
-      id: 2,
-      question: 'Players on a basketball team',
-      answer: 5,
-      operator: '+',
-      solution: { operand1: 2, operand2: 3, result: 5 },
-    },
-    {
-      id: 3,
-      question: 'Innings in a baseball game',
-      answer: 9,
-      operator: '+',
-      solution: { operand1: 4, operand2: 5, result: 9 },
-    },
-    {
-      id: 4,
-      question: 'Points for an NFL touchdown',
-      answer: 6,
-      operator: '-',
-      solution: { operand1: 13, operand2: 7, result: 6 },
-    },
-    {
-      id: 5,
-      question: 'Frames in a game of bowling',
-      answer: 10,
-      operator: '-',
-      solution: { operand1: 11, operand2: 1, result: 10 },
-    },
-  ],
-};
 
 /* ===================================
    QUESTION BANKS 
    =================================== */
 
-// Placeholder question banks - will expand later
 const questionBanks = {
   sports: [
     { question: 'Super Bowls won by Tom Brady', answer: 7 },
@@ -1157,9 +1121,8 @@ function selectRandomQuestions(questions, count) {
  * Generate a valid operand pair for the given answer and operator.
  * Both operands are whole numbers from 1 to the difficulty's range cap.
  * The pair is also unambiguous: no OTHER operator allowed at this difficulty
- * gives the same answer with it (so 2 + 2 = 2 × 2 is never built). Operators
- * are hidden on Medium/Hard, so an ambiguous equation would have two right
- * answers.
+ * gives the same answer with it (so 2 + 2 = 2 × 2 is never built), which keeps
+ * every equation tied to a single operator.
  * @param {number} answer - The equation result
  * @param {string} operator - '+', '-', '×' or '÷'
  * @param {string} difficulty - Difficulty level (easy, medium, hard)
@@ -1341,7 +1304,6 @@ function savePuzzleState() {
     };
 
     localStorage.setItem('sumwords_currentPuzzle', JSON.stringify(puzzleState));
-    console.log('Puzzle state saved to localStorage');
   } catch (error) {
     console.error('Failed to save puzzle state:', error);
     // Game continues to work even if save fails
@@ -1358,7 +1320,6 @@ function loadPuzzleState() {
     if (!saved) return null;
 
     const puzzleState = JSON.parse(saved);
-    console.log('Puzzle state loaded from localStorage');
     return puzzleState;
   } catch (error) {
     console.error('Failed to load puzzle state:', error);
@@ -1411,7 +1372,6 @@ function hasMeaningfulProgress(puzzleState) {
 function clearPuzzleState() {
   try {
     localStorage.removeItem('sumwords_currentPuzzle');
-    console.log('Puzzle state cleared from localStorage');
   } catch (error) {
     console.error('Failed to clear puzzle state:', error);
   }
@@ -1428,7 +1388,6 @@ function savePreferences() {
     };
 
     localStorage.setItem('sumwords_preferences', JSON.stringify(preferences));
-    console.log('Preferences saved:', preferences);
   } catch (error) {
     console.error('Failed to save preferences:', error);
   }
@@ -1444,7 +1403,6 @@ function loadPreferences() {
     if (!saved) return null;
 
     const preferences = JSON.parse(saved);
-    console.log('Preferences loaded:', preferences);
     return preferences;
   } catch (error) {
     console.error('Failed to load preferences:', error);
@@ -1504,7 +1462,6 @@ function loadStatistics() {
     if (!saved) return getDefaultStats();
 
     const stats = JSON.parse(saved);
-    console.log('Statistics loaded:', stats);
     return stats;
   } catch (error) {
     console.error('Failed to load statistics:', error);
@@ -1520,7 +1477,6 @@ function loadStatistics() {
 function saveStatistics(stats) {
   try {
     localStorage.setItem('sumwords_statistics', JSON.stringify(stats));
-    console.log('Statistics saved:', stats);
   } catch (error) {
     console.error('Failed to save statistics:', error);
   }
@@ -1580,10 +1536,6 @@ function updateStatistics(difficulty, attempts, hints) {
   }
 
   saveStatistics(stats);
-  console.log(`Statistics updated for ${difficulty} difficulty:`, stats);
-  if (selectedDifficulty === 'random') {
-    console.log('Also tracked in random category');
-  }
 }
 
 /**
@@ -1593,7 +1545,6 @@ function resetStreak() {
   const stats = loadStatistics();
   stats.overall.currentStreak = 0;
   saveStatistics(stats);
-  console.log('Win streak reset');
 }
 
 /* ===================================
@@ -1605,16 +1556,11 @@ let currentPuzzle = null;
 
 // Initialize game when page loads
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('========================================');
-  console.log('DOM CONTENT LOADED - INITIALIZING GAME');
-  console.log('========================================');
   initializeGame();
 });
 
 function initializeGame() {
-  console.log('========================================');
-  console.log('INITIALIZE GAME FUNCTION CALLED');
-  console.log('========================================');
+  showGameVersion();
 
   // Load saved preferences
   const savedPreferences = loadPreferences();
@@ -1631,15 +1577,11 @@ function initializeGame() {
     difficultySelect.value = savedPreferences.difficulty;
     gameState.currentCategory = savedPreferences.category;
     gameState.currentDifficulty = savedPreferences.difficulty;
-    console.log('Loaded saved preferences:', savedPreferences);
   } else {
     // Use default values from dropdowns
     gameState.currentCategory = categorySelect.value;
     gameState.currentDifficulty = difficultySelect.value;
   }
-
-  console.log('Selected category:', gameState.currentCategory);
-  console.log('Selected difficulty:', gameState.currentDifficulty);
 
   // Set up event listeners FIRST (before showing any modals)
   setupEventListeners();
@@ -1658,8 +1600,6 @@ function initializeGame() {
     }
     startNewGame();
   }
-
-  console.log('Game initialized');
 }
 
 /**
@@ -1676,14 +1616,12 @@ function showResumeModal(savedPuzzle) {
 
   // Resume button handler
   resumeBtn.onclick = () => {
-    console.log('User chose to resume puzzle');
     modal.classList.add('hidden');
     resumeSavedGame(savedPuzzle);
   };
 
   // New game button handler
   newGameBtn.onclick = () => {
-    console.log('User chose to start new puzzle');
     modal.classList.add('hidden');
     clearPuzzleState();
     startNewGame();
@@ -1714,8 +1652,6 @@ function startNewGame() {
 
   // Save the new puzzle state
   savePuzzleState();
-
-  console.log('New game started:', currentPuzzle);
 }
 
 /**
@@ -1755,7 +1691,6 @@ function resumeSavedGame(savedPuzzle) {
   document.getElementById('hint-count').textContent = gameState.hintsUsed;
 
   showFeedback('Puzzle resumed!', 'success');
-  console.log('Game resumed from saved state');
 }
 
 /**
@@ -1845,11 +1780,6 @@ function restoreUserInputs(savedGameState) {
  * @param {object} puzzle - Puzzle object to load
  */
 function loadPuzzle(puzzle) {
-  console.log('=== LOAD PUZZLE START ===');
-  console.log('Puzzle object:', puzzle);
-  console.log('Puzzle difficulty:', puzzle?.difficulty);
-  console.log('Number of equations:', puzzle?.equations?.length);
-
   // Show assigned difficulty if random was selected
   const assignedDifficultyEl = document.getElementById('assigned-difficulty');
   if (gameState.assignedDifficulty) {
@@ -1871,9 +1801,7 @@ function loadPuzzle(puzzle) {
     puzzle.columnTargets.column2;
 
   // Update equation questions and operators
-  console.log('=== UPDATING EQUATIONS ===');
   puzzle.equations.forEach((eq) => {
-    console.log(`Processing equation ${eq.id}`);
     const equationDiv = document.querySelector(`[data-equation="${eq.id}"]`);
     equationDiv.querySelector('.question').textContent = eq.question;
 
@@ -1885,21 +1813,16 @@ function loadPuzzle(puzzle) {
   });
 
   // Clear any previous state
-  console.log('Calling resetGameState...');
   resetGameState();
 
   // Populate number pool
-  console.log('Calling renderNumberPool...');
   renderNumberPool(puzzle);
 
   // Update column totals (initially 0)
-  console.log('Calling updateColumnTotals...');
   updateColumnTotals();
 
   // Initialize hint button states (disabled until equation selected)
   updateHintButtonStates();
-
-  console.log('=== LOAD PUZZLE END ===');
 }
 
 /**
@@ -1997,7 +1920,6 @@ function setupEventListeners() {
   // Solution input changes (with validation)
   document.querySelectorAll('.blank.solution').forEach((input, index) => {
     input.addEventListener('input', validateSolutionInput);
-    input.addEventListener('input', handleSolutionInput); // For logging
   });
 
   // Submit button
@@ -2032,14 +1954,6 @@ function setupEventListeners() {
   document.querySelectorAll('.equation').forEach((equation) => {
     equation.addEventListener('click', handleEquationSelect);
   });
-
-  console.log('========================================');
-  console.log('EVENT LISTENERS SET UP COMPLETE');
-  console.log(
-    'Difficulty select listener attached to:',
-    document.getElementById('difficulty-select')
-  );
-  console.log('========================================');
 }
 /* ===================================
   POOL NUMBER CLICK HANDLER
@@ -2083,8 +1997,6 @@ function handlePoolClick(event) {
   clickedNumber.classList.add('selected');
   gameState.selectedNumber = parseInt(clickedNumber.dataset.number);
   gameState.selectedNumberElement = clickedNumber;
-
-  console.log('Selected pool number:', gameState.selectedNumber);
 }
 
 function deselectPoolNumber() {
@@ -2180,8 +2092,6 @@ function selectBlankForPlacement(blank) {
   // Select this blank
   blank.classList.add('selected');
   gameState.selectedBlank = blank;
-
-  console.log('Blank selected, click a pool number to place it here');
 }
 
 /**
@@ -2205,8 +2115,6 @@ function placeNumberInBlank(blank, position) {
   // Mark pool number as used
   gameState.selectedNumberElement.classList.add('used');
   gameState.poolNumbersUsed.push(gameState.selectedNumber);
-
-  console.log(`Placed ${gameState.selectedNumber} in ${position}`);
 
   // Deselect pool number, blank, and update totals
   deselectPoolNumber();
@@ -2246,22 +2154,8 @@ function returnNumberToPool(blank, position) {
     }
   });
 
-  console.log(`Returned ${numberValue} from ${position} to pool`);
   updateColumnTotals();
   savePuzzleState(); // AUTO-SAVE after returning number
-}
-
-/* ===================================
-  SOLUTION INPUT HANDLER
-  =================================== */
-
-function handleSolutionInput(event) {
-  // Validation is now handled by validateSolutionInput()
-  // This function can be removed or kept for logging
-  const position = event.target.dataset.position;
-  const value = gameState.userInputs[position];
-
-  console.log(`Solution entered for ${position}:`, value);
 }
 
 /* ===================================
@@ -2503,15 +2397,11 @@ function handleWin() {
 
   // Trigger confetti
   triggerConfetti();
-
-  console.log('Puzzle completed! Statistics updated.');
 }
 
 function handleErrors(errors) {
   const message = 'Not quite right:\n' + errors.join('\n');
   showFeedback(message, 'error');
-
-  console.log('Validation errors:', errors);
 }
 
 function showFeedback(message, type) {
@@ -2528,8 +2418,6 @@ function showFeedback(message, type) {
  * Generate and load a completely new puzzle
  */
 function handleNewPuzzle() {
-  console.log('New puzzle requested');
-
   // Generate new puzzle
   currentPuzzle = generatePuzzle(
     gameState.currentCategory,
@@ -2603,8 +2491,6 @@ function handleReset() {
 
   showFeedback('Puzzle reset. Try again!', 'warning');
 
-  console.log('Puzzle reset');
-
   // Reset streak (user gave up on this puzzle)
   resetStreak();
 
@@ -2633,7 +2519,6 @@ function handleCategoryChange(event) {
   loadPuzzle(currentPuzzle);
   showFeedback(`New ${gameState.currentCategory} puzzle loaded!`, 'success');
 
-  console.log('Category changed to:', gameState.currentCategory);
   savePreferences(); // Save category preference
   clearPuzzleState(); // Clear old puzzle
   savePuzzleState(); // Save new puzzle
@@ -2643,29 +2528,22 @@ function handleCategoryChange(event) {
  * Handle difficulty selection change
  */
 function handleDifficultyChange(event) {
-  console.log('=== DIFFICULTY CHANGE START ===');
   gameState.currentDifficulty = event.target.value;
-  console.log('Selected difficulty:', gameState.currentDifficulty);
 
   // Generate new puzzle with selected difficulty
-  console.log('Calling generatePuzzle...');
   currentPuzzle = generatePuzzle(
     gameState.currentCategory,
     gameState.currentDifficulty
   );
 
   if (!currentPuzzle) {
-    console.log('ERROR: generatePuzzle returned null/undefined');
     showFeedback('Failed to generate puzzle. Please try again.', 'error');
     return;
   }
 
-  console.log('Puzzle generated successfully:', currentPuzzle);
-  console.log('Calling loadPuzzle...');
   loadPuzzle(currentPuzzle);
   showFeedback(`New ${gameState.currentDifficulty} puzzle loaded!`, 'success');
 
-  console.log('=== DIFFICULTY CHANGE END ===');
   savePreferences(); // Save difficulty preference
   clearPuzzleState(); // Clear old puzzle
   savePuzzleState(); // Save new puzzle
@@ -2740,8 +2618,6 @@ function handleEquationSelect(event) {
 
   // Update hint button states (enable buttons)
   updateHintButtonStates();
-
-  console.log('Selected equation for hint:', equationId);
 }
 
 /**
@@ -2803,7 +2679,6 @@ function revealAnswer() {
   savePuzzleState();
 
   showFeedback('Answer revealed!', 'success');
-  console.log(`Revealed answer: ${equation.answer} for equation ${equationId}`);
 }
 
 /**
@@ -2878,9 +2753,6 @@ function revealNumbers() {
   savePuzzleState();
 
   showFeedback('Numbers revealed!', 'success');
-  console.log(
-    `Revealed numbers: ${operands[0]}, ${operands[1]} for equation ${equationId}`
-  );
 }
 
 /**
@@ -3028,8 +2900,6 @@ function showStatsModal() {
 
   // Show modal
   modal.classList.remove('hidden');
-
-  console.log('Statistics modal opened');
 }
 
 /**
@@ -3068,7 +2938,6 @@ function updateDifficultyStats(difficulty, stats) {
 function closeStatsModal() {
   const modal = document.getElementById('stats-modal');
   modal.classList.add('hidden');
-  console.log('Statistics modal closed');
 }
 
 /**
@@ -3093,7 +2962,6 @@ function handleResetStats() {
       'Statistics reset successfully. Tutorial will show on next page load.',
       'success'
     );
-    console.log('Statistics reset');
   }
 }
 
