@@ -429,6 +429,41 @@
           </div>
         </div>
 
+        <!-- Win panel (shown in place of the feedback line after a win) -->
+        <div class="win-panel" id="win-panel" role="status" hidden>
+          <p class="win-title">🎉 Puzzle complete!</p>
+          <p class="win-stats">
+            <span id="win-attempts"></span> ·
+            <span id="win-hints"></span> ·
+            Win streak: <span id="win-streak"></span>
+          </p>
+          <div class="win-buttons">
+            <button class="btn btn-primary" id="share-btn" type="button">
+              Share result
+            </button>
+            <button
+              class="btn btn-secondary"
+              id="win-new-puzzle-btn"
+              type="button"
+            >
+              New Puzzle
+            </button>
+          </div>
+          <div class="share-fallback" id="share-fallback" hidden>
+            <p>
+              Couldn't copy automatically. Select the text below and copy it
+              by hand.
+            </p>
+            <textarea
+              id="share-fallback-text"
+              class="share-fallback-text"
+              readonly
+              rows="8"
+              aria-label="Share result text"
+            ></textarea>
+          </div>
+        </div>
+
         <!-- Feedback Area -->
         <div class="feedback" id="feedback">
           <!-- Validation messages appear here -->

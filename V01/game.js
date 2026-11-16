@@ -1264,6 +1264,7 @@ const gameState = {
   selectedEquationForHint: null, // Currently selected equation for hint
   hintedEquations: {}, // Object: { equationId: ['?', '#'] } tracks hint types used
   assignedDifficulty: null, // Stores actual difficulty when "random" is selected
+  attemptHistory: [], // One entry per Submit press, used for the share result
 };
 
 /* ===================================
@@ -1299,6 +1300,7 @@ function savePuzzleState() {
         currentCategory: gameState.currentCategory,
         currentDifficulty: gameState.currentDifficulty,
         assignedDifficulty: gameState.assignedDifficulty,
+        attemptHistory: gameState.attemptHistory,
       },
       timestamp: new Date().toISOString(),
     };
@@ -1659,32 +1661,34 @@ function startNewGame() {
  * @param {object} savedPuzzle - The saved puzzle state
  */
 function resumeSavedGame(savedPuzzle) {
+  const saved = savedPuzzle.gameState;
+
   // Restore puzzle data
   currentPuzzle = savedPuzzle.puzzle;
 
-  // Restore game state
-  gameState.userInputs = savedPuzzle.gameState.userInputs || {}; // FIXED: was userAnswers
-  gameState.poolNumbersUsed = savedPuzzle.gameState.poolNumbersUsed || [];
-  gameState.attempts = savedPuzzle.gameState.attempts || 0;
-  gameState.hintsUsed = savedPuzzle.gameState.hintsUsed || 0;
-  gameState.hintedEquations = withoutOperatorMarkers(
-    savedPuzzle.gameState.hintedEquations
-  );
-  gameState.currentCategory = savedPuzzle.gameState.currentCategory;
-  gameState.currentDifficulty = savedPuzzle.gameState.currentDifficulty;
-  gameState.assignedDifficulty =
-    savedPuzzle.gameState.assignedDifficulty || null;
+  gameState.currentCategory = saved.currentCategory;
+  gameState.currentDifficulty = saved.currentDifficulty;
+  gameState.assignedDifficulty = saved.assignedDifficulty || null; // Read by loadPuzzle for "Playing: ..."
 
   // Update dropdowns to match saved puzzle
   document.getElementById('category-select').value = gameState.currentCategory;
   document.getElementById('difficulty-select').value =
     gameState.currentDifficulty;
 
-  // Load puzzle into UI
+  // Load puzzle into UI. This resets gameState, so the saved progress is
+  // restored after it below.
   loadPuzzle(currentPuzzle);
 
-  // Restore user inputs to UI
-  restoreUserInputs(savedPuzzle.gameState);
+  gameState.poolNumbersUsed = saved.poolNumbersUsed || [];
+  gameState.attempts = saved.attempts || 0;
+  gameState.hintsUsed = saved.hintsUsed || 0;
+  gameState.hintedEquations = withoutOperatorMarkers(saved.hintedEquations);
+  gameState.attemptHistory = Array.isArray(saved.attemptHistory)
+    ? saved.attemptHistory
+    : []; // Saves from before share results have no history
+
+  // Restore user inputs to UI (also sets gameState.userInputs)
+  restoreUserInputs(saved);
 
   // Update counters
   document.getElementById('attempt-count').textContent = gameState.attempts;
@@ -1780,6 +1784,8 @@ function restoreUserInputs(savedGameState) {
  * @param {object} puzzle - Puzzle object to load
  */
 function loadPuzzle(puzzle) {
+  hideWinPanel(); // Every new or resumed puzzle starts without the win panel
+
   // Show assigned difficulty if random was selected
   const assignedDifficultyEl = document.getElementById('assigned-difficulty');
   if (gameState.assignedDifficulty) {
@@ -1840,6 +1846,7 @@ function resetGameState() {
   gameState.selectedEquationForHint = null;
   gameState.hintedEquations = {}; // Reset to empty object
   gameState.assignedDifficulty = null;
+  gameState.attemptHistory = [];
 
   // Clear UI - operand blanks
   document.querySelectorAll('.blank.operand').forEach((blank) => {
@@ -1981,6 +1988,12 @@ function setupEventListeners() {
     .getElementById('new-puzzle-btn')
     .addEventListener('click', handleNewPuzzle);
   document.getElementById('reset-btn').addEventListener('click', handleReset);
+
+  // Win panel
+  document.getElementById('share-btn').addEventListener('click', handleShare);
+  document
+    .getElementById('win-new-puzzle-btn')
+    .addEventListener('click', handleNewPuzzle);
 
   // Category and difficulty selectors
   document
@@ -2293,6 +2306,15 @@ function handleSubmit() {
   gameState.attempts++;
   document.getElementById('attempt-count').textContent = gameState.attempts;
 
+  // Record this attempt for the share result (before validating, which only highlights)
+  gameState.attemptHistory.push(
+    buildAttemptEntry(
+      currentPuzzle.equations,
+      currentPuzzle.columnTargets,
+      gameState.userInputs
+    )
+  );
+
   // Validate all conditions
   const validation = validatePuzzle();
 
@@ -2456,11 +2478,8 @@ function handleWin() {
   // Clear saved puzzle (completed)
   clearPuzzleState();
 
-  // Show win message
-  showFeedback(
-    `🎉 Puzzle Complete! Attempts: ${gameState.attempts}, Hints: ${gameState.hintsUsed}`,
-    'success'
-  );
+  // Show the win panel in place of the one-line message
+  showWinPanel();
 
   // Trigger confetti
   triggerConfetti();
@@ -2475,6 +2494,196 @@ function showFeedback(message, type) {
   const feedback = document.getElementById('feedback');
   feedback.textContent = message;
   feedback.className = `feedback ${type}`;
+}
+
+/* ===================================
+  SHARE RESULTS
+  =================================== */
+
+const SHARE_URL = 'https://thebimsider.github.io/sumwords/V01/';
+const SHARE_MAX_ROWS = 8; // Grid shows only the last rows of a very long game
+const SHARE_SQUARES = { correct: '🟩', wrong: '🟥', empty: '⬜' };
+let shareLabelTimer = null;
+
+/**
+ * Records one Submit press as a spoiler-free result: each equation's status
+ * and whether each column matches its target. Reads only its arguments.
+ * An equation is 'correct' when its numbers work out AND the solution matches
+ * the trivia answer, 'empty' when any blank is unfilled, otherwise 'wrong'.
+ * A column is true only when all its blanks are filled and the total matches.
+ *
+ * @param {object[]} equations - currentPuzzle.equations
+ * @param {{column1: number, column2: number}} columnTargets - currentPuzzle.columnTargets
+ * @param {object} userInputs - gameState.userInputs
+ * @returns {{equations: string[], columns: boolean[]}} One attempt's result
+ */
+function buildAttemptEntry(equations, columnTargets, userInputs) {
+  const equationResults = equations.map((eq) => {
+    const op1 = userInputs[`op1-${eq.id}`];
+    const op2 = userInputs[`op2-${eq.id}`];
+    const sol = userInputs[`sol-${eq.id}`];
+    if (isBlank(op1) || isBlank(op2) || isBlank(sol)) return 'empty';
+
+    const numbersWork = applyOperator(eq.operator, op1, op2) === sol;
+    return numbersWork && sol === eq.answer ? 'correct' : 'wrong';
+  });
+
+  const columnComplete = (prefix, target) => {
+    const values = equations.map((eq) => userInputs[`${prefix}-${eq.id}`]);
+    if (values.some(isBlank)) return false;
+    return values.reduce((total, value) => total + value, 0) === target;
+  };
+
+  return {
+    equations: equationResults,
+    columns: [
+      columnComplete('op1', columnTargets.column1),
+      columnComplete('op2', columnTargets.column2),
+    ],
+  };
+}
+
+/**
+ * Builds the text copied by "Share result". Pure: no page or game globals.
+ *
+ * @param {object} result
+ * @param {string} result.version - GAME_VERSION
+ * @param {string} result.url - Game link shown on the last line
+ * @param {string} result.currentDifficulty - 'easy', 'medium', 'hard' or 'random'
+ * @param {string|null} result.assignedDifficulty - Actual level when random was chosen
+ * @param {number} result.attempts - True attempt count (may exceed history length)
+ * @param {number} result.hints - Hints used
+ * @param {{equations: string[], columns: boolean[]}[]} result.history - One entry per Submit
+ * @returns {string} Share text with no trivia or puzzle numbers
+ */
+function buildShareText({
+  version,
+  url,
+  currentDifficulty,
+  assignedDifficulty,
+  attempts,
+  hints,
+  history,
+}) {
+  const difficultyKey = assignedDifficulty || currentDifficulty;
+  const difficulty =
+    difficultyKey.charAt(0).toUpperCase() + difficultyKey.slice(1);
+  const perfect = attempts === 1 && hints === 0;
+
+  const lines = [
+    `Sumwords v${version} · ${difficulty}`,
+    `${countWord(attempts, 'attempt')} · ${countWord(hints, 'hint')}${perfect ? ' ⭐' : ''}`,
+    '',
+  ];
+
+  history.slice(-SHARE_MAX_ROWS).forEach((entry) => {
+    const equationRow = entry.equations
+      .map((status) => SHARE_SQUARES[status] || SHARE_SQUARES.empty)
+      .join('');
+    const columnRow = entry.columns
+      .map((ok) => (ok ? SHARE_SQUARES.correct : SHARE_SQUARES.wrong))
+      .join('');
+    lines.push(`${equationRow} ${columnRow}`);
+  });
+
+  lines.push('', url);
+  return lines.join('\n');
+}
+
+/**
+ * "1 attempt", "3 attempts", "1 hint", "2 hints"
+ * @param {number} count
+ * @param {string} word - Singular noun
+ * @returns {string}
+ */
+function countWord(count, word) {
+  return `${count} ${word}${count === 1 ? '' : 's'}`;
+}
+
+/**
+ * Show the win panel in place of the one-line success message.
+ * Call after updateStatistics so the streak is up to date.
+ */
+function showWinPanel() {
+  document.getElementById('win-attempts').textContent = countWord(
+    gameState.attempts,
+    'attempt'
+  );
+  document.getElementById('win-hints').textContent = countWord(
+    gameState.hintsUsed,
+    'hint'
+  );
+  document.getElementById('win-streak').textContent =
+    loadStatistics().overall.currentStreak;
+
+  document.getElementById('feedback').hidden = true;
+  document.getElementById('win-panel').hidden = false;
+}
+
+/**
+ * Hide the win panel and bring back the message line. Safe to call anytime.
+ */
+function hideWinPanel() {
+  clearTimeout(shareLabelTimer);
+  shareLabelTimer = null;
+  document.getElementById('share-btn').textContent = 'Share result';
+  document.getElementById('share-fallback').hidden = true;
+  document.getElementById('share-fallback-text').value = '';
+
+  document.getElementById('win-panel').hidden = true;
+  document.getElementById('feedback').hidden = false;
+}
+
+/**
+ * Copy the share text. If the clipboard is unavailable (for example a
+ * file:// page or permission denied), show the text in a box to copy by hand.
+ */
+async function handleShare() {
+  const text = buildShareText({
+    version: GAME_VERSION,
+    url: SHARE_URL,
+    currentDifficulty: gameState.currentDifficulty,
+    assignedDifficulty: gameState.assignedDifficulty,
+    attempts: gameState.attempts,
+    hints: gameState.hintsUsed,
+    history: gameState.attemptHistory,
+  });
+
+  try {
+    await navigator.clipboard.writeText(text);
+    showShareCopied();
+  } catch (error) {
+    showShareFallback(text);
+  }
+}
+
+/**
+ * Tell the player the result was copied: the button reads "Copied!" for
+ * two seconds, then goes back to "Share result".
+ */
+function showShareCopied() {
+  const button = document.getElementById('share-btn');
+  document.getElementById('share-fallback').hidden = true;
+  button.textContent = 'Copied!';
+
+  clearTimeout(shareLabelTimer);
+  shareLabelTimer = setTimeout(() => {
+    button.textContent = 'Share result';
+    shareLabelTimer = null;
+  }, 2000);
+}
+
+/**
+ * Show the result in a read-only text box, selected, so the player can copy
+ * it by hand when the clipboard is blocked (for example on a file:// page).
+ * @param {string} text - The share text to show
+ */
+function showShareFallback(text) {
+  const box = document.getElementById('share-fallback-text');
+  box.value = text;
+  document.getElementById('share-fallback').hidden = false;
+  box.focus();
+  box.select();
 }
 
 /* ===================================
@@ -2587,6 +2796,8 @@ function handleReset() {
   gameState.hintsUsed = 0;
   gameState.selectedEquationForHint = null;
   gameState.hintedEquations = {}; // Reset to empty object
+  gameState.attemptHistory = [];
+  hideWinPanel();
 
   // Clear UI - operand blanks
   document.querySelectorAll('.blank.operand').forEach((blank) => {

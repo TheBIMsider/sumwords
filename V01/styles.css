@@ -834,6 +834,75 @@ body {
 }
 
 /* ===================================
+   WIN PANEL & SHARE RESULT
+   =================================== */
+
+.win-panel {
+  min-height: 60px;
+  padding: 12px;
+  border-radius: 8px;
+  text-align: center;
+  background-color: var(--state-correct-bg);
+  color: var(--state-correct-text);
+  border: 2px solid var(--state-correct-border);
+}
+
+.win-title {
+  margin: 0 0 4px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.win-stats {
+  margin: 0 0 12px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.win-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.win-buttons .btn {
+  flex: 1 1 140px;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.share-fallback {
+  margin-top: 12px;
+  text-align: left;
+}
+
+.share-fallback p {
+  margin: 0 0 8px;
+  font-size: 13px;
+}
+
+.share-fallback-text {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--text-primary);
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-medium);
+  border-radius: 6px;
+  resize: vertical;
+}
+
+/* ===================================
    TUTORIAL OVERLAY
    =================================== */
 
