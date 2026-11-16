@@ -206,6 +206,8 @@ Add it to the array for its category. Example, added to `science`:
 
 This project is licensed under the **BSD 3-Clause License** - see the [LICENSE](LICENSE) file for details.
 
+Copyright © 2026 Carl Storms (The BIMsider)
+
 ## 👤 Author (Vibe Coder)
 
 **Carl Storms (The BIMsider)** With the help of his AI Buddy 🤖 **Claude Code**
