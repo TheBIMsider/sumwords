@@ -70,7 +70,6 @@ vm.runInContext(
 function build(difficulty, specs) {
   const equations = [];
   const userInputs = {};
-  const userOperators = {};
   let column1 = 0;
   let column2 = 0;
   specs.forEach(([a, operator, b, answer], i) => {
@@ -79,7 +78,6 @@ function build(difficulty, specs) {
     userInputs[`op1-${id}`] = a;
     userInputs[`op2-${id}`] = b;
     userInputs[`sol-${id}`] = answer;
-    userOperators[id] = operator;
     column1 += a;
     column2 += b;
   });
@@ -93,8 +91,8 @@ function build(difficulty, specs) {
     },
     state: {
       userInputs,
-      userOperators,
-      poolNumbersUsed: new Array(poolSize).fill(1),
+      // Only the operand blanks are filled; decoys stay in the pool
+      poolNumbersUsed: new Array(specs.length * 2).fill(1),
     },
   };
 }
@@ -123,23 +121,20 @@ const EASY = [
   [6, '-', 3, 3],
   [12, '+', 8, 20],
 ];
-const MEDIUM = [...EASY, [10, '-', 4, 6]];
+const MEDIUM = EASY.map((spec) => [...spec]);
 const HARD = [
   [2, '+', 3, 5],
   [30, '-', 27, 3],
   [6, '×', 4, 24],
   [20, '÷', 5, 4],
   [7, '+', 8, 15],
-  [9, '-', 2, 7],
-  [3, '×', 5, 15],
-  [12, '÷', 3, 4],
 ];
 
 // ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
 
-// A correct puzzle wins at every size (5, 6 and 8 equations)
+// A correct puzzle wins on every level (5 equations each; the pool differs)
 for (const [difficulty, specs] of [
   ['Easy', EASY],
   ['Medium', MEDIUM],
@@ -154,36 +149,37 @@ for (const [difficulty, specs] of [
   );
 }
 
-// Pool-size message uses the real pool size
-for (const [difficulty, specs, size] of [
-  ['Easy', EASY, 10],
-  ['Medium', MEDIUM, 12],
-  ['Hard', HARD, 16],
+// Decoys are never placed: 10 numbers used is enough on every level, and the
+// message counts against the 10 operand blanks, not the whole pool
+for (const [difficulty, specs] of [
+  ['Easy', EASY],
+  ['Medium', MEDIUM],
+  ['Hard', HARD],
 ]) {
   const { puzzle, state } = build(difficulty, specs);
   state.poolNumbersUsed.pop();
   const result = check(puzzle, state);
   expect(
-    `${difficulty}: pool message says ${size - 1}/${size}`,
-    result.errors.includes(`Only ${size - 1}/${size} pool numbers used`),
+    `${difficulty}: pool message says 9/10`,
+    result.errors.includes('Only 9/10 pool numbers used'),
     JSON.stringify(result.errors)
   );
 }
 
-// The sixth and eighth equations count towards the column totals
+// The last equation counts towards the column totals
 {
   const { puzzle, state } = build('Hard', HARD);
-  state.userInputs['op1-8'] = 13;
+  state.userInputs['op1-5'] = 13;
   const result = check(puzzle, state);
   const expected = puzzle.columnTargets.column1;
   expect(
-    'Hard: a change in equation 8 changes the column 1 total',
+    'Hard: a change in equation 5 changes the column 1 total',
     result.errors.some((e) => e.includes(`should be ${expected}`)),
     JSON.stringify(result.errors)
   );
 }
 
-// Inputs left over for equations the puzzle doesn't have are ignored
+// Inputs left over for equations the puzzle doesn't have are ignored (6 is one past the end)
 {
   const { puzzle, state } = build('Easy', EASY);
   state.userInputs['op1-6'] = 99;
@@ -222,15 +218,15 @@ expect('isBlank(undefined)', sandbox.isBlank(undefined) === true);
 expect('isBlank(null)', sandbox.isBlank(null) === true);
 expect('isBlank(NaN)', sandbox.isBlank(NaN) === true);
 
-// Incomplete equations (empty blank, or no operator chosen)
+// Incomplete equations (empty blank)
 {
   const { puzzle, state } = build('Medium', MEDIUM);
   delete state.userInputs['sol-3'];
-  delete state.userOperators[4];
+  delete state.userInputs['op1-4'];
   const result = check(puzzle, state);
   expect(
-    'Medium: empty blank and missing operator reported as not finished',
-    result.errors.includes('Equations 3, 4: a number or operator is missing'),
+    'Medium: empty blanks reported as not finished',
+    result.errors.includes('Equations 3, 4: a number is missing'),
     JSON.stringify(result.errors)
   );
   expect(
@@ -240,61 +236,30 @@ expect('isBlank(NaN)', sandbox.isBlank(NaN) === true);
   );
 }
 
-// Wrong operator is reported separately from wrong numbers
-{
-  const { puzzle, state } = build('Medium', MEDIUM);
-  state.userOperators[2] = '+'; // 9 + 5 = 14, not 4
-  const result = check(puzzle, state);
-  expect(
-    'Medium: wrong operator reported on its own',
-    result.errors.includes('Equation 2: wrong operator') &&
-      !result.errors.some((e) => e.includes('numbers do not give')),
-    JSON.stringify(result.errors)
-  );
-}
+// Wrong numbers are checked against the equation's own (visible) operator
 {
   const { puzzle, state } = build('Medium', MEDIUM);
   state.userInputs['op2-3'] = 9; // 3 + 9 = 12, not 7
   const result = check(puzzle, state);
   expect(
-    'Medium: wrong numbers reported on their own',
-    result.errors.includes(
-      'Equation 3: the numbers do not give the answer'
-    ) && !result.errors.some((e) => e.includes('wrong operator')),
+    'Medium: wrong numbers reported',
+    result.errors.includes('Equation 3: the numbers do not give the answer'),
     JSON.stringify(result.errors)
   );
+  expect('Medium: equation 3 highlighted', highlighted.has(3));
 }
 
-// Wrong operator AND wrong numbers in the same equation: both reported
-{
-  const { puzzle, state } = build('Medium', MEDIUM);
-  state.userOperators[2] = '+';
-  state.userInputs['op2-2'] = 7; // 9 - 7 = 2, not 4, so numbers are wrong too
-  const result = check(puzzle, state);
-  expect(
-    'Medium: wrong operator and wrong numbers both reported',
-    result.errors.includes('Equation 2: wrong operator') &&
-      result.errors.includes(
-        'Equation 2: the numbers do not give the answer'
-      ),
-    JSON.stringify(result.errors)
-  );
-  expect('Medium: equation 2 highlighted', highlighted.has(2));
-}
-
-// The generator no longer builds ambiguous equations (see generator.test.js),
-// but a puzzle saved by an older version might hold one. Submit accepts an
-// equation that works with a different operator (2 + 2 = 2 x 2) rather than
-// calling a correct equation "wrong operator".
+// The operator is never chosen by the player: 2 x 2 = 4 does not pass for an
+// equation that shows +, because 2 + 2 is what is on screen.
 {
   const specs = HARD.map((s) => [...s]);
-  specs[0] = [2, '+', 2, 4];
+  specs[0] = [2, '+', 3, 5];
   const { puzzle, state } = build('Hard', specs);
-  state.userOperators[1] = '×';
+  state.userInputs['sol-1'] = 6; // 2 + 3 is not 6
   const result = check(puzzle, state);
   expect(
-    'Hard: 2 × 2 = 4 accepted where the puzzle used +',
-    result.success,
+    'Hard: result is checked against the shown operator',
+    result.errors.includes('Equation 1: the numbers do not give the answer'),
     JSON.stringify(result.errors)
   );
 }

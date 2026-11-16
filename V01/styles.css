@@ -560,13 +560,6 @@ body {
   color: var(--hint-revealed-text) !important;
 }
 
-.operator-select.hint-revealed {
-  background-color: var(--hint-revealed-bg);
-  border-color: var(--hint-revealed-border);
-  font-style: italic;
-  color: var(--hint-revealed-text);
-}
-
 .solution.hint-revealed {
   background-color: var(--hint-revealed-bg);
   border-color: var(--hint-revealed-border);
@@ -588,51 +581,11 @@ body {
   user-select: none;
 }
 
-/* Operator container for showing/hiding based on difficulty */
+/* Operator is plain text on every difficulty */
 .operator-container {
   display: inline-block;
   min-width: 40px;
   text-align: center;
-}
-
-.operator-container .operator {
-  display: inline;
-}
-
-.operator-container .operator.hidden {
-  display: none;
-}
-
-.operator-container .operator-select {
-  display: none;
-}
-
-.operator-container .operator-select.visible {
-  display: inline-block;
-}
-
-.operator-select {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--text-tertiary);
-  border: 2px solid var(--color-primary-blue);
-  border-radius: 6px;
-  background-color: var(--bg-container);
-  padding: 4px 8px;
-  cursor: pointer;
-  text-align: center;
-  min-width: 50px;
-}
-
-.operator-select:focus {
-  outline: none;
-  border-color: var(--selection-border);
-  background-color: var(--selection-bg);
-}
-
-/* Style for selected operator */
-.operator-select option {
-  font-size: 18px;
 }
 
 /* ===================================
