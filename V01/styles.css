@@ -262,9 +262,10 @@ body {
    =================================== */
 
 .game-container {
+  --gutter: 16px; /* Side padding; the sticky strips use it to span the full width */
   max-width: 600px;
   margin: 0 auto;
-  padding: 16px;
+  padding: var(--gutter);
   background-color: var(--bg-container);
   min-height: 100vh;
   display: flex;
@@ -394,8 +395,8 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-  margin: 0 -16px 12px;
-  padding: 8px 16px;
+  margin: 0 calc(var(--gutter) * -1) 12px;
+  padding: 8px var(--gutter);
   background-color: var(--bg-container);
   border-bottom: 1px solid var(--border-light);
 }
@@ -979,8 +980,8 @@ body {
   /* Number pool (sticky on every screen size, see NUMBER POOL): full width and
      compact here so it covers less of the equations */
   .number-pool {
-    margin: 0 -16px 12px;
-    padding: 8px 16px;
+    margin: 0 calc(var(--gutter) * -1) 12px;
+    padding: 8px var(--gutter);
     border-radius: 0;
     border-width: 2px 0 0 0;
   }
@@ -997,48 +998,38 @@ body {
     white-space: nowrap;
   }
 
-  /* Flex wrap (not grid) so a short last row, such as Hard's 4 tiles, is centered.
-     max-width = columns x tile width + gaps, so rows wrap at 5, 6 and 6 tiles. */
-  .pool-numbers {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    justify-content: center;
-  }
-
+  /* Tiles per row and tile size for each difficulty (Hard: 16 tiles as 6, 6, 4) */
   .pool-numbers[data-difficulty='easy'] {
-    max-width: 244px; /* 5 x 44 + 4 x 6 */
+    --cols: 5;
+    --tile: 44px;
   }
 
   .pool-numbers[data-difficulty='medium'] {
-    max-width: 282px; /* 6 x 42 + 5 x 6 */
+    --cols: 6;
+    --tile: 42px;
   }
 
-  /* Hard: 16 tiles as 6, 6 and 4 (centered) */
   .pool-numbers[data-difficulty='hard'] {
-    max-width: 270px; /* 6 x 40 + 5 x 6 */
+    --cols: 6;
+    --tile: 40px;
+  }
+
+  /* Flex wrap (not grid) so a short last row is centered. max-width is exactly
+     --cols tiles plus their gaps, so rows wrap after --cols tiles. */
+  .pool-numbers[data-difficulty] {
+    --gap: 6px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap);
+    justify-content: center;
+    max-width: calc(var(--cols) * var(--tile) + (var(--cols) - 1) * var(--gap));
   }
 
   .pool-numbers .pool-number {
     flex: none;
-  }
-
-  .pool-numbers[data-difficulty='easy'] .pool-number {
-    width: 44px;
-    height: 44px;
-    font-size: 18px;
-  }
-
-  .pool-numbers[data-difficulty='medium'] .pool-number {
-    width: 42px;
-    height: 42px;
-    font-size: 18px;
-  }
-
-  .pool-numbers[data-difficulty='hard'] .pool-number {
-    width: 40px;
-    height: 40px;
-    font-size: 17px;
+    width: var(--tile);
+    height: var(--tile);
+    font-size: calc(var(--tile) * 0.42);
   }
 }
 
@@ -1068,7 +1059,7 @@ body {
 
 @media (max-width: 480px) {
   .game-container {
-    padding: 12px;
+    --gutter: 12px;
   }
 
   /* Mobile logo sizing */
@@ -1090,21 +1081,6 @@ body {
   .operator,
   .equals {
     font-size: 24px;
-  }
-
-  /* Sticky strips span the narrower container padding */
-  .column-targets {
-    margin-left: -12px;
-    margin-right: -12px;
-    padding-left: 12px;
-    padding-right: 12px;
-  }
-
-  .number-pool {
-    margin-left: -12px;
-    margin-right: -12px;
-    padding-left: 12px;
-    padding-right: 12px;
   }
 }
 

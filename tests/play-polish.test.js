@@ -32,7 +32,17 @@ vm.runInContext(
     '\nthis.hasPlayed = hasPlayed; this.hasProgress = hasProgress; this.findNextEmptyPosition = findNextEmptyPosition;',
   context
 );
-const { hasPlayed, hasProgress, findNextEmptyPosition } = context;
+const { findNextEmptyPosition } = context;
+
+// hasPlayed / hasProgress read the global gameState, so point it at each test state
+const hasPlayed = (state) => {
+  context.gameState = state;
+  return context.hasPlayed();
+};
+const hasProgress = (state) => {
+  context.gameState = state;
+  return context.hasProgress();
+};
 
 let failures = 0;
 function check(name, actual, expected) {

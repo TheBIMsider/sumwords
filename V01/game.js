@@ -2166,8 +2166,7 @@ function placeNumberInBlank(blank, position) {
 
   // Deselect pool number, blank, and update totals
   deselectPoolNumber();
-  deselectBlank();
-  selectNextEmptyBlank(position); // Auto-advance to the next empty blank
+  selectNextEmptyBlank(position); // Clears this blank's selection, then auto-advances
   updateColumnTotals();
   savePuzzleState(); // AUTO-SAVE after number placement
 }
@@ -2487,20 +2486,22 @@ function showFeedback(message, type) {
  * solved yet (breaks the win streak on Reset). A solved puzzle never counts:
  * its win is already recorded.
  */
-function hasPlayed(state = gameState) {
-  return !state.completed && (state.attempts > 0 || state.hintsUsed > 0);
+function hasPlayed() {
+  return (
+    !gameState.completed && (gameState.attempts > 0 || gameState.hintsUsed > 0)
+  );
 }
 
 /**
  * True if the player has progress that a new puzzle or reset would discard.
  * A solved puzzle has nothing left to lose.
  */
-function hasProgress(state = gameState) {
+function hasProgress() {
   return (
-    !state.completed &&
-    (hasPlayed(state) ||
-      state.poolNumbersUsed.length > 0 ||
-      Object.keys(state.userInputs).some((key) => key.startsWith('sol')))
+    !gameState.completed &&
+    (hasPlayed() ||
+      gameState.poolNumbersUsed.length > 0 ||
+      Object.keys(gameState.userInputs).some((key) => key.startsWith('sol')))
   );
 }
 
@@ -2924,8 +2925,9 @@ function revealNumbers() {
   });
 
   // If the hint filled the selected blank, move the selection on
-  if (gameState.selectedBlank && gameState.selectedBlank.classList.contains('filled')) {
-    selectNextEmptyBlank(gameState.selectedBlank.dataset.position);
+  const selected = gameState.selectedBlank;
+  if (selected && selected.classList.contains('filled')) {
+    selectNextEmptyBlank(selected.dataset.position);
   }
 
   // Update column totals
