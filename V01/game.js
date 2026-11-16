@@ -2415,9 +2415,45 @@ function showFeedback(message, type) {
   =================================== */
 
 /**
+ * True if the player has made a Submit or used a hint (breaks the win streak on Reset)
+ */
+function hasPlayed() {
+  return gameState.attempts > 0 || gameState.hintsUsed > 0;
+}
+
+/**
+ * True if the player has any progress that a new puzzle or reset would discard
+ */
+function hasProgress() {
+  return (
+    hasPlayed() ||
+    gameState.poolNumbersUsed.length > 0 ||
+    Object.keys(gameState.userInputs).some((key) => key.startsWith('sol'))
+  );
+}
+
+/**
+ * Ask before discarding progress. Returns true when there is nothing to lose or the player confirms.
+ * @param {string} message - Confirmation text
+ * @returns {boolean}
+ */
+function confirmDiscardProgress(message) {
+  if (!hasProgress()) return true;
+  return confirm(message);
+}
+
+/**
  * Generate and load a completely new puzzle
  */
 function handleNewPuzzle() {
+  if (
+    !confirmDiscardProgress(
+      'Start a new puzzle? Your progress on this one will be lost.'
+    )
+  ) {
+    return;
+  }
+
   // Generate new puzzle
   currentPuzzle = generatePuzzle(
     gameState.currentCategory,
@@ -2440,6 +2476,17 @@ function handleNewPuzzle() {
  * Reset current puzzle (clear all inputs, keep same puzzle)
  */
 function handleReset() {
+  // Only a played puzzle (Submit or hint) breaks the win streak
+  const breaksStreak = hasPlayed();
+
+  if (hasProgress()) {
+    const streak = loadStatistics().overall.currentStreak;
+    const streakNote =
+      breaksStreak && streak > 0 ? ' Your win streak will be reset.' : '';
+    const message = `Reset this puzzle? Your blanks and hints will be cleared.${streakNote}`;
+    if (!confirm(message)) return;
+  }
+
   // Clear all user inputs
   gameState.userInputs = {};
   gameState.poolNumbersUsed = [];
@@ -2491,8 +2538,10 @@ function handleReset() {
 
   showFeedback('Puzzle reset. Try again!', 'warning');
 
-  // Reset streak (user gave up on this puzzle)
-  resetStreak();
+  // Reset streak only if the player had played this puzzle
+  if (breaksStreak) {
+    resetStreak();
+  }
 
   // Clear saved state and save fresh reset state
   clearPuzzleState();
@@ -2503,6 +2552,15 @@ function handleReset() {
  * Handle category selection change
  */
 function handleCategoryChange(event) {
+  if (
+    !confirmDiscardProgress(
+      'Change category? Your progress on this puzzle will be lost.'
+    )
+  ) {
+    event.target.value = gameState.currentCategory; // Snap back to the loaded category
+    return;
+  }
+
   gameState.currentCategory = event.target.value;
 
   // Generate new puzzle with selected category
@@ -2528,6 +2586,15 @@ function handleCategoryChange(event) {
  * Handle difficulty selection change
  */
 function handleDifficultyChange(event) {
+  if (
+    !confirmDiscardProgress(
+      'Change difficulty? Your progress on this puzzle will be lost.'
+    )
+  ) {
+    event.target.value = gameState.currentDifficulty; // Snap back to the loaded difficulty
+    return;
+  }
+
   gameState.currentDifficulty = event.target.value;
 
   // Generate new puzzle with selected difficulty
