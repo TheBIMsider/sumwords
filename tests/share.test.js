@@ -52,7 +52,7 @@ const { buildAttemptEntry, buildShareText } = sandbox;
 // ---------------------------------------------------------------------------
 
 const URL_LINE = 'https://thebimsider.github.io/sumwords/V01/';
-const GRID_ROW = /^[🟩🟥⬜]{5} [🟩🟥]{2}$/u;
+const GRID_ROW = /^[🟩🟨🟥⬜]{5} [🟩🟥]{2}$/u;
 
 // Five equations, all correct: a [op] b = answer, with column totals on target
 const SPECS = [
@@ -338,6 +338,103 @@ function expect(name, condition, detail) {
     text.split('\n')[0] === 'Sumwords v1.1.0 · Medium' &&
       text.split('\n').pop() === URL_LINE &&
       gridRows(text).length === 0
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Hint squares: a correct equation with any hint shows yellow
+// ---------------------------------------------------------------------------
+
+{
+  const entry = buildAttemptEntry(EQUATIONS, COLUMN_TARGETS, fullInputs(), { 2: ['?'] });
+  expect(
+    'hinted flags are one per equation, true only where a hint was used',
+    JSON.stringify(entry.hinted) === '[false,true,false,false,false]',
+    JSON.stringify(entry.hinted)
+  );
+  expect(
+    'a hint does not change the equation status or the columns',
+    entry.equations.every((s) => s === 'correct') && entry.columns.every((ok) => ok),
+    JSON.stringify(entry)
+  );
+}
+
+{
+  const entry = buildAttemptEntry(EQUATIONS, COLUMN_TARGETS, fullInputs(), { 1: ['#'], 3: ['?', '#'] });
+  expect(
+    'either hint type counts, and two hints on one equation still count once',
+    JSON.stringify(entry.hinted) === '[true,false,true,false,false]',
+    JSON.stringify(entry.hinted)
+  );
+}
+
+{
+  const entry = buildAttemptEntry(EQUATIONS, COLUMN_TARGETS, fullInputs());
+  expect(
+    'no hintedEquations argument means no hints',
+    entry.hinted.every((h) => h === false),
+    JSON.stringify(entry.hinted)
+  );
+}
+
+{
+  const hints = {};
+  const entry = buildAttemptEntry(EQUATIONS, COLUMN_TARGETS, fullInputs(), hints);
+  hints[1] = ['?'];
+  expect(
+    'a hint used after a Submit does not change that Submit\'s entry',
+    entry.hinted.every((h) => h === false),
+    JSON.stringify(entry.hinted)
+  );
+}
+
+{
+  const inputs = fullInputs();
+  inputs['sol-1'] = 6; // equation 1 is wrong; equation 2 is correct and hinted
+  const entry = buildAttemptEntry(EQUATIONS, COLUMN_TARGETS, inputs, { 2: ['?'] });
+  const rows = gridRows(shareText({ history: [entry], attempts: 1, hints: 1 }));
+  expect(
+    'a correct hinted equation renders yellow; a wrong one beside it stays red',
+    rows[0] === '🟥🟨🟩🟩🟩 🟩🟩',
+    rows.join(' | ')
+  );
+}
+
+{
+  const entry = {
+    equations: ['wrong', 'correct', 'empty', 'correct', 'correct'],
+    columns: [false, false],
+    hinted: [true, true, true, false, true],
+  };
+  const rows = gridRows(shareText({ history: [entry], attempts: 1, hints: 3 }));
+  expect(
+    'a hinted wrong stays red and a hinted empty stays grey',
+    rows[0] === '🟥🟨⬜🟩🟨 🟥🟥',
+    rows.join(' | ')
+  );
+}
+
+{
+  // A save from before this feature: no hinted field at all
+  const oldEntry = { equations: ['correct', 'correct', 'correct', 'correct', 'correct'], columns: [true, true] };
+  const rows = gridRows(shareText({ history: [oldEntry], attempts: 1, hints: 0 }));
+  expect(
+    'an entry without hinted renders exactly as before',
+    rows[0] === '🟩🟩🟩🟩🟩 🟩🟩',
+    rows.join(' | ')
+  );
+}
+
+{
+  // Wrong Submit first, then a hint on the win: the first row must not change
+  const wrong = buildAttemptEntry(EQUATIONS, COLUMN_TARGETS, { ...fullInputs(), 'sol-1': 6 }, {});
+  const hints = { 2: ['?'] };
+  const win = buildAttemptEntry(EQUATIONS, COLUMN_TARGETS, fullInputs(), hints);
+  const rows = gridRows(shareText({ history: [wrong, win], attempts: 2, hints: 1 }));
+  expect(
+    'a wrong Submit then a hinted win: first row unchanged, last row yellow in the hinted slot',
+    rows[0] === '🟥🟩🟩🟩🟩 🟩🟩' && rows[1] === '🟩🟨🟩🟩🟩 🟩🟩',
+    rows.join(' | ')
   );
 }
 

@@ -54,7 +54,7 @@ Plus an **"Everything"** category that combines all questions for maximum variet
   - Reveal which numbers to place in the equation
 - **Smart Resume:** Automatically saves progress and offers to resume unfinished puzzles
 - **Statistics Tracking:** Track completed puzzles, attempts, hints used, perfect games, and win streaks
-- **Share Results:** After a win, copy a spoiler-free, Wordle-style grid of your attempts to the clipboard
+- **Share Results:** After a win, copy a spoiler-free, Wordle-style grid of your attempts to the clipboard; an equation solved with a hint shows as a yellow square
 - **Mobile-Optimized:** Fully responsive design works great on phones and tablets
 - **Persistent Storage:** Game state, preferences, stats, and theme saved locally
 
