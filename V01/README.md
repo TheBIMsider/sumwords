@@ -107,7 +107,7 @@ Place numbers from the number pool into the equation blanks to make valid equati
 2. **Open in browser**
 
 ```bash
-   # Simply open index.html in your web browser
+   # Simply open V01/index.html in your web browser
    # No build process or dependencies required
 ```
 
@@ -117,14 +117,11 @@ Place numbers from the number pool into the equation blanks to make valid equati
    # Python 3
    python -m http.server 8000
 
-   # Python 2
-   python -m SimpleHTTPServer 8000
-
    # Node.js (if you have http-server installed)
-   npx http-server
+   npx http-server -p 8000
 ```
 
-Then navigate to `http://localhost:8000`
+Then navigate to `http://localhost:8000/V01/`
 
 ## 📁 Project Structure
 
@@ -134,11 +131,14 @@ sumwords/
 │   ├── index.html          # Game HTML structure
 │   ├── styles.css          # Game styling with dark mode
 │   ├── game.js             # Game logic and 500 trivia questions
-│   └── Sumwords_Logo.png   # Game logo
+│   ├── Sumwords_Logo.png   # Game logo
+│   └── README.md           # Copy of this README for the game folder
 ├── landing/
 │   ├── index.html          # Landing page HTML
 │   ├── styles.css          # Landing page styling with dark mode
-│   └── script.js           # Landing page theme switcher
+│   ├── script.js           # Landing page theme switcher
+│   ├── Sumwords_Logo.png   # Landing page logo
+│   └── Sumwords_in_Action.png  # Landing page screenshot
 ├── tests/
 │   ├── generator.test.js   # Checks every generated puzzle is solvable, plus question bank rules
 │   └── validation.test.js  # Checks Submit validation messages
@@ -152,8 +152,8 @@ sumwords/
 
 - Questions are randomly selected from the chosen category
 - Equations are generated using a "from" approach (targets calculated from equations)
-- Number pools include the correct answer plus additional numbers
-- Decoy numbers (Medium/Hard) add strategic complexity
+- Number pools hold the two operands of every equation (the trivia answer is typed into its own blank)
+- Decoy numbers (Medium/Hard) are extra pool numbers that belong to no equation, adding strategic complexity
 
 ### Difficulty Scaling
 
@@ -217,10 +217,10 @@ This project is licensed under the **BSD 3-Clause License** - see the [LICENSE](
 
 ## 📝 Development
 
-This project was developed (Vibe Coded) over 20 documented sessions with comprehensive planning:
+This project was developed (Vibe Coded) over 21 sessions with Claude Chat and continues in Claude Code:
 
-- Session recaps track all development decisions
-- Roadmap documents evolution from concept to launch
+- Automated tests check that every generated puzzle is solvable and that Submit validation behaves
+- Question bank fact-checked and kept within the generator's answer rules
 - Beginner-friendly code for long-term maintainability
 - Systematic testing and bug fixes
 - CSS variable architecture for maintainable theming
