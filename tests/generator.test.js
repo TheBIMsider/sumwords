@@ -115,6 +115,13 @@ console.log('');
 
 const isWhole = (n) => typeof n === 'number' && Number.isInteger(n);
 
+// Operators allowed at each difficulty (mirrors getOperatorsForDifficulty)
+const OPERATORS = {
+  easy: ['+', '-'],
+  medium: ['+', '-'],
+  hard: ['+', '-', '×', '÷'],
+};
+
 function applyOperator(op, a, b) {
   switch (op) {
     case '+':
@@ -169,6 +176,14 @@ function checkPuzzle(puzzle, difficulty) {
       );
     } else if (result !== eq.answer) {
       add('operator does not give answer', `${label}, actually ${result}`);
+    }
+
+    // Operators are hidden on Medium/Hard, so no OTHER allowed operator may
+    // also give the answer (e.g. 2 + 2 = 2 × 2 would have two right answers)
+    for (const other of OPERATORS[difficulty]) {
+      if (other !== eq.operator && applyOperator(other, a, b) === eq.answer) {
+        add('ambiguous operator', `${label}, ${other} also gives ${eq.answer}`);
+      }
     }
 
     sum1 += a;
@@ -244,6 +259,43 @@ for (const r of rows) {
     console.log(`       - ${cause}: ${count} equation/puzzle checks`);
   }
 }
+
+// ---------------------------------------------------------------------------
+// Ambiguity sweep: every answer the bank allows, every operator, every
+// difficulty. generateOperands must never return a pair where another allowed
+// operator also gives the answer. (It may return null: that question is
+// skipped and the puzzle uses another.)
+// ---------------------------------------------------------------------------
+
+const SWEEP_TRIES = 30;
+let ambiguousPairs = 0;
+const ambiguousExamples = [];
+for (const difficulty of Object.keys(DIFFICULTIES)) {
+  for (const operator of OPERATORS[difficulty]) {
+    for (let answer = BANK_MIN_ANSWER; answer <= BANK_MAX_ANSWER; answer++) {
+      for (let t = 0; t < SWEEP_TRIES; t++) {
+        const pair = sandbox.generateOperands(answer, operator, difficulty);
+        if (!pair) continue;
+        const other = OPERATORS[difficulty].find(
+          (o) => o !== operator && applyOperator(o, pair.op1, pair.op2) === answer
+        );
+        if (other) {
+          ambiguousPairs++;
+          if (ambiguousExamples.length < 5) {
+            ambiguousExamples.push(
+              `${difficulty}: ${pair.op1} ${operator} ${pair.op2} = ${answer}, but ${other} also gives ${answer}`
+            );
+          }
+        }
+      }
+    }
+  }
+}
+console.log(
+  `\nAmbiguity sweep: ${ambiguousPairs ? 'FAIL' : 'ok  '} ${ambiguousPairs} ambiguous operand pairs`
+);
+for (const line of ambiguousExamples) console.log(`       - ${line}`);
+totalBroken += ambiguousPairs;
 
 if (examples.length) {
   console.log('\nExample failures (to reproduce):');

@@ -1150,6 +1150,10 @@ function selectRandomQuestions(questions, count) {
 /**
  * Generate a valid operand pair for the given answer and operator.
  * Both operands are whole numbers from 1 to the difficulty's range cap.
+ * The pair is also unambiguous: no OTHER operator allowed at this difficulty
+ * gives the same answer with it (so 2 + 2 = 2 × 2 is never built). Operators
+ * are hidden on Medium/Hard, so an ambiguous equation would have two right
+ * answers.
  * @param {number} answer - The equation result
  * @param {string} operator - '+', '-', '×' or '÷'
  * @param {string} difficulty - Difficulty level (easy, medium, hard)
@@ -1157,6 +1161,26 @@ function selectRandomQuestions(questions, count) {
  *   with this operator inside the range (the caller picks another question)
  */
 function generateOperands(answer, operator, difficulty = 'easy') {
+  // A random pair is only occasionally ambiguous, so a few tries is plenty
+  for (let attempt = 0; attempt < 20; attempt++) {
+    const operands = pickOperands(answer, operator, difficulty);
+    if (!operands) return null;
+    if (!hasOtherOperatorThatWorks(operands, answer, operator, difficulty)) {
+      return operands;
+    }
+  }
+  return null;
+}
+
+/**
+ * Picks ONE random operand pair for the answer and operator. It does not
+ * check for ambiguity; generateOperands does that and retries.
+ * @param {number} answer - The equation result
+ * @param {string} operator - '+', '-', '×' or '÷'
+ * @param {string} difficulty - Difficulty level (easy, medium, hard)
+ * @returns {object|null} { op1, op2 }, or null if none fits the range
+ */
+function pickOperands(answer, operator, difficulty) {
   const maxOperand =
     difficulty === 'easy' ? 50 : difficulty === 'medium' ? 100 : 200;
 
@@ -1221,6 +1245,41 @@ function generateOperands(answer, operator, difficulty = 'easy') {
  */
 function randomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+/**
+ * Does one equation's maths: a [operator] b.
+ * Shared by the generator (ambiguity check) and Submit validation.
+ *
+ * @param {string} operator - '+', '-', '×' or '÷'
+ * @param {number} a - First operand
+ * @param {number} b - Second operand
+ * @returns {number|undefined} The result, or undefined for an unknown operator
+ */
+function applyOperator(operator, a, b) {
+  if (operator === '+') return a + b;
+  if (operator === '-') return a - b;
+  if (operator === '×') return a * b;
+  if (operator === '÷') return a / b;
+  return undefined;
+}
+
+/**
+ * True when some OTHER operator allowed at this difficulty also turns the
+ * operand pair into the answer (e.g. 2 + 2 and 2 × 2 are both 4).
+ *
+ * @param {object} operands - { op1, op2 }
+ * @param {number} answer - The equation result
+ * @param {string} operator - The operator the equation was built with
+ * @param {string} difficulty - Difficulty level (easy, medium, hard)
+ * @returns {boolean} True if the pair is ambiguous
+ */
+function hasOtherOperatorThatWorks(operands, answer, operator, difficulty) {
+  return getOperatorsForDifficulty(difficulty).some(
+    (other) =>
+      other !== operator &&
+      applyOperator(other, operands.op1, operands.op2) === answer
+  );
 }
 
 const gameState = {
@@ -2303,25 +2362,28 @@ function handleSolutionInput(event) {
   COLUMN TOTALS UPDATE
   =================================== */
 
+/**
+ * Adds up one column of placed operands.
+ * Loops over the puzzle's own equations so the count is never hardcoded.
+ * Empty blanks add nothing; a real 0 still counts.
+ *
+ * @param {string} prefix - 'op1' for column 1 (first operands), 'op2' for column 2
+ * @returns {number} Sum of the operands currently placed in that column
+ */
+function sumColumn(prefix) {
+  let total = 0;
+  currentPuzzle.equations.forEach((eq) => {
+    const value = gameState.userInputs[`${prefix}-${eq.id}`];
+    if (!isBlank(value)) {
+      total += value;
+    }
+  });
+  return total;
+}
+
 function updateColumnTotals() {
-  let col1Total = 0;
-  let col2Total = 0;
-
-  // Sum column 1 (first operands: op1-1, op1-2, op1-3, op1-4, op1-5)
-  for (let i = 1; i <= 5; i++) {
-    const key = `op1-${i}`;
-    if (gameState.userInputs[key]) {
-      col1Total += gameState.userInputs[key];
-    }
-  }
-
-  // Sum column 2 (second operands: op2-1, op2-2, op2-3, op2-4, op2-5)
-  for (let i = 1; i <= 5; i++) {
-    const key = `op2-${i}`;
-    if (gameState.userInputs[key]) {
-      col2Total += gameState.userInputs[key];
-    }
-  }
+  const col1Total = sumColumn('op1');
+  const col2Total = sumColumn('op2');
 
   // Update display
   document.getElementById('col1-current').textContent = col1Total;
@@ -2374,48 +2436,52 @@ function handleSubmit() {
   }
 }
 
-function validatePuzzle() {
-  const errors = [];
+/**
+ * True when a blank has nothing usable placed in it.
+ * Checks explicitly, because 0 is a real value (a plain `!value` check would
+ * wrongly treat 0 as empty). NaN can only come from a damaged saved puzzle,
+ * so it counts as empty rather than poisoning the column totals.
+ *
+ * @param {number|undefined|null} value - The blank's value from gameState.userInputs
+ * @returns {boolean} True if nothing usable is placed
+ */
+function isBlank(value) {
+  return value === undefined || value === null || Number.isNaN(value);
+}
 
-  // Check 1: All pool numbers used
-  if (gameState.poolNumbersUsed.length !== currentPuzzle.numberPool.length) {
-    errors.push(
-      `Only ${gameState.poolNumbersUsed.length}/10 pool numbers used`
-    );
-  }
+/**
+ * Builds a plain-English label for one or more equation numbers.
+ *
+ * @param {number[]} ids - Equation ids, e.g. [2] or [2, 4]
+ * @returns {string} "Equation 2" or "Equations 2, 4"
+ */
+function equationLabel(ids) {
+  return ids.length === 1
+    ? `Equation ${ids[0]}`
+    : `Equations ${ids.join(', ')}`;
+}
 
-  // Check 2: Column 1 total correct
-  let col1Total = 0;
-  for (let i = 1; i <= 5; i++) {
-    col1Total += gameState.userInputs[`op1-${i}`] || 0;
-  }
-  if (col1Total !== currentPuzzle.columnTargets.column1) {
-    errors.push(
-      `Column 1 total is ${col1Total}, should be ${currentPuzzle.columnTargets.column1}`
-    );
-  }
+/**
+ * Sorts every equation that isn't right yet into one of three groups, so
+ * Submit can tell the player what kind of problem each one has.
+ *
+ * @returns {{incompleteEquations: number[], wrongOperatorEquations: number[], wrongNumberEquations: number[], badEquationIds: number[]}}
+ *   Equation ids: still has an empty blank or no operator, uses the wrong
+ *   operator, or has numbers that don't work out (an equation can be in both
+ *   of the last two). badEquationIds lists every problem equation once.
+ */
+function findBadEquations() {
+  const incompleteEquations = [];
+  const wrongOperatorEquations = [];
+  const wrongNumberEquations = [];
 
-  // Check 3: Column 2 total correct
-  let col2Total = 0;
-  for (let i = 1; i <= 5; i++) {
-    col2Total += gameState.userInputs[`op2-${i}`] || 0;
-  }
-  if (col2Total !== currentPuzzle.columnTargets.column2) {
-    errors.push(
-      `Column 2 total is ${col2Total}, should be ${currentPuzzle.columnTargets.column2}`
-    );
-  }
-
-  // Check 4: All equations mathematically valid
-  const invalidEquations = [];
   currentPuzzle.equations.forEach((eq) => {
     const op1 = gameState.userInputs[`op1-${eq.id}`];
     const op2 = gameState.userInputs[`op2-${eq.id}`];
     const sol = gameState.userInputs[`sol-${eq.id}`];
 
-    // Compare with null so a value of 0 is not treated as empty
-    if (op1 == null || op2 == null || sol == null) {
-      invalidEquations.push(eq.id);
+    if (isBlank(op1) || isBlank(op2) || isBlank(sol)) {
+      incompleteEquations.push(eq.id);
       return;
     }
 
@@ -2426,39 +2492,108 @@ function validatePuzzle() {
     } else {
       operator = gameState.userOperators[eq.id];
 
-      // Check if operator selected
+      // No operator chosen yet counts as incomplete
       if (!operator) {
-        invalidEquations.push(eq.id);
+        incompleteEquations.push(eq.id);
         return;
       }
     }
 
-    // Calculate result based on operator
-    let result;
-    if (operator === '+') {
-      result = op1 + op2;
-    } else if (operator === '-') {
-      result = op1 - op2;
-    } else if (operator === '×') {
-      result = op1 * op2;
-    } else if (operator === '÷') {
-      result = op1 / op2;
+    // An equation that works with the operator in place is fine, even if it
+    // is not the operator the puzzle was built with (e.g. 2 + 2 = 2 × 2).
+    if (applyOperator(operator, op1, op2) === sol) {
+      return;
     }
 
-    // Check if result matches solution AND correct operator chosen
-    if (
-      result !== sol ||
-      (currentPuzzle.difficulty !== 'Easy' && operator !== eq.operator)
-    ) {
-      invalidEquations.push(eq.id);
+    // It doesn't work, so say why. The operator is wrong if it isn't the
+    // puzzle's own. The numbers are wrong if they fail even with the puzzle's
+    // own operator. Both can be true, and both get reported.
+    if (operator !== eq.operator) {
+      wrongOperatorEquations.push(eq.id);
+    }
+    if (applyOperator(eq.operator, op1, op2) !== sol) {
+      wrongNumberEquations.push(eq.id);
     }
   });
 
-  if (invalidEquations.length > 0) {
-    errors.push(`Equations ${invalidEquations.join(', ')} are incorrect`);
+  // Every equation with any problem (once each), for highlighting
+  const badEquationIds = [
+    ...new Set([
+      ...incompleteEquations,
+      ...wrongOperatorEquations,
+      ...wrongNumberEquations,
+    ]),
+  ];
 
+  return {
+    incompleteEquations,
+    wrongOperatorEquations,
+    wrongNumberEquations,
+    badEquationIds,
+  };
+}
+
+/**
+ * Checks the whole puzzle and collects plain-English errors for Submit.
+ * Each check is reported separately so the player knows what to fix.
+ *
+ * @returns {{success: boolean, errors: string[]}} Result and list of messages
+ */
+function validatePuzzle() {
+  const errors = [];
+
+  // Check 1: All pool numbers used
+  // Pool size comes from the puzzle (10 / 12 / 16), not a fixed number
+  const poolSize = currentPuzzle.numberPool.length;
+  if (gameState.poolNumbersUsed.length !== poolSize) {
+    errors.push(
+      `Only ${gameState.poolNumbersUsed.length}/${poolSize} pool numbers used`
+    );
+  }
+
+  // Check 2: Column 1 total correct
+  const col1Total = sumColumn('op1');
+  if (col1Total !== currentPuzzle.columnTargets.column1) {
+    errors.push(
+      `Column 1 total is ${col1Total}, should be ${currentPuzzle.columnTargets.column1}`
+    );
+  }
+
+  // Check 3: Column 2 total correct
+  const col2Total = sumColumn('op2');
+  if (col2Total !== currentPuzzle.columnTargets.column2) {
+    errors.push(
+      `Column 2 total is ${col2Total}, should be ${currentPuzzle.columnTargets.column2}`
+    );
+  }
+
+  // Check 4: Every equation is complete, has the right operator and works.
+  const {
+    incompleteEquations,
+    wrongOperatorEquations,
+    wrongNumberEquations,
+    badEquationIds,
+  } = findBadEquations();
+
+  if (incompleteEquations.length > 0) {
+    errors.push(
+      `${equationLabel(incompleteEquations)}: a number or operator is missing`
+    );
+  }
+  if (wrongOperatorEquations.length > 0) {
+    errors.push(
+      `${equationLabel(wrongOperatorEquations)}: wrong operator`
+    );
+  }
+  if (wrongNumberEquations.length > 0) {
+    errors.push(
+      `${equationLabel(wrongNumberEquations)}: the numbers do not give the answer`
+    );
+  }
+
+  if (badEquationIds.length > 0) {
     // Highlight incorrect equations
-    invalidEquations.forEach((id) => {
+    badEquationIds.forEach((id) => {
       document.querySelector(`[data-equation="${id}"]`).classList.add('error');
     });
   } else {
@@ -2468,10 +2603,11 @@ function validatePuzzle() {
       .forEach((eq) => eq.classList.remove('error'));
   }
 
-  // Check 5: Solutions match trivia answers
+  // Check 5: Solutions match trivia answers.
+  // An empty solution is already reported by Check 4, so skip it here.
   currentPuzzle.equations.forEach((eq) => {
     const userAnswer = gameState.userInputs[`sol-${eq.id}`];
-    if (userAnswer !== eq.answer) {
+    if (!isBlank(userAnswer) && userAnswer !== eq.answer) {
       errors.push(
         `Question ${eq.id} answer is ${userAnswer}, should be ${eq.answer}`
       );
