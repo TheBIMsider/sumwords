@@ -339,7 +339,7 @@ body {
 
 .tips-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(6, 1fr);
   gap: 25px;
   max-width: 1200px;
   margin: 0 auto;
@@ -352,6 +352,15 @@ body {
   border-left: 4px solid var(--color-primary-orange);
   box-shadow: var(--shadow-sm);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Each tip spans two of six columns (3 across); a lone last tip is centered */
+.tip-card {
+  grid-column: span 2;
+}
+
+.tip-card:last-child:nth-child(3n + 1) {
+  grid-column: 3 / span 2;
 }
 
 .tip-card:hover {
@@ -394,6 +403,14 @@ body {
 
 @media (max-width: 960px) {
   /* Two across; a lone last card is centered */
+  .tips-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .tip-card:last-child:nth-child(odd) {
+    grid-column: 2 / span 2;
+  }
+
   .feature-grid {
     grid-template-columns: repeat(4, 1fr);
   }
@@ -655,6 +672,11 @@ footer a:hover {
 
   .tips-section h3 {
     font-size: 1.5rem;
+  }
+
+  .tip-card,
+  .tip-card:last-child:nth-child(3n + 1) {
+    grid-column: auto;
   }
 
   .tips-grid {
