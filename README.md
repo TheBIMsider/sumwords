@@ -58,6 +58,8 @@ Plus an **"Everything"** category that combines all questions for maximum variet
 - **Hint System:** Every equation has its own Hint button; tap it to choose one of two hints
   - Reveal the answer to the trivia question
   - Reveal which numbers to place in the equation
+  - Check an equation's mark (✓ Correct or ✗) for one hint, without a Submit
+- **Undo:** Take back your last placed or removed number with the Undo button or Ctrl+Z (Cmd+Z on Mac), one move at a time
 - **Smart Resume:** Automatically saves progress and offers to resume unfinished puzzles
 - **Confirm Before Discarding:** Reset, New Puzzle and changing the category or difficulty ask first when you have progress on the board
 - **Submit Feedback:** Submit marks every equation and column target so you can see what to fix, without revealing the trivia answer
@@ -97,6 +99,8 @@ Place numbers from the number pool into the equation blanks to make valid equati
 - Start by placing the answer to the trivia question
 - Work backwards from column totals to narrow down number choices
 - Use hints strategically if you get stuck
+- **✓ Check** in an equation's Hint row shows its mark without a Submit. It costs one hint, but is free when the equation is incomplete or its mark is already current
+- Made a slip? **Undo** takes back your last placed or removed number. The undo history is kept in memory only, so it starts empty after a page refresh
 - Each number can only be used once
 
 ### Keyboard
@@ -106,6 +110,7 @@ Place numbers from the number pool into the equation blanks to make valid equati
 - **Arrow keys** move between the number blanks (and select them), or across the unused tiles when a pool tile is focused
 - **Enter** or **Space** places the focused pool tile or clears a filled blank; **Backspace** or **Delete** clears a filled blank
 - **Escape** cancels one thing at a time: the typed digits, then the selected tile, then the selected blank
+- **Ctrl+Z** (Cmd+Z on Mac) undoes the last placed or removed number, unless a text box has focus
 - Answer boxes are reached with **Tab**: type up to 3 digits, and **Enter** jumps to the next one
 
 ## 🛠️ Technology Stack
@@ -167,6 +172,7 @@ sumwords/
 │   ├── play-polish.test.js # Checks the Reset/New Puzzle confirm rules and auto-advance lookup
 │   ├── scoring.test.js     # Checks the star rating, the star tally in the statistics and the play time clock
 │   ├── share.test.js       # Checks the share text and per-attempt results
+│   ├── undo.test.js        # Checks the Undo move history, the Check mark and when Check costs a hint
 │   └── validation.test.js  # Checks Submit validation messages
 ├── README.md               # This file
 └── LICENSE                 # BSD 3-Clause License

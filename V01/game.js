@@ -1372,6 +1372,7 @@ const gameState = {
   dailyDate: null, // YYYY-MM-DD of the daily being played (daily mode only)
   elapsedMs: 0, // Active play time counted so far (see PLAY TIME below)
   clockStartedAt: null, // When the clock last started running, or null while stopped
+  undoHistory: [], // Moves for Undo in this puzzle, newest last (never saved)
 };
 
 /* ===================================
@@ -2129,6 +2130,7 @@ function resetGameState() {
   gameState.attemptHistory = [];
   gameState.elapsedMs = 0;
   gameState.clockStartedAt = null;
+  gameState.undoHistory = []; // Undo never reaches back past a new puzzle
 
   // Clear UI - operand blanks
   document.querySelectorAll('.blank.operand').forEach((blank) => {
@@ -2158,6 +2160,7 @@ function resetGameState() {
   document.getElementById('submit-btn').disabled = false;
   document.getElementById('reset-btn').disabled = false;
   closeHintChoices();
+  updateUndoControls();
   updateHintControls();
 
   // Clear feedback
@@ -2273,6 +2276,10 @@ function setupEventListeners() {
     );
   });
 
+  // Undo button, and Ctrl+Z / Cmd+Z on the board
+  document.getElementById('undo-btn').addEventListener('click', undoLastMove);
+  document.addEventListener('keydown', handleUndoShortcut);
+
   // Submit button
   document.getElementById('submit-btn').addEventListener('click', handleSubmit);
 
@@ -2329,6 +2336,12 @@ function handlePoolClick(event) {
   if (gameState.selectedBlank) {
     const blank = gameState.selectedBlank;
     const position = blank.dataset.position;
+
+    // Arrow keys can select a filled blank. Give its number back first (as a
+    // recorded removal), so the pool and Undo stay in step
+    if (blank.classList.contains('filled')) {
+      returnNumberToPool(blank, position);
+    }
 
     // Set up selected number state temporarily
     gameState.selectedNumber = parseInt(clickedNumber.dataset.number);
@@ -2416,24 +2429,45 @@ function deselectBlank() {
 }
 
 function placeNumberInBlank(blank, position) {
-  // Set blank value and styling
-  blank.textContent = gameState.selectedNumber;
-  blank.classList.add('filled');
-
-  // Store in game state
-  gameState.userInputs[position] = gameState.selectedNumber;
-  clearEquationMark(equationIdOf(position)); // The player changed this equation
-
-  // Mark pool number as used
-  gameState.selectedNumberElement.classList.add('used');
-  gameState.poolNumbersUsed.push(gameState.selectedNumber);
+  putNumberInBlank(
+    blank,
+    position,
+    gameState.selectedNumber,
+    gameState.selectedNumberElement
+  );
+  recordMove(gameState.undoHistory, {
+    type: 'place',
+    position,
+    value: gameState.selectedNumber,
+  });
   announce(`Placed ${gameState.selectedNumber} in ${operandSpot(position)}.`);
 
   // Deselect pool number, blank, and update totals
   deselectPoolNumber();
   selectNextEmptyBlank(position); // Clears this blank's selection, then auto-advances
   updateColumnTotals();
+  updateUndoControls();
   savePuzzleState(); // AUTO-SAVE after number placement
+}
+
+/**
+ * Fills one operand blank and marks one pool tile as used. Shared by normal
+ * placement and Undo, so the board, `userInputs` and `poolNumbersUsed` agree.
+ * Records nothing in the undo history.
+ *
+ * @param {HTMLElement} blank - The empty operand blank
+ * @param {string} position - data-position of the blank, e.g. 'op1-3'
+ * @param {number} value - The number going in
+ * @param {HTMLElement|undefined} tile - The pool tile to mark used
+ */
+function putNumberInBlank(blank, position, value, tile) {
+  blank.textContent = value;
+  blank.classList.add('filled');
+  gameState.userInputs[position] = value;
+  clearEquationMark(equationIdOf(position)); // The player changed this equation
+
+  if (tile) tile.classList.add('used');
+  gameState.poolNumbersUsed.push(value);
 }
 
 /**
@@ -2455,7 +2489,15 @@ function selectNextEmptyBlank(fromPosition) {
   selectBlankForPlacement(nextBlank);
 }
 
-function returnNumberToPool(blank, position) {
+/**
+ * Empties one operand blank and frees one used pool tile with its value.
+ * Shared by tap-to-fix, Backspace and Undo. Records nothing in the history.
+ *
+ * @param {HTMLElement} blank - The operand blank
+ * @param {string} position - data-position of the blank, e.g. 'op1-3'
+ * @returns {number} The value that was in the blank
+ */
+function takeNumberFromBlank(blank, position) {
   const numberValue = gameState.userInputs[position];
 
   // Clear blank
@@ -2487,9 +2529,151 @@ function returnNumberToPool(blank, position) {
     }
   });
 
+  return numberValue;
+}
+
+/**
+ * Returns one operand's number to the pool and records the move, so Undo can put it back.
+ *
+ * @param {HTMLElement} blank - The filled operand blank
+ * @param {string} position - data-position of the blank, e.g. 'op1-3'
+ */
+function returnNumberToPool(blank, position) {
+  const numberValue = takeNumberFromBlank(blank, position);
+  recordMove(gameState.undoHistory, {
+    type: 'remove',
+    position,
+    value: numberValue,
+  });
+
   announce(`Returned ${numberValue} to the pool.`);
   updateColumnTotals();
+  updateUndoControls();
   savePuzzleState(); // AUTO-SAVE after returning number
+}
+
+/* ===================================
+  UNDO (board moves only)
+  =================================== */
+
+// Why Undo skipped a move, by the action type planUndo returns
+const UNDO_REFUSALS = {
+  hint: "Can't undo: a hint filled that blank.",
+  unavailable: "Can't undo: that number is now in use.",
+  stale: "Can't undo: that move no longer applies.",
+};
+
+/**
+ * Undoes the newest placement or removal on the board. Hints, Submit and typing
+ * in the answer boxes are never undone.
+ */
+function undoLastMove() {
+  if (gameState.completed || gameState.undoHistory.length === 0) return;
+
+  const hintFilled = Array.from(
+    document.querySelectorAll('.blank.operand.hint-revealed'),
+    (blank) => blank.dataset.position
+  );
+  const { history, action } = planUndo(
+    gameState.undoHistory,
+    gameState.userInputs,
+    currentPuzzle.numberPool,
+    gameState.poolNumbersUsed,
+    hintFilled
+  );
+  gameState.undoHistory = history;
+  deselectPoolNumber(); // Undo drops any pool tile picked for placing
+
+  if (action.type === 'clear') {
+    const blank = operandBlankAt(action.position);
+    takeNumberFromBlank(blank, action.position);
+    announce(`Undid: removed ${action.value} from ${operandSpot(action.position)}.`);
+    selectBlankForPlacement(blank);
+  } else if (action.type === 'fill') {
+    const blank = operandBlankAt(action.position);
+    fillBlankFromPool(blank, action.position, action.value);
+    announce(`Undid: put ${action.value} back in ${operandSpot(action.position)}.`);
+    selectBlankForPlacement(blank);
+  } else if (UNDO_REFUSALS[action.type]) {
+    showFeedback(UNDO_REFUSALS[action.type], 'warning');
+    announce(UNDO_REFUSALS[action.type]);
+  }
+
+  updateColumnTotals();
+  updateUndoControls();
+  followSelectedBlank();
+  savePuzzleState();
+}
+
+/**
+ * Puts a value into an empty operand blank and marks one unused pool tile with
+ * that value. Any unused tile with the value will do, because they are alike.
+ * Records nothing in the history.
+ *
+ * @param {HTMLElement} blank - The empty operand blank
+ * @param {string} position - data-position of the blank, e.g. 'op1-3'
+ * @param {number} value - The number to put back
+ */
+function fillBlankFromPool(blank, position, value) {
+  const tile = Array.from(document.querySelectorAll('.pool-number')).find(
+    (t) => parseInt(t.dataset.number) === value && !t.classList.contains('used')
+  );
+  putNumberInBlank(blank, position, value, tile);
+}
+
+/**
+ * @param {string} position - data-position of an operand blank, e.g. 'op2-4'
+ * @returns {HTMLElement|null}
+ */
+function operandBlankAt(position) {
+  return document.querySelector(`.blank.operand[data-position="${position}"]`);
+}
+
+/**
+ * Plain words for the move Undo would reverse, for the button's tooltip
+ *
+ * @param {{type: string, position: string, value: number}} move
+ * @returns {string} e.g. "remove 7 from equation 2, first number"
+ */
+function describeUndo(move) {
+  return move.type === 'place'
+    ? `remove ${move.value} from ${operandSpot(move.position)}`
+    : `put ${move.value} back in ${operandSpot(move.position)}`;
+}
+
+/**
+ * Enables Undo only when there is a move to undo on a puzzle not yet won
+ */
+function updateUndoControls() {
+  const button = document.getElementById('undo-btn');
+  if (!button) return;
+
+  const history = gameState.undoHistory;
+  const canUndo = !gameState.completed && history.length > 0;
+  button.disabled = !canUndo;
+  button.title = canUndo
+    ? `Undo: ${describeUndo(history[history.length - 1])}`
+    : 'Nothing to undo';
+}
+
+/**
+ * Ctrl+Z (Cmd+Z on Mac) undoes a move on the board. Text fields, selects and
+ * open dialogs keep the browser's own undo, and Shift or Alt are not Undo.
+ * @param {KeyboardEvent} event
+ */
+function handleUndoShortcut(event) {
+  const isUndoKey =
+    (event.ctrlKey || event.metaKey) &&
+    !event.shiftKey &&
+    !event.altKey &&
+    event.key.toLowerCase() === 'z';
+  if (!isUndoKey) return;
+  if (event.target.closest?.('input, select, textarea')) return;
+  if (document.querySelector('.modal:not(.hidden)')) return;
+  if (gameState.completed || gameState.undoHistory.length === 0) return;
+
+  event.preventDefault();
+  undoLastMove();
 }
 
 /* ===================================
@@ -2737,6 +2921,8 @@ function handleWin() {
   gameState.completed = true;
   bankClock(); // Play time stops at the win
   closeHintChoices();
+  gameState.undoHistory = []; // A win ends the undo history
+  updateUndoControls();
 
   // Update statistics
   updateStatistics(
@@ -2796,15 +2982,23 @@ const EQUATION_STATUS_CLASSES = ['is-correct', 'is-wrong', 'is-empty'];
  */
 function showSubmitMarks(statuses, columns) {
   currentPuzzle.equations.forEach((eq, index) => {
-    const status = statuses[index];
-    const card = document.querySelector(`.equation[data-equation="${eq.id}"]`);
-    card.classList.remove(...EQUATION_STATUS_CLASSES);
-    card.classList.add(EQUATION_STATUS_CLASS[status]);
-    card.querySelector('.equation-status').textContent =
-      EQUATION_STATUS_TEXT[status];
+    setEquationMark(eq.id, statuses[index]);
   });
   setColumnMark('col1', columns[0]);
   setColumnMark('col2', columns[1]);
+}
+
+/**
+ * Draws one equation's status mark on its card (the same mark Submit draws)
+ *
+ * @param {number} equationId - Equation id
+ * @param {string} status - 'correct', 'math', 'answer' or 'empty'
+ */
+function setEquationMark(equationId, status) {
+  const card = document.querySelector(`.equation[data-equation="${equationId}"]`);
+  card.classList.remove(...EQUATION_STATUS_CLASSES);
+  card.classList.add(EQUATION_STATUS_CLASS[status]);
+  card.querySelector('.equation-status').textContent = EQUATION_STATUS_TEXT[status];
 }
 
 /**
@@ -2924,6 +3118,109 @@ function classifyEquation(eq, userInputs) {
   if (applyOperator(eq.operator, op1, op2) !== sol) return 'math';
   if (sol !== eq.answer) return 'answer';
   return 'correct';
+}
+
+/* ===================================
+  UNDO HISTORY (pure helpers)
+  =================================== */
+
+// A move is { type: 'place' | 'remove', position, value } for an operand blank.
+// The history lives in memory only (gameState.undoHistory) and is never saved.
+// Hints and answer-box typing are not recorded.
+const UNDO_LIMIT = 100;
+
+/**
+ * Adds a move to the end of the history, dropping the oldest once past the cap.
+ *
+ * @param {object[]} history - Undo history (changed in place)
+ * @param {{type: string, position: string, value: number}} move - Move to add
+ * @returns {object[]} The same history array
+ */
+function recordMove(history, move) {
+  history.push(move);
+  if (history.length > UNDO_LIMIT) {
+    history.splice(0, history.length - UNDO_LIMIT);
+  }
+  return history;
+}
+
+/**
+ * Counts the unused pool tiles that show one value. Tiles with the same value
+ * are interchangeable, so a count is all Undo needs.
+ *
+ * @param {number[]} poolValues - Every tile in the pool (currentPuzzle.numberPool)
+ * @param {number[]} poolNumbersUsed - gameState.poolNumbersUsed
+ * @param {number} value - Number to count
+ * @returns {number} Unused tiles showing that value
+ */
+function freeTileCount(poolValues, poolNumbersUsed, value) {
+  const total = poolValues.filter((v) => v === value).length;
+  const used = poolNumbersUsed.filter((v) => v === value).length;
+  return total - used;
+}
+
+/**
+ * Works out the next Undo step. The newest move is always taken off the
+ * history, even when it cannot be undone, so the next press goes one move
+ * further back. Pure: reads its arguments only.
+ *
+ * Action types:
+ *  - 'none': the history was empty
+ *  - 'clear': empty the blank (undoing a placement)
+ *  - 'fill': put the value back in the blank (undoing a removal)
+ *  - 'unavailable': every tile with that value is in use again
+ *  - 'hint': a hint filled that blank, so Undo never changes it
+ *  - 'stale': the board no longer matches the move, so nothing changes
+ *
+ * @param {object[]} history - gameState.undoHistory
+ * @param {object} userInputs - gameState.userInputs
+ * @param {number[]} poolValues - currentPuzzle.numberPool
+ * @param {number[]} poolNumbersUsed - gameState.poolNumbersUsed
+ * @param {string[]} [hintFilled=[]] - Positions of blanks a hint filled
+ * @returns {{history: object[], action: {type: string, position?: string, value?: number}}}
+ */
+function planUndo(history, userInputs, poolValues, poolNumbersUsed, hintFilled = []) {
+  if (history.length === 0) return { history, action: { type: 'none' } };
+
+  const move = history[history.length - 1];
+  const rest = history.slice(0, -1);
+  const { position, value } = move;
+
+  if (hintFilled.includes(position)) {
+    return { history: rest, action: { type: 'hint', position, value } };
+  }
+
+  if (move.type === 'place') {
+    if (userInputs[position] !== value) {
+      return { history: rest, action: { type: 'stale', position, value } };
+    }
+    return { history: rest, action: { type: 'clear', position, value } };
+  }
+
+  // A removal: the blank must be empty, and one unused tile must show the value
+  if (userInputs[position] !== undefined) {
+    return { history: rest, action: { type: 'stale', position, value } };
+  }
+  if (freeTileCount(poolValues, poolNumbersUsed, value) < 1) {
+    return { history: rest, action: { type: 'unavailable', position, value } };
+  }
+  return { history: rest, action: { type: 'fill', position, value } };
+}
+
+/**
+ * Decides what a Check does for one equation. A Check charges a hint only when
+ * the equation is complete and its card has no current mark. Marks clear on
+ * any edit, so an unmarked complete equation has changed since its last check.
+ * The status comes from classifyEquation, the same as Submit uses.
+ *
+ * @param {{id: number, operator: string, answer: number}} eq - One equation of currentPuzzle
+ * @param {object} userInputs - gameState.userInputs
+ * @param {boolean} alreadyMarked - True when the card still shows a status mark
+ * @returns {{status: string, charge: boolean}} status is 'correct', 'math', 'answer' or 'empty'
+ */
+function checkEquationOutcome(eq, userInputs, alreadyMarked) {
+  const status = classifyEquation(eq, userInputs);
+  return { status, charge: status !== 'empty' && !alreadyMarked };
 }
 
 /**
@@ -3626,6 +3923,7 @@ function showFinishedDaily(result) {
   gameState.attemptHistory = Array.isArray(result.history) ? result.history : [];
   gameState.completed = true;
   gameState.clockStartedAt = null; // Nothing to time: the daily is already done
+  updateUndoControls(); // A finished daily cannot be undone
   document.getElementById('attempt-count').textContent = gameState.attempts;
   document.getElementById('hint-count').textContent = gameState.hintsUsed;
   document.getElementById('submit-btn').disabled = true;
@@ -3784,6 +4082,7 @@ function handleReset() {
   gameState.hintsUsed = 0;
   gameState.hintedEquations = {}; // Reset to empty object
   gameState.attemptHistory = [];
+  gameState.undoHistory = [];
   resetClock(); // A reset starts the puzzle over, and the time with it
   hideWinPanel();
 
@@ -3824,6 +4123,7 @@ function handleReset() {
 
   // Update column totals to 0
   updateColumnTotals();
+  updateUndoControls();
 
   showFeedback('Puzzle reset. Try again!', 'warning');
 
@@ -4012,6 +4312,7 @@ function handleHintClick(event) {
     const equationId = parseInt(choice.dataset.equation);
     if (choice.dataset.hint === 'answer') revealAnswer(equationId);
     if (choice.dataset.hint === 'numbers') revealNumbers(equationId);
+    if (choice.dataset.hint === 'check') checkEquation(equationId);
     updateHintControls();
     closeHintChoices(true);
     return;
@@ -4077,9 +4378,54 @@ function updateHintControls() {
     const row = document.getElementById(`hint-choices-${id}`);
     row.querySelector('[data-hint="answer"]').disabled = answerUsed;
     row.querySelector('[data-hint="numbers"]').disabled = numbersUsed;
-    toggle.disabled = answerUsed && numbersUsed;
-    toggle.textContent = toggle.disabled ? 'Hinted' : 'Hint';
+    // Both hints used: the pill reads "Hinted" but stays tappable, so the
+    // row still offers ✓ Check (the other two choices are off)
+    const allHinted = answerUsed && numbersUsed;
+    toggle.classList.toggle('is-hinted', allHinted);
+    toggle.textContent = allHinted ? 'Hinted' : 'Hint';
   });
+}
+
+/**
+ * Check one equation without a Submit. Shows the same status mark Submit
+ * would, never marks the columns, adds no attempt and never wins. A complete
+ * equation whose mark is not current costs one hint; an incomplete equation,
+ * or one whose mark is already current, is free.
+ *
+ * @param {number} equationId - ID of equation
+ */
+function checkEquation(equationId) {
+  if (gameState.completed) return;
+
+  const equation = currentPuzzle.equations.find((eq) => eq.id === equationId);
+  if (!equation) return;
+
+  const card = document.querySelector(`.equation[data-equation="${equationId}"]`);
+  const alreadyMarked = EQUATION_STATUS_CLASSES.some((name) =>
+    card.classList.contains(name)
+  );
+  const { status, charge } = checkEquationOutcome(
+    equation,
+    gameState.userInputs,
+    alreadyMarked
+  );
+
+  if (status === 'empty') {
+    showFeedback(`Fill every blank in equation ${equationId} first.`, 'warning');
+    return;
+  }
+
+  setEquationMark(equationId, status);
+
+  if (!charge) {
+    showFeedback(`Equation ${equationId} is unchanged since its last check.`, 'warning');
+    return;
+  }
+
+  gameState.hintsUsed++;
+  updateHintCounter();
+  savePuzzleState();
+  showFeedback(`Checked equation ${equationId}. That counts as 1 hint.`, 'warning');
 }
 
 /**

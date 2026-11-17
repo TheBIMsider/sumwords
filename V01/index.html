@@ -360,6 +360,14 @@
               type="button"
               class="btn-hint-choice"
               data-equation="1"
+              data-hint="check"
+            >
+              ✓ Check
+            </button>
+            <button
+              type="button"
+              class="btn-hint-choice"
+              data-equation="1"
               data-hint="cancel"
             >
               Cancel
@@ -421,6 +429,14 @@
               data-hint="numbers"
             >
               # Numbers
+            </button>
+            <button
+              type="button"
+              class="btn-hint-choice"
+              data-equation="2"
+              data-hint="check"
+            >
+              ✓ Check
             </button>
             <button
               type="button"
@@ -492,6 +508,14 @@
               type="button"
               class="btn-hint-choice"
               data-equation="3"
+              data-hint="check"
+            >
+              ✓ Check
+            </button>
+            <button
+              type="button"
+              class="btn-hint-choice"
+              data-equation="3"
               data-hint="cancel"
             >
               Cancel
@@ -553,6 +577,14 @@
               data-hint="numbers"
             >
               # Numbers
+            </button>
+            <button
+              type="button"
+              class="btn-hint-choice"
+              data-equation="4"
+              data-hint="check"
+            >
+              ✓ Check
             </button>
             <button
               type="button"
@@ -624,6 +656,14 @@
               type="button"
               class="btn-hint-choice"
               data-equation="5"
+              data-hint="check"
+            >
+              ✓ Check
+            </button>
+            <button
+              type="button"
+              class="btn-hint-choice"
+              data-equation="5"
               data-hint="cancel"
             >
               Cancel
@@ -659,7 +699,12 @@
 
         <!-- Submit Button -->
         <div class="controls">
-          <button class="btn-submit" id="submit-btn">Submit Answer</button>
+          <div class="submit-row">
+            <button class="btn-undo" id="undo-btn" disabled>
+              <span aria-hidden="true">↶</span> Undo
+            </button>
+            <button class="btn-submit" id="submit-btn">Submit Answer</button>
+          </div>
           <div class="game-stats">
             <div class="attempts">
               Attempts: <span id="attempt-count">0</span>
@@ -773,6 +818,11 @@
               <li>
                 On a keyboard, press Tab to reach a blank and type a number to
                 place it; arrow keys move between blanks, and Escape cancels
+              </li>
+              <li>
+                Made a slip? Undo (or Ctrl+Z) takes back your last placed or
+                removed number. Check an equation's mark with its Hint row's
+                ✓ Check, which costs one hint
               </li>
               <li>
                 Fewer attempts and hints earn more stars: ⭐⭐⭐ is one attempt
