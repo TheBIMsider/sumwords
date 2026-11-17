@@ -669,10 +669,16 @@
         </div>
 
         <!-- Win panel (shown in place of the feedback line after a win) -->
-        <div class="win-panel" id="win-panel" role="status" hidden>
+        <div
+          class="win-panel"
+          id="win-panel"
+          role="region"
+          aria-label="Puzzle result"
+          hidden
+        >
           <p class="win-title">
             <span class="win-stars" id="win-stars" role="img"></span>
-            <span id="win-label"></span>
+            <span id="win-label" tabindex="-1"></span>
           </p>
           <p class="win-stats">
             <span id="win-attempts"></span> ·
@@ -711,6 +717,9 @@
             ></textarea>
           </div>
         </div>
+
+        <!-- Screen reader announcements for placements (visually hidden) -->
+        <div class="sr-only" id="sr-announcer" aria-live="polite"></div>
 
         <!-- Feedback Area -->
         <div class="feedback" id="feedback" role="status">
@@ -761,6 +770,10 @@
               <li>Start by placing the trivia answer in its equation</li>
               <li>Use the column targets to narrow down number choices</li>
               <li>Tap Hint on an equation to reveal its answer or its numbers</li>
+              <li>
+                On a keyboard, press Tab to reach a blank and type a number to
+                place it; arrow keys move between blanks, and Escape cancels
+              </li>
               <li>
                 Fewer attempts and hints earn more stars: ⭐⭐⭐ is one attempt
                 with no hints

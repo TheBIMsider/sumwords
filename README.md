@@ -99,6 +99,15 @@ Place numbers from the number pool into the equation blanks to make valid equati
 - Use hints strategically if you get stuck
 - Each number can only be used once
 
+### Keyboard
+
+- **Tab** moves between the blanks, the number pool, the answer boxes and the buttons. The pool is a single Tab stop
+- **Type a number** with a blank selected to place the first unused tile with that value. A multi-digit number places when it is unambiguous, on **Enter**, or after a short pause
+- **Arrow keys** move between the number blanks (and select them), or across the unused tiles when a pool tile is focused
+- **Enter** or **Space** places the focused pool tile or clears a filled blank; **Backspace** or **Delete** clears a filled blank
+- **Escape** cancels one thing at a time: the typed digits, then the selected tile, then the selected blank
+- Answer boxes are reached with **Tab**: type up to 3 digits, and **Enter** jumps to the next one
+
 ## 🛠️ Technology Stack
 
 - **HTML5** - Semantic structure
@@ -294,9 +303,10 @@ This project was developed (Vibe Coded) over 21 sessions with Claude Chat and co
 - Star rating and play time: 1 to 3 stars per win, play time on the win panel, stars in the share text and a star tally in the statistics
 - v1.2.0: daily puzzle, per-equation Hint button, share results with yellow hint squares, Submit feedback marks, star rating and play time, confirm before discarding progress, sticky number pool and column targets
 
+- Keyboard play and screen reader support: type a number to place it, arrow keys move between blanks and tiles, Escape cancels, visible focus rings in both themes and labels on every blank and tile
+
 ### Potential Future Enhancements
 
-- Keyboard navigation support
 - Sound effects (optional)
 - Additional question categories
 - Leaderboards

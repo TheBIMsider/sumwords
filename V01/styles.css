@@ -65,6 +65,7 @@
   --selection-bg: #e3f2fd;
   --selection-border: #0d47a1;
   --selection-shadow: rgba(25, 118, 210, 0.3);
+  --focus-ring: #0d47a1; /* Keyboard focus outline; 3:1 or better on white and the card greys */
 
   /* Puzzle Select Colors */
   --puzzle-select-bg: #e8f4f8;
@@ -143,6 +144,7 @@
   --selection-bg: #1e3a5f;
   --selection-border: #64b5f6;
   --selection-shadow: 0 0 0 3px rgba(100, 181, 246, 0.3);
+  --focus-ring: #ffb74d; /* Keyboard focus outline; 3:1 or better on the dark surfaces */
   --hint-revealed-bg: #4a148c;
   --hint-revealed-border: #9c27b0;
   --hint-revealed-text: #e1bee7;
@@ -1593,5 +1595,60 @@ body {
 @media (max-width: 480px) {
   .stats-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+/* ===================================
+   KEYBOARD FOCUS AND ACCESSIBILITY
+   =================================== */
+
+/* Visible keyboard focus on every control, in both themes.
+   :focus-visible keeps the ring off for mouse and touch. The select and the
+   answer boxes are listed because their own :focus styles remove the outline. */
+:focus-visible,
+.puzzle-select:focus-visible,
+.blank.solution:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* Selection must not rely on colour alone (it has to survive grayscale):
+   a selected blank gets a dashed border, a selected tile an underline */
+.blank.operand.selected {
+  border-style: dashed;
+}
+
+.pool-number.selected {
+  text-decoration: underline;
+}
+
+/* Keep a focused blank clear of the sticky targets above and number pool below */
+.blank.operand {
+  scroll-margin-top: 120px;
+  scroll-margin-bottom: 240px;
+}
+
+/* Visually hidden, still read by screen readers */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Players who ask for less motion get no transitions or animations */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
   }
 }
