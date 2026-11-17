@@ -34,6 +34,11 @@ function applyTheme(theme) {
   } else {
     document.documentElement.removeAttribute('data-theme');
   }
+  // Keep the browser bar colour in step with the in-game theme (see manifest)
+  const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+  if (themeColorMeta) {
+    themeColorMeta.setAttribute('content', theme === 'dark' ? '#121212' : '#f5f5f5');
+  }
   localStorage.setItem('sumwords_landing_theme', theme);
 }
 
@@ -4044,3 +4049,21 @@ function handleTutorialKeydown(event) {
     stops[0].focus();
   }
 }
+
+// ===================================
+// SERVICE WORKER (OFFLINE)
+// ===================================
+
+/**
+ * Register the offline service worker (sw.js). Skipped on file:// and in
+ * browsers without support. A failure is ignored: the game works without it.
+ */
+function registerServiceWorker() {
+  if (!('serviceWorker' in navigator)) return;
+  if (location.protocol !== 'http:' && location.protocol !== 'https:') return;
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
+
+registerServiceWorker();

@@ -156,6 +156,16 @@ Place numbers from the number pool into the equation blanks to make valid equati
 
 Then navigate to `http://localhost:8000/V01/`
 
+## 📲 Install and Offline
+
+Sumwords is a Progressive Web App (PWA). You can install it and play without a connection.
+
+- **Install:** In Chrome, Edge or Android Chrome, use the install prompt or the browser menu (Install app). On iPhone or iPad, open the game in Safari and choose Share > Add to Home Screen.
+- **Offline:** After one visit with a connection, the game loads and plays offline on every difficulty, including the Daily puzzle. Each online visit picks up the latest version.
+- **Shared storage:** The installed app and the browser tab use the same saved puzzle, statistics and theme, because they share one address and storage.
+- **Landing page:** The landing page needs a connection. The game's 🏠 Home button opens it, so offline it shows the browser's offline page.
+- **Local files:** Opening `index.html` straight from disk (`file://`) still works, but installing and offline play need the game served over `http://localhost` or `https://`.
+
 ## 📁 Project Structure
 
 ```
@@ -165,6 +175,9 @@ sumwords/
 │   ├── styles.css          # Game styling with dark mode
 │   ├── questions.js        # 800 trivia questions (questionBanks), loaded before game.js
 │   ├── game.js             # Game logic
+│   ├── sw.js               # Service worker for offline play
+│   ├── manifest.webmanifest # App name, colours and icons for install
+│   ├── icons/              # App icons (192, 512, maskable 512, Apple 180)
 │   ├── Sumwords_Logo.png   # Game logo
 │   └── README.md           # Copy of this README for the game folder
 ├── landing/
@@ -179,6 +192,7 @@ sumwords/
 │   ├── generator.test.js   # Checks every generated puzzle is solvable, plus question bank rules
 │   ├── hints.test.js       # Checks every equation has its Hint button and choice row, and old hint code is gone
 │   ├── play-polish.test.js # Checks the Reset/New Puzzle confirm rules and auto-advance lookup
+│   ├── pwa.test.js         # Checks the manifest, icon sizes, service worker cache list and install wiring
 │   ├── tutorial.test.js    # Checks the How to Play button, tutorial dialog markup and that replay never sets the seen flag
 │   ├── scoring.test.js     # Checks the star rating, the star tally in the statistics and the play time clock
 │   ├── share.test.js       # Checks the share text and per-attempt results
@@ -327,7 +341,6 @@ This project was developed (Vibe Coded) over 21 sessions with Claude Chat and co
 
 - Sound effects (optional)
 - Leaderboards
-- Progressive Web App (PWA) support
 - Advanced tutorial with interactive walkthrough
 
 ---
