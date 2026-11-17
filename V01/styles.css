@@ -1126,11 +1126,34 @@ body {
   line-height: 1;
 }
 
+.tutorial-checkbox[hidden] {
+  display: none; /* replay mode: .tutorial-checkbox sets display: flex, which would win over [hidden] */
+}
+
 #tutorial-close {
   padding: 12px 24px;
   font-size: 16px;
   font-weight: 600;
   white-space: nowrap;
+  margin-left: auto;
+}
+
+/* Keyboard controls: a native disclosure styled like the section headings */
+.tutorial-details summary {
+  cursor: pointer;
+  color: var(--text-heading);
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 4px;
+}
+
+.tutorial-details[open] .tutorial-list {
+  margin-top: 16px;
+}
+
+/* The dialog heading takes focus on open so the title is announced; no ring needed */
+#tutorial-title:focus {
+  outline: none;
 }
 
 /* Mobile header: Home, Stats, New Puzzle and Reset move into a dropdown panel */
