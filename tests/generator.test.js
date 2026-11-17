@@ -17,7 +17,6 @@ const path = require('path');
 const vm = require('vm');
 
 const PUZZLES_PER_COMBO = 1000;
-const CATEGORIES = ['sports', 'everything'];
 const DIFFICULTIES = {
   easy: { range: 50, pool: 10 },
   medium: { range: 100, pool: 12 },
@@ -60,6 +59,8 @@ vm.runInContext(
   sandbox
 );
 const { generatePuzzle, questionBanks } = sandbox;
+// Every bank category plus Everything, so new categories are exercised automatically.
+const CATEGORIES = [...Object.keys(questionBanks), 'everything'];
 
 // ---------------------------------------------------------------------------
 // Question bank rules
@@ -70,7 +71,7 @@ const { generatePuzzle, questionBanks } = sandbox;
 // built, and 0 or 1 cannot be built as a sum of two whole numbers of at least 1.
 const BANK_MIN_ANSWER = 2;
 const BANK_MAX_ANSWER = 400;
-const BANK_CATEGORIES = 10;
+const BANK_CATEGORIES = 16;
 const BANK_PER_CATEGORY = 50;
 
 function checkBank(banks) {

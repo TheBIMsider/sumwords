@@ -81,7 +81,7 @@ const DAILY_SALT = 'sumwords-daily';
 // change alters the dailies: adding or editing questions, or a generator
 // change. The pinned-date test in tests/daily.test.js fails when that happens.
 // Dailies are numbered "series-day", for example #1-1, then #2-1 after a bump.
-const DAILY_SERIES = 1;
+const DAILY_SERIES = 2;
 
 // Day 1 of the current series: its first daily's local calendar date (YYYY-MM-DD)
 const DAILY_EPOCH = '2026-11-17';
@@ -166,7 +166,7 @@ function getDailyNumber(dateString) {
 }
 
 /**
- * The daily's displayed number: series and day, for example "1-12"
+ * The daily's displayed number: series and day, for example "2-12"
  * @param {string} dateString - YYYY-MM-DD
  * @returns {string} "series-day"
  */
@@ -2427,7 +2427,7 @@ function buildAttemptEntry(
  * @param {number} result.attempts - True attempt count (may exceed history length)
  * @param {number} result.hints - Hints used
  * @param {{equations: string[], columns: boolean[], hinted?: boolean[]}[]} result.history - One entry per Submit (hinted is absent in older saves)
- * @param {number|string} [result.dailyNumber] - Daily puzzle number (the "series-day" label, for example "1-12"). When present the header shows it instead of the difficulty
+ * @param {number|string} [result.dailyNumber] - Daily puzzle number (the "series-day" label, for example "2-12"). When present the header shows it instead of the difficulty
  * @returns {string} Share text with no trivia or puzzle numbers
  */
 function buildShareText({

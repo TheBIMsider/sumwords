@@ -100,7 +100,7 @@ function checkDailyPuzzle(puzzle, date) {
   const problems = [];
   if (!puzzle) return ['no puzzle returned'];
 
-  if (puzzle.id !== `daily_1_${date}`) problems.push(`id is ${puzzle.id}`);
+  if (puzzle.id !== `daily_2_${date}`) problems.push(`id is ${puzzle.id}`);
   if (puzzle.category !== 'Everything') problems.push(`category ${puzzle.category}`);
   if (puzzle.difficulty !== 'Medium') problems.push(`difficulty ${puzzle.difficulty}`);
   if (puzzle.equations.length !== EQUATIONS) {
@@ -174,7 +174,7 @@ function consecutiveDates(startYmd, count) {
 }
 
 const EPOCH = '2026-11-17';
-// The pinned puzzle is for this date (it no longer matches the epoch)
+// The pinned puzzle is for this date (before the epoch; re-pinned in series 2)
 const PINNED_DATE = '2026-11-16';
 
 // ---------------------------------------------------------------------------
@@ -232,46 +232,69 @@ const PINNED_DATE = '2026-11-16';
 
 {
   const expected = {
-    id: 'daily_1_2026-11-16',
+    id: 'daily_2_2026-11-16',
     category: 'Everything',
     difficulty: 'Medium',
-    numberPool: [93, 86, 67, 7, 15, 9, 1, 26, 2, 4, 56, 67],
-    columnTargets: { column1: 178, column2: 132 },
+    numberPool: [3, 5, 85, 43, 75, 55, 39, 31, 94, 62, 61, 78],
+    columnTargets: {
+      column1: 296,
+      column2: 196,
+    },
     equations: [
       {
         id: 1,
-        question: 'How many seasons of Mad Men were there?',
-        answer: 7,
-        operator: '-',
-        solution: { operand1: 93, operand2: 86, result: 7 },
+        question: 'Nights of Hanukkah',
+        answer: 8,
+        operator: '+',
+        solution: {
+          operand1: 3,
+          operand2: 5,
+          result: 8,
+        },
       },
       {
         id: 2,
-        question: 'Minutes in an hour',
-        answer: 60,
-        operator: '-',
-        solution: { operand1: 67, operand2: 7, result: 60 },
+        question: 'How many fluid ounces are in a gallon?',
+        answer: 128,
+        operator: '+',
+        solution: {
+          operand1: 85,
+          operand2: 43,
+          result: 128,
+        },
       },
       {
         id: 3,
-        question: 'Seconds on a basketball shot clock',
-        answer: 24,
-        operator: '+',
-        solution: { operand1: 15, operand2: 9, result: 24 },
+        question: 'Baby teeth in children',
+        answer: 20,
+        operator: '-',
+        solution: {
+          operand1: 75,
+          operand2: 55,
+          result: 20,
+        },
       },
       {
         id: 4,
-        question: 'Member countries of the European Union',
-        answer: 27,
-        operator: '+',
-        solution: { operand1: 1, operand2: 26, result: 27 },
+        question: 'Stories in the Leaning Tower of Pisa, bell chamber included',
+        answer: 8,
+        operator: '-',
+        solution: {
+          operand1: 39,
+          operand2: 31,
+          result: 8,
+        },
       },
       {
         id: 5,
-        question: 'How many Oscars did La La Land win?',
-        answer: 6,
-        operator: '+',
-        solution: { operand1: 2, operand2: 4, result: 6 },
+        question: 'Degrees Fahrenheit water freezes',
+        answer: 32,
+        operator: '-',
+        solution: {
+          operand1: 94,
+          operand2: 62,
+          result: 32,
+        },
       },
     ],
   };
@@ -336,11 +359,11 @@ const PINNED_DATE = '2026-11-16';
 // ---------------------------------------------------------------------------
 
 {
-  check('getDailyLabel: the first daily is 1-1', getDailyLabel(EPOCH) === '1-1');
-  check('getDailyLabel: the next day is 1-2', getDailyLabel('2026-11-18') === '1-2');
+  check('getDailyLabel: the first daily is 2-1', getDailyLabel(EPOCH) === '2-1');
+  check('getDailyLabel: the next day is 2-2', getDailyLabel('2026-11-18') === '2-2');
 
-  const next = loadGenerator(2);
-  check('after a bump the label starts with the new series (2-1)', next.getDailyLabel(EPOCH) === '2-1');
+  const next = loadGenerator(3);
+  check('after a bump the label starts with the new series (3-1)', next.getDailyLabel(EPOCH) === '3-1');
   check(
     'a different series gives a different puzzle for the same date',
     JSON.stringify(next.generateDailyPuzzle(EPOCH)) !==
