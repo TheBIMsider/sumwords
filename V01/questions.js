@@ -1,4 +1,4 @@
-// Sumwords trivia question bank: 12 categories, 600 questions.
+// Sumwords trivia question bank: 14 categories, 700 questions.
 // Plain classic script loaded by index.html before game.js. Keep it to this declaration.
 
 const questionBanks = {
@@ -999,5 +999,235 @@ const questionBanks = {
       answer: 18,
     },
     { question: 'Which planet number from the Sun is Neptune?', answer: 8 },
+  ],
+  bodyhealth: [
+    { question: 'Protein chains in one hemoglobin molecule', answer: 4 },
+    { question: 'Pairs of floating ribs in the human body', answer: 2 },
+    { question: 'Incisors in a full set of adult teeth', answer: 8 },
+    { question: 'Premolars in a full set of adult teeth', answer: 8 },
+    { question: 'Canines in a full set of adult teeth', answer: 4 },
+    {
+      question: 'Molars in a full adult set, wisdom teeth included',
+      answer: 12,
+    },
+    { question: 'Sets of teeth a person grows in a lifetime', answer: 2 },
+    { question: 'Pairs of cranial nerves in humans', answer: 12 },
+    { question: 'Pairs of spinal nerves in humans', answer: 31 },
+    {
+      question: 'Pairs of true ribs, attached directly to the breastbone',
+      answer: 7,
+    },
+    { question: 'Vertebrae in the human lower back', answer: 5 },
+    { question: 'Thoracic vertebrae in the human spine', answer: 12 },
+    {
+      question: 'Movable vertebrae in an adult spine (sacrum and coccyx not counted)',
+      answer: 24,
+    },
+    { question: 'Bones in one human thumb', answer: 2 },
+    { question: 'Carpal bones in one human wrist', answer: 8 },
+    { question: 'Phalanx bones in one human hand', answer: 14 },
+    { question: 'Metatarsal bones in one human foot', answer: 5 },
+    { question: 'Tarsal bones in one human foot', answer: 7 },
+    {
+      question: 'Cranial bones in the skull (face bones not counted)',
+      answer: 8,
+    },
+    { question: 'Facial bones in the human skull', answer: 14 },
+    { question: 'Different bases in DNA', answer: 4 },
+    { question: 'Bases in one DNA codon', answer: 3 },
+    { question: 'Essential amino acids for humans', answer: 9 },
+    { question: 'Essential vitamins for humans', answer: 13 },
+    { question: 'Water-soluble vitamins essential to humans', answer: 9 },
+    { question: 'Valves in the human heart', answer: 4 },
+    { question: 'Lobes in the human right lung', answer: 3 },
+    { question: 'Lobes in the human left lung', answer: 2 },
+    { question: 'Types of cone cells in the human eye', answer: 3 },
+    { question: 'Muscles that move each human eyeball', answer: 6 },
+    {
+      question: 'Weeks in a full-term pregnancy, counted from the last period',
+      answer: 40,
+    },
+    { question: 'Semicircular canals in each human inner ear', answer: 3 },
+    { question: 'Which number cranial nerve is the vagus nerve?', answer: 10 },
+    { question: 'Which number cranial nerve is the facial nerve?', answer: 7 },
+    { question: 'Amino acids in human insulin', answer: 51 },
+    {
+      question: 'Atomic number of calcium, the main mineral in bones',
+      answer: 20,
+    },
+    { question: 'Atomic number of iron, the metal in hemoglobin', answer: 26 },
+    {
+      question: 'Hours of sleep per night sleep experts recommend for adults, at least',
+      answer: 7,
+    },
+    {
+      question: 'Minutes of moderate activity per week the WHO advises adults, at least',
+      answer: 150,
+    },
+    {
+      question: 'Minutes of vigorous activity per week the WHO advises adults, at least',
+      answer: 75,
+    },
+    {
+      question: 'The famous daily step goal, answered in thousands of steps',
+      answer: 10,
+    },
+    {
+      question: 'Calories in the daily reference diet on US food labels, in hundreds',
+      answer: 20,
+    },
+    {
+      question: 'Seconds the CDC says to scrub your hands with soap',
+      answer: 20,
+    },
+    {
+      question: 'Grams of fruit and vegetables the WHO advises per day, at least',
+      answer: 400,
+    },
+    {
+      question: 'Chest compressions in one standard CPR cycle (then 2 breaths)',
+      answer: 30,
+    },
+    {
+      question: 'Grams of salt per day the WHO advises adults to stay under',
+      answer: 5,
+    },
+    {
+      question: 'Minutes of daily activity the WHO advises for children, on average',
+      answer: 60,
+    },
+    {
+      question: 'Chest compressions per minute in CPR, at least (AHA)',
+      answer: 100,
+    },
+    {
+      question: 'Normal blood pressure is under this top number, in mmHg (AHA)',
+      answer: 120,
+    },
+    {
+      question: 'Normal blood pressure is under this bottom number, in mmHg (AHA)',
+      answer: 80,
+    },
+  ],
+  artarchitecture: [
+    {
+      question: 'Columns across the front of the Parthenon in Athens',
+      answer: 8,
+    },
+    { question: 'Outer columns all the way around the Parthenon', answer: 46 },
+    {
+      question: 'Granite columns in the Pantheon porch in Rome, in total',
+      answer: 16,
+    },
+    {
+      question: 'Minarets at the corners of the Taj Mahal platform',
+      answer: 4,
+    },
+    { question: 'Floors in the Empire State Building', answer: 102 },
+    { question: 'Floors in the Chrysler Building', answer: 77 },
+    { question: 'Floors in the Burj Khalifa', answer: 163 },
+    { question: 'Floors in Taipei 101', answer: 101 },
+    { question: 'Floors in each Petronas Tower', answer: 88 },
+    { question: 'Floors in the Flatiron Building', answer: 22 },
+    { question: 'Floors in the Shanghai Tower', answer: 128 },
+    {
+      question: 'Floors in the Gherkin (30 St Mary Axe) in London',
+      answer: 41,
+    },
+    { question: 'Floors in 30 Rockefeller Plaza', answer: 70 },
+    { question: 'Floors in the John Hancock Center in Chicago', answer: 100 },
+    { question: 'Floors in the Transamerica Pyramid', answer: 48 },
+    {
+      question: 'Stories in the Leaning Tower of Pisa, bell chamber included',
+      answer: 8,
+    },
+    { question: 'Towers on the west front of Notre-Dame de Paris', answer: 2 },
+    { question: 'Towers on the Golden Gate Bridge', answer: 2 },
+    { question: 'Ancient Greek architectural orders', answer: 3 },
+    { question: 'Classical orders used in Roman architecture', answer: 5 },
+    { question: 'Floors above ground in the Pentagon', answer: 5 },
+    { question: 'Levels open to visitors on the Eiffel Tower', answer: 3 },
+    {
+      question: "Central scenes on Michelangelo's Sistine Chapel ceiling",
+      answer: 9,
+    },
+    {
+      question: 'Years Michelangelo spent painting the Sistine Chapel ceiling',
+      answer: 4,
+    },
+    {
+      question: "Prophets and sibyls on Michelangelo's Sistine ceiling",
+      answer: 12,
+    },
+    { question: "Apostles in Leonardo da Vinci's Last Supper", answer: 12 },
+    {
+      question: "People seated at the table in da Vinci's Last Supper",
+      answer: 13,
+    },
+    {
+      question: "Figures in Rodin's sculpture The Burghers of Calais",
+      answer: 6,
+    },
+    { question: "Canvases in Andy Warhol's Campbell's Soup Cans", answer: 32 },
+    { question: 'Muses in Greek mythology', answer: 9 },
+    { question: 'Panels in a triptych', answer: 3 },
+    { question: 'Panels in a diptych', answer: 2 },
+    { question: "Marilyn images in Andy Warhol's Marilyn Diptych", answer: 50 },
+    {
+      question: 'Height of Christ the Redeemer in meters, pedestal not counted',
+      answer: 30,
+    },
+    {
+      question: "Height of Michelangelo's David in feet, to the nearest foot",
+      answer: 17,
+    },
+    {
+      question: 'Height of the Great Sphinx in feet, to the nearest foot',
+      answer: 66,
+    },
+    {
+      question: 'Height of the Statue of Liberty from heel to torch, in feet',
+      answer: 151,
+    },
+    {
+      question: 'Diameter of the Pantheon dome in meters, to the nearest meter',
+      answer: 43,
+    },
+    {
+      question: 'Group exhibitions held by the Impressionists in Paris',
+      answer: 8,
+    },
+    {
+      question: "Prints in Hokusai's Thirty-Six Views of Mount Fuji, full series",
+      answer: 46,
+    },
+    {
+      question: "Relief panels on Ghiberti's Gates of Paradise in Florence",
+      answer: 10,
+    },
+    { question: 'Doric columns on the Brandenburg Gate in Berlin, in total', answer: 12 },
+    { question: 'Passages through the Brandenburg Gate in Berlin', answer: 5 },
+    { question: 'Columns in the Great Hypostyle Hall at Karnak', answer: 134 },
+    {
+      question: "Columns in Bernini's colonnade around St. Peter's Square",
+      answer: 284,
+    },
+    {
+      question: 'Arches on each of the lower three tiers of the Colosseum',
+      answer: 80,
+    },
+    {
+      question: 'Windows around the base of the Hagia Sophia dome',
+      answer: 40,
+    },
+    {
+      question: 'Caryatid statues on the Erechtheion porch in Athens',
+      answer: 6,
+    },
+    { question: "Trilithons in Stonehenge's inner horseshoe", answer: 5 },
+    {
+      question: "Painted versions of Vincent van Gogh's The Bedroom",
+      answer: 3,
+    },
   ],
 };
