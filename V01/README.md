@@ -53,6 +53,8 @@ Plus an **"Everything"** category that combines all questions for maximum variet
   - Reveal the answer to the trivia question
   - Reveal which numbers to place in the equation
 - **Smart Resume:** Automatically saves progress and offers to resume unfinished puzzles
+- **Confirm Before Discarding:** Reset, New Puzzle and changing the category or difficulty ask first when you have progress on the board
+- **Submit Feedback:** Submit marks every equation and column target so you can see what to fix, without revealing the trivia answer
 - **Statistics Tracking:** Track completed puzzles, attempts, hints used, perfect games, win streaks and stars earned
 - **Star Rating:** Every win earns 1 to 3 stars from attempts and hints (3 stars is one attempt with no hints), shown on the win panel with how long the puzzle took
 - **Share Results:** After a win, copy a spoiler-free, Wordle-style grid of your attempts, with your star rating, to the clipboard; an equation solved with a hint shows as a yellow square
@@ -179,7 +181,7 @@ The 📅 Daily button in the header loads one puzzle per calendar day. Everyone 
 - Always Everything and Medium; the category and difficulty selectors are locked while a daily is loaded
 - Uses the player's local date, and is playable once per day. After a win the Daily button shows your result, Share result and "Next daily puzzle tomorrow"
 - Numbered `series-day`, for example `#1-12`. The series number only goes up when a change alters the dailies (new questions or a generator change), and the day count starts again at 1
-- Share text header is `Sumwords v1.1.0 · Daily #1-12`; the rest is the usual spoiler-free grid
+- Share text header is `Sumwords v1.2.0 · Daily #1-12`; the rest is the usual spoiler-free grid
 - A daily win counts as a normal Medium win and also shows in the Daily Puzzles block in Stats (there is no separate daily streak)
 
 ### Star Rating
@@ -284,6 +286,7 @@ This project was developed (Vibe Coded) over 21 sessions with Claude Chat and co
 - Share results: win panel with a spoiler-free, Wordle-style grid copied to the clipboard
 - Daily puzzle: one shared puzzle per day from a seeded generator, with a daily number, finished-result view and daily statistics
 - Star rating and play time: 1 to 3 stars per win, play time on the win panel, stars in the share text and a star tally in the statistics
+- v1.2.0: daily puzzle, per-equation Hint button, share results with yellow hint squares, Submit feedback marks, star rating and play time, confirm before discarding progress, sticky number pool and column targets
 
 ### Potential Future Enhancements
 
