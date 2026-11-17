@@ -55,7 +55,7 @@ function toggleTheme() {
 initializeTheme();
 
 // Game version shown at the bottom of the game. Change it only here.
-const GAME_VERSION = '1.2.0';
+const GAME_VERSION = '1.3.0';
 
 /**
  * Show the game version in the footer label
