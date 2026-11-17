@@ -163,6 +163,7 @@ Then navigate to `http://localhost:8000/V01/`
 Sumwords is a Progressive Web App (PWA). You can install it and play without a connection.
 
 - **Install:** In Chrome, Edge or Android Chrome, use the install prompt or the browser menu (Install app). On iPhone or iPad, open the game in Safari and choose Share > Add to Home Screen.
+- **Uninstall:** On desktop Chrome or Edge, open the installed app, click the three-dot menu in its title bar and choose Uninstall Sumwords (or right-click it at `chrome://apps` or `edge://apps`). On Android, long-press the icon and tap Uninstall. On iPhone or iPad, long-press the icon, then tap Remove App > Delete App. Your saved puzzle and statistics stay in the browser unless you tick the option to also clear site data, or clear them yourself in the browser's site settings.
 - **Offline:** After one visit with a connection, the game loads and plays offline on every difficulty, including the Daily puzzle. Each online visit picks up the latest version.
 - **Shared storage:** The installed app and the browser tab use the same saved puzzle, statistics and theme, because they share one address and storage.
 - **Landing page:** The landing page needs a connection. The game's 🏠 Home button opens it, so offline it shows the browser's offline page.
