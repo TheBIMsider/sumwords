@@ -363,6 +363,17 @@ body {
   grid-column: 3 / span 2;
 }
 
+/* Two cards left on the last row of the desktop grid: center the pair */
+@media (min-width: 961px) {
+  .tip-card:nth-last-child(2):nth-child(3n + 1) {
+    grid-column: 2 / span 2;
+  }
+
+  .tip-card:last-child:nth-child(3n + 2) {
+    grid-column: 4 / span 2;
+  }
+}
+
 .tip-card:hover {
   transform: translateY(-3px);
   box-shadow: var(--shadow-md);

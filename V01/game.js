@@ -2117,6 +2117,7 @@ function loadPuzzle(puzzle) {
 function resetGameState() {
   gameState.selectedNumber = null;
   gameState.selectedNumberElement = null;
+  clearTypedBuffer(); // Digits typed before a new puzzle must not land in it
   gameState.selectedBlank = null; // Avoid a stale selection surviving a new puzzle
   gameState.userInputs = {};
   gameState.poolNumbersUsed = [];
@@ -2245,22 +2246,31 @@ function setupHeaderMenu() {
 }
 
 function setupEventListeners() {
+  // Keyboard input goes first so Escape reaches it before the header menu and
+  // hint handlers below close what they own (see handleEscapeKey)
+  document.addEventListener('keydown', handleKeyboardInput);
+
   setupHeaderMenu();
 
-  // Number pool clicks
-  document
-    .getElementById('number-pool')
-    .addEventListener('click', handlePoolClick);
+  // Number pool clicks (a keyboard click then moves focus to the selected blank)
+  const pool = document.getElementById('number-pool');
+  pool.addEventListener('click', handlePoolClick);
+  pool.addEventListener('click', followKeyboardClick);
 
   // Operand blank clicks
   document.querySelectorAll('.blank.operand').forEach((blank) => {
     blank.addEventListener('click', handleOperandClick);
+    blank.addEventListener('click', followKeyboardClick);
   });
 
   // Solution input changes (with validation)
   document.querySelectorAll('.blank.solution').forEach((input) => {
     input.addEventListener('input', validateSolutionInput);
     input.addEventListener('keydown', handleSolutionKeydown);
+    input.setAttribute(
+      'aria-label',
+      `Equation ${equationIdOf(input.dataset.position)} answer`
+    );
   });
 
   // Submit button
@@ -2337,6 +2347,7 @@ function handlePoolClick(event) {
   clickedNumber.classList.add('selected');
   gameState.selectedNumber = parseInt(clickedNumber.dataset.number);
   gameState.selectedNumberElement = clickedNumber;
+  syncInputLabels();
 }
 
 function deselectPoolNumber() {
@@ -2345,6 +2356,7 @@ function deselectPoolNumber() {
   }
   gameState.selectedNumber = null;
   gameState.selectedNumberElement = null;
+  syncInputLabels();
 }
 
 /* ===================================
@@ -2378,6 +2390,8 @@ function handleOperandClick(event) {
  * Select a blank to receive the next pool number clicked
  */
 function selectBlankForPlacement(blank) {
+  clearTypedBuffer(); // Digits typed for another blank must not land in this one
+
   // Deselect any previously selected blank
   document.querySelectorAll('.blank.operand.selected').forEach((b) => {
     b.classList.remove('selected');
@@ -2386,16 +2400,19 @@ function selectBlankForPlacement(blank) {
   // Select this blank
   blank.classList.add('selected');
   gameState.selectedBlank = blank;
+  syncInputLabels();
 }
 
 /**
  * Deselect the selected blank
  */
 function deselectBlank() {
+  clearTypedBuffer();
   if (gameState.selectedBlank) {
     gameState.selectedBlank.classList.remove('selected');
   }
   gameState.selectedBlank = null;
+  syncInputLabels();
 }
 
 function placeNumberInBlank(blank, position) {
@@ -2410,6 +2427,7 @@ function placeNumberInBlank(blank, position) {
   // Mark pool number as used
   gameState.selectedNumberElement.classList.add('used');
   gameState.poolNumbersUsed.push(gameState.selectedNumber);
+  announce(`Placed ${gameState.selectedNumber} in ${operandSpot(position)}.`);
 
   // Deselect pool number, blank, and update totals
   deselectPoolNumber();
@@ -2469,6 +2487,7 @@ function returnNumberToPool(blank, position) {
     }
   });
 
+  announce(`Returned ${numberValue} to the pool.`);
   updateColumnTotals();
   savePuzzleState(); // AUTO-SAVE after returning number
 }
@@ -2511,6 +2530,10 @@ function updateColumnTotals() {
   // Update visual status using current puzzle targets
   updateColumnStatus('col1', col1Total, currentPuzzle.columnTargets.column1);
   updateColumnStatus('col2', col2Total, currentPuzzle.columnTargets.column2);
+
+  // Every placement, return, hint, resume and reset ends here, so the screen
+  // reader labels and the pool's Tab stop are refreshed in one place
+  syncInputLabels();
 }
 
 function updateColumnStatus(columnId, current, target) {
@@ -3076,6 +3099,8 @@ function showWinPanel(timeMs) {
     gameState.mode !== 'daily';
   document.getElementById('feedback').hidden = true;
   document.getElementById('win-panel').hidden = false;
+  // Land keyboard and screen reader users on the result
+  document.getElementById('win-label').focus();
 }
 
 /**
@@ -3201,6 +3226,346 @@ function findNextEmptyPosition(positions, userInputs, fromPosition) {
 function confirmDiscardProgress(message) {
   if (!hasProgress()) return true;
   return confirm(message);
+}
+
+/* ===================================
+  KEYBOARD INPUT AND ACCESSIBILITY
+  =================================== */
+
+// KEYBOARD HELPERS START (pure functions, loaded by tests/keyboard.test.js)
+
+const TYPED_PAUSE_MS = 700; // A typed multi-digit number is placed after this pause
+const ARROW_DIRECTIONS = {
+  ArrowLeft: -1,
+  ArrowUp: -1,
+  ArrowRight: 1,
+  ArrowDown: 1,
+};
+const OPERAND_NAMES = { op1: 'first number', op2: 'second number' };
+
+/**
+ * Match typed digits to a pool tile.
+ * An unused tile whose value equals the digits is placed at once, unless a longer
+ * unused value starts with them (typing "1" while a 12 is free); then the digits
+ * stay pending until Enter, a pause (`final`) or more digits.
+ * @param {string} buffer - Digits typed so far
+ * @param {number[]} values - Pool values in tile order
+ * @param {boolean[]} used - Whether each tile is already used
+ * @param {boolean} [final] - No more digits are coming: never pending
+ * @returns {{index: number}|{pending: true}|{none: true}}
+ */
+function matchTypedValue(buffer, values, used, final = false) {
+  if (!/^\d+$/.test(buffer)) return { none: true };
+  let exact = -1;
+  let longer = false;
+  values.forEach((value, index) => {
+    if (used[index]) return;
+    const text = String(value);
+    if (text === buffer) {
+      if (exact === -1) exact = index;
+    } else if (text.startsWith(buffer)) {
+      longer = true;
+    }
+  });
+  if (exact !== -1 && (final || !longer)) return { index: exact };
+  if (longer && !final) return { pending: true };
+  return { none: true };
+}
+
+/**
+ * The operand position `direction` steps from `current`, wrapping at the ends
+ * @param {string[]} positions - Operand positions in play order
+ * @param {string} current - Current position (not found: start at the first or last)
+ * @param {number} direction - 1 forward, -1 back
+ * @returns {string}
+ */
+function nextOperandPosition(positions, current, direction) {
+  const i = positions.indexOf(current);
+  if (i === -1) return direction > 0 ? positions[0] : positions[positions.length - 1];
+  return positions[(i + direction + positions.length) % positions.length];
+}
+
+/**
+ * The index of the unused pool tile `direction` steps from `current`, wrapping
+ * @param {boolean[]} used - Whether each tile is already used
+ * @param {number} current - Current tile index (-1: start before the first)
+ * @param {number} direction - 1 forward, -1 back
+ * @returns {number} Tile index, or -1 when every tile is used
+ */
+function nextPoolIndex(used, current, direction) {
+  const count = used.length;
+  const from = current < 0 ? (direction > 0 ? -1 : count) : current;
+  for (let step = 1; step <= count; step++) {
+    const i = (((from + direction * step) % count) + count) % count;
+    if (!used[i]) return i;
+  }
+  return -1;
+}
+
+/**
+ * Plain-language spot for an operand blank, e.g. "equation 2, first number"
+ * @param {string} position - 'op1-N' or 'op2-N'
+ * @returns {string}
+ */
+function operandSpot(position) {
+  const [prefix, id] = position.split('-');
+  return `equation ${id}, ${OPERAND_NAMES[prefix]}`;
+}
+
+/**
+ * Screen reader label for an operand blank
+ * @param {string} position - 'op1-N' or 'op2-N'
+ * @param {number|undefined} value - Placed number, if any
+ * @returns {string} e.g. "Equation 2, first number, empty"
+ */
+function operandLabel(position, value) {
+  const spot = operandSpot(position);
+  const state = value === undefined || value === null ? 'empty' : value;
+  return `${spot.charAt(0).toUpperCase()}${spot.slice(1)}, ${state}`;
+}
+
+// KEYBOARD HELPERS END
+
+let typedBuffer = ''; // Digits typed toward a pool number; never saved
+let typedTimer = null;
+let lastAnnouncement = '';
+
+/**
+ * Say something to screen readers through the polite live region
+ * @param {string} message - Text to announce
+ */
+function announce(message) {
+  const region = document.getElementById('sr-announcer');
+  if (!region) return;
+  // The same message twice in a row would not be read again, so vary it
+  lastAnnouncement = lastAnnouncement === message ? `${message} ` : message;
+  region.textContent = lastAnnouncement;
+}
+
+/**
+ * Refresh every operand blank and pool tile label, the selected state and the
+ * pool's single Tab stop. Called wherever placement or selection changes.
+ */
+function syncInputLabels() {
+  document.querySelectorAll('.blank.operand').forEach((blank) => {
+    const position = blank.dataset.position;
+    blank.setAttribute('aria-label', operandLabel(position, gameState.userInputs[position]));
+    blank.setAttribute('aria-pressed', String(blank === gameState.selectedBlank));
+  });
+
+  const tiles = Array.from(document.querySelectorAll('.pool-number'));
+  const unused = tiles.filter((tile) => !tile.classList.contains('used'));
+  // The pool is one Tab stop: the focused tile, else the first unused one
+  const stop = unused.includes(document.activeElement)
+    ? document.activeElement
+    : unused[0];
+  tiles.forEach((tile) => {
+    const isUsed = tile.classList.contains('used');
+    const state = isUsed
+      ? 'used'
+      : tile.classList.contains('selected')
+        ? 'selected'
+        : 'available';
+    tile.setAttribute('aria-label', `${tile.dataset.number}, ${state}`); // e.g. "7, available"
+    tile.setAttribute('aria-disabled', String(isUsed));
+    tile.tabIndex = tile === stop ? 0 : -1;
+  });
+}
+
+function clearTypedBuffer() {
+  clearTimeout(typedTimer);
+  typedTimer = null;
+  typedBuffer = '';
+}
+
+/**
+ * Current pool as parallel arrays, in tile order
+ */
+function readPool() {
+  const tiles = Array.from(document.querySelectorAll('.pool-number'));
+  return {
+    tiles,
+    values: tiles.map((tile) => parseInt(tile.dataset.number)),
+    used: tiles.map((tile) => tile.classList.contains('used')),
+  };
+}
+
+/**
+ * One delegated keydown handler for typing numbers, arrow navigation and Escape.
+ * Registered before the header menu and hint handlers so that Escape still
+ * closes an open menu or hint row first, and only then peels off a selection.
+ * @param {KeyboardEvent} event
+ */
+function handleKeyboardInput(event) {
+  if (event.ctrlKey || event.altKey || event.metaKey) return;
+  if (gameState.completed) return;
+  if (document.querySelector('.modal:not(.hidden)')) return;
+  const target = event.target;
+  if (target.closest('input, select, textarea')) return;
+
+  const onBlank = target.closest('.blank.operand');
+  const onTile = target.closest('.pool-number');
+  const key = event.key;
+
+  if (key === 'Escape') {
+    handleEscapeKey();
+  } else if (/^[0-9]$/.test(key)) {
+    // Digits only count on a blank, a tile or the bare page
+    if (onBlank || onTile || target === document.body) {
+      handleTypedDigit(event, onBlank);
+    }
+  } else if (
+    key === 'Enter' &&
+    typedBuffer &&
+    (onBlank || onTile || target === document.body) &&
+    (onBlank || gameState.selectedBlank)
+  ) {
+    // Only on a blank, a tile or the bare page: Enter on a button keeps its job
+    event.preventDefault(); // Enter places the typed number, not a click
+    resolveTypedBuffer(onBlank || gameState.selectedBlank, true);
+  } else if (onBlank) {
+    handleBlankKey(event, onBlank);
+  } else if (onTile) {
+    handlePoolKey(event, onTile);
+  }
+}
+
+/**
+ * Escape undoes one thing: the typed digits, then the selected tile, then the
+ * selected blank. An open hint row or header menu keeps Escape for itself.
+ */
+function handleEscapeKey() {
+  if (document.querySelector('.hint-choices:not([hidden])')) return;
+  const menu = document.getElementById('header-controls');
+  if (menu && menu.classList.contains('open')) return;
+
+  if (typedBuffer) {
+    clearTypedBuffer();
+  } else if (gameState.selectedNumberElement) {
+    deselectPoolNumber();
+  } else if (gameState.selectedBlank) {
+    deselectBlank();
+  }
+}
+
+/**
+ * Arrows move between operand blanks (selecting each); Backspace or Delete
+ * returns a filled blank's number to the pool. Enter and Space click natively.
+ * @param {KeyboardEvent} event
+ * @param {HTMLElement} blank - The focused operand blank
+ */
+function handleBlankKey(event, blank) {
+  const position = blank.dataset.position;
+  const direction = ARROW_DIRECTIONS[event.key];
+
+  if (direction) {
+    event.preventDefault();
+    clearTypedBuffer();
+    const positions = Array.from(document.querySelectorAll('.blank.operand')).map(
+      (b) => b.dataset.position
+    );
+    const next = document.querySelector(
+      `.blank.operand[data-position="${nextOperandPosition(positions, position, direction)}"]`
+    );
+    selectBlankForPlacement(next);
+    next.focus();
+  } else if (
+    (event.key === 'Backspace' || event.key === 'Delete') &&
+    blank.classList.contains('filled')
+  ) {
+    event.preventDefault();
+    clearTypedBuffer();
+    returnNumberToPool(blank, position);
+    selectBlankForPlacement(blank); // Same as tap-to-fix: the next number goes back here
+  }
+}
+
+/**
+ * Arrows move focus across the unused pool tiles
+ * @param {KeyboardEvent} event
+ * @param {HTMLElement} tile - The focused pool tile
+ */
+function handlePoolKey(event, tile) {
+  const direction = ARROW_DIRECTIONS[event.key];
+  if (!direction) return;
+  event.preventDefault();
+  const { tiles, used } = readPool();
+  const next = nextPoolIndex(used, tiles.indexOf(tile), direction);
+  if (next === -1) return;
+  tiles[next].focus();
+  syncInputLabels(); // Moves the pool's Tab stop to the tile just focused
+}
+
+/**
+ * Add a typed digit and place the number if it is clear which tile is meant
+ * @param {KeyboardEvent} event
+ * @param {HTMLElement|null} onBlank - The focused operand blank, if any
+ */
+function handleTypedDigit(event, onBlank) {
+  const blank = onBlank || gameState.selectedBlank;
+  if (!blank) return;
+  event.preventDefault();
+  typedBuffer += event.key;
+  resolveTypedBuffer(blank, false);
+}
+
+/**
+ * Place the typed number, keep waiting for more digits, or report no match
+ * @param {HTMLElement} blank - Operand blank to fill
+ * @param {boolean} final - Enter or the pause ended the typing
+ */
+function resolveTypedBuffer(blank, final) {
+  clearTimeout(typedTimer);
+  const { tiles, values, used } = readPool();
+  const result = matchTypedValue(typedBuffer, values, used, final);
+
+  if (result.pending) {
+    typedTimer = setTimeout(() => {
+      if (typedBuffer) resolveTypedBuffer(blank, true);
+    }, TYPED_PAUSE_MS);
+    return;
+  }
+
+  const typed = typedBuffer;
+  clearTypedBuffer();
+  if (result.none) {
+    showFeedback(`No unused ${typed} in the pool.`, 'warning');
+    return;
+  }
+  placeTypedNumber(blank, tiles[result.index]);
+}
+
+/**
+ * Place a pool tile in a blank through the same code a tap uses, so
+ * poolNumbersUsed and duplicate pool values stay correct
+ * @param {HTMLElement} blank - Operand blank (a filled one is emptied first)
+ * @param {HTMLElement} tile - Unused pool tile to place
+ */
+function placeTypedNumber(blank, tile) {
+  const position = blank.dataset.position;
+  if (blank.classList.contains('filled')) returnNumberToPool(blank, position);
+  deselectPoolNumber();
+  gameState.selectedNumber = parseInt(tile.dataset.number);
+  gameState.selectedNumberElement = tile;
+  placeNumberInBlank(blank, position);
+  followSelectedBlank();
+}
+
+/**
+ * After a placement, keep keyboard focus on the blank that is now selected
+ * so typing can carry on
+ */
+function followSelectedBlank() {
+  if (gameState.selectedBlank) gameState.selectedBlank.focus();
+}
+
+/**
+ * Click listener added after the tap handlers: a click from Enter or Space
+ * (detail 0) moves focus on, a mouse or touch click keeps its own focus
+ * @param {MouseEvent} event
+ */
+function followKeyboardClick(event) {
+  if (event.detail === 0) followSelectedBlank();
 }
 
 /* ===================================
@@ -3413,6 +3778,7 @@ function handleReset() {
   gameState.selectedNumber = null;
   gameState.selectedNumberElement = null;
   gameState.selectedBlank = null;
+  clearTypedBuffer();
   gameState.attempts = 0;
   gameState.completed = false;
   gameState.hintsUsed = 0;
