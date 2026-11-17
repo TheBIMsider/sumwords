@@ -33,7 +33,8 @@ A constraint-based math puzzle game that combines trivia knowledge with equation
   - **Medium:** Addition/subtraction with numbers up to 100, 12 numbers and 2 decoys
   - **Hard:** All four operators (+, −, ×, ÷) with numbers up to 200, 16 numbers and 6 decoys
 - **Random Difficulty Mode:** Game randomly selects difficulty for variety
-- **500 Trivia Questions** across 10 diverse categories
+- **800 Trivia Questions** across 16 diverse categories
+- **Whole-number answers:** Every answer is a whole number from 2 to 400 (at most 3 digits). A bigger figure is asked in thousands or millions, and the question says so
 - **Constraint-Based Puzzles:** Numbers must satisfy both equations AND column totals
 
 ### Categories
@@ -48,6 +49,12 @@ A constraint-based math puzzle game that combines trivia knowledge with equation
 8. Technology
 9. Games & Literature
 10. Animals & Nature
+11. Music
+12. Space & Astronomy
+13. Body & Health
+14. Art & Architecture
+15. Transportation
+16. Holidays
 
 Plus an **"Everything"** category that combines all questions for maximum variety.
 
@@ -66,7 +73,7 @@ Plus an **"Everything"** category that combines all questions for maximum variet
 - **Statistics Tracking:** Track completed puzzles, attempts, hints used, perfect games, win streaks and stars earned
 - **Star Rating:** Every win earns 1 to 3 stars from attempts and hints (3 stars is one attempt with no hints), shown on the win panel with how long the puzzle took
 - **Share Results:** After a win, copy a spoiler-free, Wordle-style grid of your attempts, with your star rating, to the clipboard; an equation solved with a hint shows as a yellow square
-- **Daily Puzzle:** One shared puzzle per day (Everything, Medium) from a seeded generator, so everyone gets the same puzzle with no server; play it once per day and share your result as `Daily #1-12`
+- **Daily Puzzle:** One shared puzzle per day (Everything, Medium) from a seeded generator, so everyone gets the same puzzle with no server; play it once per day and share your result as `Daily #2-12`
 - **Mobile-Optimized:** Fully responsive design works great on phones and tablets
 - **Persistent Storage:** Game state, preferences, stats, and theme saved locally
 
@@ -155,7 +162,7 @@ sumwords/
 ├── V01/
 │   ├── index.html          # Game HTML structure
 │   ├── styles.css          # Game styling with dark mode
-│   ├── questions.js        # 500 trivia questions (questionBanks), loaded before game.js
+│   ├── questions.js        # 800 trivia questions (questionBanks), loaded before game.js
 │   ├── game.js             # Game logic
 │   ├── Sumwords_Logo.png   # Game logo
 │   └── README.md           # Copy of this README for the game folder
@@ -196,14 +203,16 @@ Every level has 5 equations. Operators are always visible.
 - **Medium:** Numbers up to 100, addition/subtraction only, 12 numbers (2 decoys) in a 6×2 pool grid (3×4 mobile)
 - **Hard:** Numbers up to 200, all operators (+, −, ×, ÷), 16 numbers (6 decoys) in an 8×2 pool grid (4×4 mobile)
 
+Difficulty is the math, not the trivia. A level changes the operators, number range and decoys, not the questions: any question can appear on any level.
+
 ### Daily Puzzle
 
 The 📅 Daily button in the header loads one puzzle per calendar day. Everyone who plays on the same date gets the same puzzle, with no server: the puzzle is built from a seed made from the date, so every device builds the same questions and numbers (the order of the tiles in the pool may differ).
 
 - Always Everything and Medium; the category and difficulty selectors are locked while a daily is loaded
 - Uses the player's local date, and is playable once per day. After a win the Daily button shows your result, Share result and "Next daily puzzle tomorrow"
-- Numbered `series-day`, for example `#1-12`. The series number only goes up when a change alters the dailies (new questions or a generator change), and the day count starts again at 1
-- Share text header is `Sumwords v1.2.0 · Daily #1-12`; the rest is the usual spoiler-free grid
+- Numbered `series-day`, for example `#2-12`. The series number only goes up when a change alters the dailies (new questions or a generator change), and the day count starts again at 1
+- Share text header is `Sumwords v1.2.0 · Daily #2-12`; the rest is the usual spoiler-free grid
 - A daily win counts as a normal Medium win and also shows in the Daily Puzzles block in Stats (there is no separate daily streak)
 
 ### Star Rating
@@ -246,7 +255,7 @@ Contributions are welcome! This is a personal learning project, but feel free to
 
 ### Adding Trivia Questions
 
-Questions are stored in `V01/questions.js` in the `questionBanks` object, one array per category (`sports`, `history`, `geography`, `popculture`, `science`, `moviestv`, `fooddrink`, `technology`, `gamesliterature`, `animalsnature`). Each question needs:
+Questions are stored in `V01/questions.js` in the `questionBanks` object, one array per category (`sports`, `history`, `geography`, `popculture`, `science`, `moviestv`, `fooddrink`, `technology`, `gamesliterature`, `animalsnature`, `music`, `spaceastronomy`, `bodyhealth`, `artarchitecture`, `transportation`, `holidays`). Each question needs:
 
 - `question`: The trivia question text
 - `answer`: Whole number answer. The existing bank uses answers from 2 to 400; the rules are enforced by `tests/generator.test.js`
@@ -294,7 +303,7 @@ This project was developed (Vibe Coded) over 21 sessions with Claude Chat and co
 
 - Core game mechanics
 - Three difficulty levels plus random mode
-- 500 trivia questions across 10 categories
+- 800 trivia questions across 16 categories (Music, Space & Astronomy, Body & Health, Art & Architecture, Transportation, Holidays added)
 - Hint system with two hint types (answer and numbers)
 - localStorage persistence
 - Statistics tracking
@@ -315,7 +324,6 @@ This project was developed (Vibe Coded) over 21 sessions with Claude Chat and co
 ### Potential Future Enhancements
 
 - Sound effects (optional)
-- Additional question categories
 - Leaderboards
 - Progressive Web App (PWA) support
 - Advanced tutorial with interactive walkthrough

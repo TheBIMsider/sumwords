@@ -71,7 +71,7 @@ const CATEGORIES = [...Object.keys(questionBanks), 'everything'];
 // built, and 0 or 1 cannot be built as a sum of two whole numbers of at least 1.
 const BANK_MIN_ANSWER = 2;
 const BANK_MAX_ANSWER = 400;
-const BANK_CATEGORIES = 14;
+const BANK_CATEGORIES = 16;
 const BANK_PER_CATEGORY = 50;
 
 function checkBank(banks) {

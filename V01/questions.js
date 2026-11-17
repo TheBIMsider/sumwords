@@ -1,4 +1,4 @@
-// Sumwords trivia question bank: 14 categories, 700 questions.
+// Sumwords trivia question bank: 16 categories, 800 questions.
 // Plain classic script loaded by index.html before game.js. Keep it to this declaration.
 
 const questionBanks = {
@@ -1229,5 +1229,217 @@ const questionBanks = {
       question: "Painted versions of Vincent van Gogh's The Bedroom",
       answer: 3,
     },
+  ],
+  transportation: [
+    { question: 'Strokes in a complete four-stroke engine cycle', answer: 4 },
+    { question: 'Strokes in a complete two-stroke engine cycle', answer: 2 },
+    { question: 'Cylinders in a standard V8 engine', answer: 8 },
+    { question: 'Cylinders in a V12 engine', answer: 12 },
+    { question: 'Cylinders in a V10 engine', answer: 10 },
+    { question: 'Cylinders in a V16 engine', answer: 16 },
+    { question: 'Cylinders in a W16 engine (Bugatti Veyron)', answer: 16 },
+    { question: 'Cylinders in a flat-12 engine', answer: 12 },
+    { question: 'Cylinders in an inline-six engine', answer: 6 },
+    { question: 'Cylinders in an inline-eight engine', answer: 8 },
+    { question: 'Cylinders in an inline-five engine', answer: 5 },
+    { question: 'Engines on a Boeing 747', answer: 4 },
+    { question: 'Engines on a Boeing 737', answer: 2 },
+    { question: 'Engines on the Antonov An-225 Mriya', answer: 6 },
+    { question: "Wheels on NASA's Curiosity rover", answer: 6 },
+    {
+      question: 'Bells struck at the end of a full four-hour watch at sea',
+      answer: 8,
+    },
+    { question: 'Sides on a yield sign', answer: 3 },
+    { question: 'Lights on a standard road traffic signal', answer: 3 },
+    { question: 'Wheels on a tuk-tuk (auto rickshaw)', answer: 3 },
+    { question: 'Feet in a fathom', answer: 6 },
+    {
+      question: 'How many 20-foot units (TEU) does a 40-foot container count as?',
+      answer: 2,
+    },
+    {
+      question: 'Years Concorde carried passengers commercially, 1976 to 2003',
+      answer: 27,
+    },
+    {
+      question: "Days Phileas Fogg has to circle the world in Jules Verne's novel",
+      answer: 80,
+    },
+    { question: 'Lifeboats on RMS Titanic', answer: 20 },
+    { question: 'Funnels on RMS Titanic, counting the dummy one', answer: 4 },
+    { question: 'Propellers on RMS Titanic', answer: 3 },
+    {
+      question: "Years from the Wright brothers' 1903 flight to the 1969 Moon landing",
+      answer: 66,
+    },
+    {
+      question: "Seconds the Wright brothers' first powered flight lasted",
+      answer: 12,
+    },
+    {
+      question: 'Powered flights the Wright brothers made on 17 December 1903',
+      answer: 4,
+    },
+    {
+      question: 'Seconds in the longest Wright brothers flight on 17 December 1903',
+      answer: 59,
+    },
+    {
+      question: 'Day of December on which the Wright brothers first flew',
+      answer: 17,
+    },
+    { question: 'Horsepower of the Ford Model T engine', answer: 20 },
+    {
+      question: 'Cubic inches of displacement in the Ford Model T engine',
+      answer: 177,
+    },
+    {
+      question: 'Length in feet of the smaller standard shipping container',
+      answer: 20,
+    },
+    {
+      question: 'Length in feet of the larger standard shipping container',
+      answer: 40,
+    },
+    { question: 'Speed limit on UK motorways for cars, in mph', answer: 70 },
+    {
+      question: 'Default speed limit in built-up areas in England, in mph',
+      answer: 30,
+    },
+    {
+      question: 'Speed limit on single-carriageway roads in England for cars, in mph',
+      answer: 60,
+    },
+    {
+      question: 'Speed limit on UK motorways for cars towing a trailer, in mph',
+      answer: 60,
+    },
+    { question: 'Rowers in a rowing eight, not counting the cox', answer: 8 },
+    { question: 'Masts on a brigantine', answer: 2 },
+    { question: 'Points on a traditional compass rose', answer: 32 },
+    { question: 'Length of the Hindenburg airship, in metres', answer: 245 },
+    { question: 'Hydrogen gas cells in the Hindenburg airship', answer: 16 },
+    {
+      question: "Ships in Magellan's fleet when it left Spain in 1519",
+      answer: 5,
+    },
+    {
+      question: 'Days Voyager took to fly around the world nonstop in 1986',
+      answer: 9,
+    },
+    {
+      question: 'Years from the 1912 Titanic sinking to the 1937 Hindenburg disaster',
+      answer: 25,
+    },
+    {
+      question: 'Length of the Suez Canal in km, to the nearest km',
+      answer: 193,
+    },
+    {
+      question: 'Multiple-choice questions in the UK car theory test',
+      answer: 50,
+    },
+    { question: 'Degrees in a full compass bearing circle', answer: 360 },
+  ],
+  holidays: [
+    { question: 'Day of December on which Christmas Day falls', answer: 25 },
+    { question: 'Day of December on which Christmas Eve falls', answer: 24 },
+    { question: 'Day of December on which Boxing Day falls (UK)', answer: 26 },
+    { question: 'Day of December on which St Nicholas Day falls', answer: 6 },
+    { question: 'Day of October on which Halloween falls', answer: 31 },
+    { question: "Day of February on which Valentine's Day falls", answer: 14 },
+    { question: 'Day of July on which Bastille Day falls', answer: 14 },
+    { question: 'Day of July on which US Independence Day falls', answer: 4 },
+    { question: 'Day of November on which Guy Fawkes Night falls', answer: 5 },
+    { question: "Day of March on which St Patrick's Day falls", answer: 17 },
+    { question: 'Day of January on which Burns Night falls', answer: 25 },
+    { question: 'Day of April on which Anzac Day falls', answer: 25 },
+    { question: 'Day of January on which Australia Day falls', answer: 26 },
+    { question: 'Day of May on which Cinco de Mayo falls', answer: 5 },
+    {
+      question: 'Day of January on which Epiphany falls (Western churches)',
+      answer: 6,
+    },
+    { question: "Day of November on which St Andrew's Day falls", answer: 30 },
+    { question: "Day of April on which St George's Day falls", answer: 23 },
+    { question: 'Day of November on which Armistice Day falls', answer: 11 },
+    { question: 'Nights of Hanukkah', answer: 8 },
+    {
+      question: 'Candles on a hanukkiah (Hanukkah menorah), including the shamash',
+      answer: 9,
+    },
+    { question: 'Sides on a dreidel', answer: 4 },
+    { question: 'Principles of Kwanzaa (Nguzo Saba)', answer: 7 },
+    { question: 'Candles on a Kwanzaa kinara', answer: 7 },
+    { question: 'Days Kwanzaa lasts, from 26 December', answer: 7 },
+    { question: 'Sundays in Advent', answer: 4 },
+    {
+      question: 'Golden rings in the carol "The Twelve Days of Christmas"',
+      answer: 5,
+    },
+    { question: 'Lords a-leaping on the tenth day of Christmas', answer: 10 },
+    { question: 'Pipers piping on the eleventh day of Christmas', answer: 11 },
+    {
+      question: 'Drummers drumming on the twelfth day of Christmas',
+      answer: 12,
+    },
+    { question: 'Maids a-milking on the eighth day of Christmas', answer: 8 },
+    {
+      question: 'Reindeer named in the 1823 poem "A Visit from St. Nicholas"',
+      answer: 8,
+    },
+    { question: 'Gifts named in Matthew 2:11', answer: 3 },
+    {
+      question: 'Barrels of gunpowder found in the Gunpowder Plot cellar',
+      answer: 36,
+    },
+    { question: 'Items on a traditional Passover seder plate', answer: 6 },
+    { question: 'Cups of wine drunk during a Passover seder', answer: 4 },
+    { question: 'Animals in the Chinese zodiac', answer: 12 },
+    {
+      question: 'Day of the first lunar month on which the Lantern Festival falls',
+      answer: 15,
+    },
+    { question: 'Stripes on the US flag', answer: 13 },
+    {
+      question: 'Day of December on which St Lucia Day falls (Sweden)',
+      answer: 13,
+    },
+    {
+      question: 'Day of December on which the Feast of the Immaculate Conception falls',
+      answer: 8,
+    },
+    {
+      question: 'Day of December on which Sinterklaas Day falls (Netherlands)',
+      answer: 5,
+    },
+    {
+      question: "Day of September on which Mexico's Independence Day falls",
+      answer: 16,
+    },
+    {
+      question: "Day of August on which India's Independence Day falls",
+      answer: 15,
+    },
+    { question: 'Day of November on which All Souls Day falls', answer: 2 },
+    {
+      question: 'Passengers on the Mayflower when it sailed to America in 1620',
+      answer: 102,
+    },
+    {
+      question: 'Day of February on which Waitangi Day falls (New Zealand)',
+      answer: 6,
+    },
+    { question: 'Day of June on which Fête de la Musique falls', answer: 21 },
+    {
+      question: 'Day of February on which Estonia celebrates Independence Day',
+      answer: 24,
+    },
+    {
+      question: 'Day of March on which Greek Independence Day falls',
+      answer: 25,
+    },
+    { question: 'Day of June on which Russia Day falls', answer: 12 },
   ],
 };

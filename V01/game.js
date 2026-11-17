@@ -81,7 +81,7 @@ const DAILY_SALT = 'sumwords-daily';
 // change alters the dailies: adding or editing questions, or a generator
 // change. The pinned-date test in tests/daily.test.js fails when that happens.
 // Dailies are numbered "series-day", for example #1-1, then #2-1 after a bump.
-const DAILY_SERIES = 1;
+const DAILY_SERIES = 2;
 
 // Day 1 of the current series: its first daily's local calendar date (YYYY-MM-DD)
 const DAILY_EPOCH = '2026-11-17';
