@@ -1370,7 +1370,94 @@ const gameState = {
   attemptHistory: [], // One entry per Submit press, used for the share result
   mode: 'normal', // 'normal' or 'daily'
   dailyDate: null, // YYYY-MM-DD of the daily being played (daily mode only)
+  elapsedMs: 0, // Active play time counted so far (see PLAY TIME below)
+  clockStartedAt: null, // When the clock last started running, or null while stopped
 };
+
+/* ===================================
+  PLAY TIME
+  =================================== */
+
+// Time counts only while a puzzle is on screen, the tab is visible and the
+// puzzle is not won. It is shown on the win panel and never scored, shared
+// or sent anywhere.
+
+/**
+ * Start the clock if a puzzle is being played. Safe to call anytime.
+ */
+function startClock() {
+  if (gameState.clockStartedAt !== null) return;
+  if (!currentPuzzle || gameState.completed || document.hidden) return;
+  gameState.clockStartedAt = Date.now();
+}
+
+/**
+ * Stop the clock and add the running stretch to elapsedMs. Safe to call anytime.
+ */
+function bankClock() {
+  if (gameState.clockStartedAt === null) return;
+  gameState.elapsedMs += Math.max(0, Date.now() - gameState.clockStartedAt);
+  gameState.clockStartedAt = null;
+}
+
+/**
+ * Play time so far, including the stretch that is still running
+ * @returns {number} Milliseconds
+ */
+function getElapsedMs() {
+  if (gameState.clockStartedAt === null) return gameState.elapsedMs;
+  return (
+    gameState.elapsedMs + Math.max(0, Date.now() - gameState.clockStartedAt)
+  );
+}
+
+/**
+ * Start the time over from 0 (Reset) and run it again
+ */
+function resetClock() {
+  gameState.elapsedMs = 0;
+  gameState.clockStartedAt = null;
+  startClock();
+}
+
+/**
+ * True for a usable saved or counted time. Saves from before play time was
+ * added have none, so they are not valid.
+ * @param {*} ms
+ * @returns {boolean}
+ */
+function isValidPlayTime(ms) {
+  return typeof ms === 'number' && Number.isFinite(ms) && ms >= 0;
+}
+
+/**
+ * "2:41", or "1:05:09" past an hour
+ * @param {number} ms - Milliseconds
+ * @returns {string}
+ */
+function formatPlayTime(ms) {
+  const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = String(totalSeconds % 60).padStart(2, '0');
+  if (hours > 0) return `${hours}:${String(minutes).padStart(2, '0')}:${seconds}`;
+  return `${minutes}:${seconds}`;
+}
+
+/**
+ * Pause the clock while the tab is hidden and run it again when it returns.
+ * Closing a tab usually ends in "hidden", so the time is saved then too.
+ */
+function handleVisibilityChange() {
+  if (document.hidden) {
+    bankClock();
+    if (currentPuzzle && !gameState.completed) savePuzzleState();
+  } else {
+    startClock();
+  }
+}
+
+document.addEventListener('visibilitychange', handleVisibilityChange);
 
 /* ===================================
   LOCAL STORAGE FUNCTIONS
@@ -1406,6 +1493,7 @@ function savePuzzleState() {
         currentDifficulty: gameState.currentDifficulty,
         assignedDifficulty: gameState.assignedDifficulty,
         attemptHistory: gameState.attemptHistory,
+        elapsedMs: getElapsedMs(),
         mode: gameState.mode,
         dailyDate: gameState.dailyDate,
         dailySeries: gameState.mode === 'daily' ? DAILY_SERIES : null,
@@ -1561,6 +1649,7 @@ function getDefaultStats() {
       perfectGames: 0,
       currentStreak: 0,
       bestStreak: 0,
+      stars: { 1: 0, 2: 0, 3: 0 },
     },
     easy: {
       completed: 0,
@@ -1626,6 +1715,27 @@ function saveStatistics(stats) {
 }
 
 /**
+ * Star counts from the overall stats. Saves from before star ratings have no
+ * `stars` field (or only some keys), so missing counts read as 0.
+ * @param {object} overall - stats.overall
+ * @returns {{1: number, 2: number, 3: number}}
+ */
+function getStarTally(overall) {
+  const saved = (overall && overall.stars) || {};
+  return { 1: saved[1] || 0, 2: saved[2] || 0, 3: saved[3] || 0 };
+}
+
+/**
+ * The Stats modal line: "Stars earned: ⭐ 4 · ⭐⭐ 7 · ⭐⭐⭐ 12"
+ * @param {object} overall - stats.overall
+ * @returns {string}
+ */
+function formatStarsEarned(overall) {
+  const tally = getStarTally(overall);
+  return `Stars earned: ⭐ ${tally[1]} · ⭐⭐ ${tally[2]} · ⭐⭐⭐ ${tally[3]}`;
+}
+
+/**
  * Update statistics when puzzle is completed
  * @param {string} difficulty - Difficulty level (easy/medium/hard) - the ACTUAL difficulty played
  * @param {number} attempts - Number of attempts taken
@@ -1642,6 +1752,10 @@ function updateStatistics(difficulty, attempts, hints, isDaily = false) {
   stats.overall.totalAttempts += attempts;
   stats.overall.totalHints += hints;
   if (isPerfect) stats.overall.perfectGames++;
+
+  // Star tally counts wins from the release that added stars (never backfilled)
+  stats.overall.stars = getStarTally(stats.overall);
+  stats.overall.stars[getStarRating(attempts, hints)]++;
 
   // Update streak
   stats.overall.currentStreak++;
@@ -1846,6 +1960,8 @@ function resumeSavedGame(savedPuzzle) {
   gameState.attemptHistory = Array.isArray(saved.attemptHistory)
     ? saved.attemptHistory
     : []; // Saves from before share results have no history
+  // Time continues from the saved value; saves from before play time start at 0
+  gameState.elapsedMs = isValidPlayTime(saved.elapsedMs) ? saved.elapsedMs : 0;
   // Saves from before the Daily puzzle have no mode, so they resume as normal
   gameState.mode = saved.mode === 'daily' ? 'daily' : 'normal';
   gameState.dailyDate = saved.mode === 'daily' ? saved.dailyDate || null : null;
@@ -1991,6 +2107,8 @@ function loadPuzzle(puzzle) {
 
   // Update column totals (initially 0)
   updateColumnTotals();
+
+  startClock(); // A new or resumed puzzle is now on screen
 }
 
 /**
@@ -2008,6 +2126,8 @@ function resetGameState() {
   gameState.hintedEquations = {}; // Reset to empty object
   gameState.assignedDifficulty = null;
   gameState.attemptHistory = [];
+  gameState.elapsedMs = 0;
+  gameState.clockStartedAt = null;
 
   // Clear UI - operand blanks
   document.querySelectorAll('.blank.operand').forEach((blank) => {
@@ -2592,6 +2712,7 @@ function validatePuzzle() {
 
 function handleWin() {
   gameState.completed = true;
+  bankClock(); // Play time stops at the win
   closeHintChoices();
 
   // Update statistics
@@ -2611,6 +2732,7 @@ function handleWin() {
       attempts: gameState.attempts,
       hints: gameState.hintsUsed,
       history: gameState.attemptHistory,
+      elapsedMs: gameState.elapsedMs,
     });
     document.getElementById('reset-btn').disabled = true; // No replaying the daily
   }
@@ -2619,7 +2741,7 @@ function handleWin() {
   clearPuzzleState();
 
   // Show the win panel in place of the one-line message
-  showWinPanel();
+  showWinPanel(gameState.elapsedMs);
 
   // Trigger confetti
   triggerConfetti();
@@ -2852,7 +2974,6 @@ function buildShareText({
   const difficultyKey = assignedDifficulty || currentDifficulty;
   const difficulty =
     difficultyKey.charAt(0).toUpperCase() + difficultyKey.slice(1);
-  const perfect = attempts === 1 && hints === 0;
   // A daily is always Medium, so its header names the daily number instead
   const header = dailyNumber
     ? `Sumwords v${version} · Daily #${dailyNumber}`
@@ -2860,7 +2981,7 @@ function buildShareText({
 
   const lines = [
     header,
-    `${countWord(attempts, 'attempt')} · ${countWord(hints, 'hint')}${perfect ? ' ⭐' : ''}`,
+    `${countWord(attempts, 'attempt')} · ${countWord(hints, 'hint')} ${'⭐'.repeat(getStarRating(attempts, hints))}`,
     '',
   ];
 
@@ -2886,6 +3007,34 @@ function buildShareText({
 }
 
 /**
+ * Star rating for a win: 1 to 3 stars, worked out from attempts and hints.
+ * penalty = extra attempts * 2 + hints. 0 is 3 stars (the perfect game),
+ * 1 to 3 is 2 stars, 4 or more is 1 star. Any win is at least 1 star.
+ * Recomputed every time, never saved.
+ * @param {number} attempts - Submits used, 1 or more
+ * @param {number} hints - Hints used
+ * @returns {number} 1, 2 or 3
+ */
+function getStarRating(attempts, hints) {
+  const penalty = Math.max(0, attempts - 1) * 2 + hints;
+  if (penalty === 0) return 3;
+  if (penalty <= 3) return 2;
+  return 1;
+}
+
+// The word shown beside the stars, so the rating never depends on emoji alone
+const STAR_LABELS = { 1: 'Solved!', 2: 'Nice work!', 3: 'Perfect!' };
+
+/**
+ * The win panel star line: earned stars, then empty ones ("⭐⭐☆")
+ * @param {number} stars - 1 to 3
+ * @returns {string}
+ */
+function getStarLine(stars) {
+  return '⭐'.repeat(stars) + '☆'.repeat(3 - stars);
+}
+
+/**
  * "1 attempt", "3 attempts", "1 hint", "2 hints"
  * @param {number} count
  * @param {string} word - Singular noun
@@ -2898,8 +3047,15 @@ function countWord(count, word) {
 /**
  * Show the win panel in place of the one-line success message.
  * Call after updateStatistics so the streak is up to date.
+ * @param {number} [timeMs] - Play time in ms. Left out (or invalid) hides the time, as for a daily saved before play time existed
  */
-function showWinPanel() {
+function showWinPanel(timeMs) {
+  const stars = getStarRating(gameState.attempts, gameState.hintsUsed);
+  const starsEl = document.getElementById('win-stars');
+  starsEl.textContent = getStarLine(stars);
+  starsEl.setAttribute('aria-label', `${stars} of 3 stars`);
+  document.getElementById('win-label').textContent = STAR_LABELS[stars];
+
   document.getElementById('win-attempts').textContent = countWord(
     gameState.attempts,
     'attempt'
@@ -2908,6 +3064,11 @@ function showWinPanel() {
     gameState.hintsUsed,
     'hint'
   );
+  const hasTime = isValidPlayTime(timeMs);
+  document.getElementById('win-time-item').hidden = !hasTime;
+  document.getElementById('win-time').textContent = hasTime
+    ? formatPlayTime(timeMs)
+    : '';
   document.getElementById('win-streak').textContent =
     loadStatistics().overall.currentStreak;
 
@@ -3099,6 +3260,7 @@ function showFinishedDaily(result) {
   gameState.hintsUsed = result.hints || 0;
   gameState.attemptHistory = Array.isArray(result.history) ? result.history : [];
   gameState.completed = true;
+  gameState.clockStartedAt = null; // Nothing to time: the daily is already done
   document.getElementById('attempt-count').textContent = gameState.attempts;
   document.getElementById('hint-count').textContent = gameState.hintsUsed;
   document.getElementById('submit-btn').disabled = true;
@@ -3108,7 +3270,7 @@ function showFinishedDaily(result) {
   });
 
   clearPuzzleState(); // Nothing to resume: the daily is done
-  showWinPanel();
+  showWinPanel(result.elapsedMs); // A daily saved before play time has none
 }
 
 /**
@@ -3256,6 +3418,7 @@ function handleReset() {
   gameState.hintsUsed = 0;
   gameState.hintedEquations = {}; // Reset to empty object
   gameState.attemptHistory = [];
+  resetClock(); // A reset starts the puzzle over, and the time with it
   hideWinPanel();
 
   // Clear UI - operand blanks
@@ -3779,6 +3942,9 @@ function showStatsModal() {
   document.getElementById('current-streak').textContent =
     stats.overall.currentStreak;
   document.getElementById('best-streak').textContent = stats.overall.bestStreak;
+  document.getElementById('stars-earned').textContent = formatStarsEarned(
+    stats.overall
+  );
 
   // Update Easy stats
   updateDifficultyStats('easy', stats.easy);

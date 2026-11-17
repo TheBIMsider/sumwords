@@ -57,6 +57,9 @@
               <div class="stat-label">Best Streak</div>
             </div>
           </div>
+          <p class="stars-earned" id="stars-earned">
+            Stars earned: ⭐ 0 · ⭐⭐ 0 · ⭐⭐⭐ 0
+          </p>
         </div>
 
         <div class="stats-section">
@@ -667,10 +670,16 @@
 
         <!-- Win panel (shown in place of the feedback line after a win) -->
         <div class="win-panel" id="win-panel" role="status" hidden>
-          <p class="win-title">🎉 Puzzle complete!</p>
+          <p class="win-title">
+            <span class="win-stars" id="win-stars" role="img"></span>
+            <span id="win-label"></span>
+          </p>
           <p class="win-stats">
             <span id="win-attempts"></span> ·
             <span id="win-hints"></span> ·
+            <span id="win-time-item" hidden>
+              Time <span id="win-time"></span> ·
+            </span>
             Win streak: <span id="win-streak"></span>
           </p>
           <p class="win-next" id="win-next-daily" hidden>
@@ -752,6 +761,10 @@
               <li>Start by placing the trivia answer in its equation</li>
               <li>Use the column targets to narrow down number choices</li>
               <li>Tap Hint on an equation to reveal its answer or its numbers</li>
+              <li>
+                Fewer attempts and hints earn more stars: ⭐⭐⭐ is one attempt
+                with no hints
+              </li>
               <li>Check your stats to track your progress!</li>
             </ul>
           </div>

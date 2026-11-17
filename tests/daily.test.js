@@ -411,7 +411,7 @@ function loadSlice(fromMarker, toMarker, exportNames, storage = null) {
   });
   check(
     'daily share text has the Daily # header and the same grid',
-    daily === `Sumwords v1.1.0 · Daily #12\n2 attempts · 1 hint\n\n${rows}\n\n${url}`,
+    daily === `Sumwords v1.1.0 · Daily #12\n2 attempts · 1 hint ⭐⭐\n\n${rows}\n\n${url}`,
     JSON.stringify(daily)
   );
 
@@ -425,8 +425,8 @@ function loadSlice(fromMarker, toMarker, exportNames, storage = null) {
     history,
   });
   check(
-    'share text without dailyNumber is exactly the step 7 output',
-    normal === `Sumwords v1.1.0 · Medium\n2 attempts · 1 hint\n\n${rows}\n\n${url}`,
+    'share text without dailyNumber keeps the difficulty header and the same grid',
+    normal === `Sumwords v1.1.0 · Medium\n2 attempts · 1 hint ⭐⭐\n\n${rows}\n\n${url}`,
     JSON.stringify(normal)
   );
 }
@@ -509,9 +509,16 @@ function fakeStorage({ broken = false } = {}) {
     localStorage: storage,
     gameState: { currentDifficulty: 'medium' },
   };
+  // updateStatistics also tallies stars, so getStarRating has to be loaded too
+  const starFrom = source.indexOf('/**\n * Star rating for a win');
+  const starTo = source.indexOf('/**\n * "1 attempt", "3 attempts"');
+  if (starFrom === -1 || starTo < starFrom) {
+    throw new Error('getStarRating markers not found in V01/game.js');
+  }
   vm.createContext(sb);
   vm.runInContext(
-    source.slice(from, to) +
+    source.slice(starFrom, starTo) +
+      source.slice(from, to) +
       '\n;this.updateStatistics = updateStatistics; this.loadStatistics = loadStatistics;',
     sb
   );
