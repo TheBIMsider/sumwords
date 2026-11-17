@@ -24,7 +24,7 @@ const source = fs
   .readFileSync(path.join(__dirname, '..', 'V01', 'game.js'), 'utf8')
   .split('\r\n')
   .join('\n');
-const startMarker = 'const questionBanks = {';
+const startMarker = '// Trivia questions (questionBanks) live in questions.js';
 const endMarker = 'const gameState = {';
 const start = source.indexOf(startMarker);
 const end = source.indexOf(endMarker);
@@ -35,13 +35,19 @@ if (start === -1 || end === -1 || end < start) {
   process.exit(2);
 }
 
+// questions.js holds the bank; it runs first so the generator section can read questionBanks
+const questionsSource = fs.readFileSync(
+  path.join(__dirname, '..', 'V01', 'questions.js'),
+  'utf8'
+);
+
 function loadGenerator(series = null) {
   const sandbox = {
     console: { log() {}, warn() {}, error() {} },
     gameState: {},
   };
   vm.createContext(sandbox);
-  let code = source.slice(start, end);
+  let code = questionsSource + '\n' + source.slice(start, end);
   if (series !== null) {
     // Run the same code as if DAILY_SERIES had been bumped
     code = code.replace(/const DAILY_SERIES = \d+;/, `const DAILY_SERIES = ${series};`);

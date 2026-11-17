@@ -155,7 +155,8 @@ sumwords/
 ├── V01/
 │   ├── index.html          # Game HTML structure
 │   ├── styles.css          # Game styling with dark mode
-│   ├── game.js             # Game logic and 500 trivia questions
+│   ├── questions.js        # 500 trivia questions (questionBanks), loaded before game.js
+│   ├── game.js             # Game logic
 │   ├── Sumwords_Logo.png   # Game logo
 │   └── README.md           # Copy of this README for the game folder
 ├── landing/
@@ -245,7 +246,7 @@ Contributions are welcome! This is a personal learning project, but feel free to
 
 ### Adding Trivia Questions
 
-Questions are stored in `V01/game.js` in the `questionBanks` object, one array per category (`sports`, `history`, `geography`, `popculture`, `science`, `moviestv`, `fooddrink`, `technology`, `gamesliterature`, `animalsnature`). Each question needs:
+Questions are stored in `V01/questions.js` in the `questionBanks` object, one array per category (`sports`, `history`, `geography`, `popculture`, `science`, `moviestv`, `fooddrink`, `technology`, `gamesliterature`, `animalsnature`). Each question needs:
 
 - `question`: The trivia question text
 - `answer`: Whole number answer. The existing bank uses answers from 2 to 400; the rules are enforced by `tests/generator.test.js`

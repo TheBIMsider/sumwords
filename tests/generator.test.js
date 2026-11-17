@@ -32,7 +32,7 @@ const source = fs.readFileSync(
   path.join(__dirname, '..', 'V01', 'game.js'),
   'utf8'
 );
-const startMarker = 'const questionBanks = {';
+const startMarker = '// Trivia questions (questionBanks) live in questions.js';
 const endMarker = 'const gameState = {';
 const start = source.indexOf(startMarker);
 const end = source.indexOf(endMarker);
@@ -44,6 +44,10 @@ if (start === -1 || end === -1 || end < start) {
 }
 
 // Silence the generator's debug output inside the sandbox only.
+const questionsSource = fs.readFileSync(
+  path.join(__dirname, '..', 'V01', 'questions.js'),
+  'utf8'
+);
 const sandbox = {
   console: { log() {}, warn() {}, error() {} },
   // generatePuzzle writes to gameState; give it a throwaway one.
@@ -51,7 +55,7 @@ const sandbox = {
 };
 vm.createContext(sandbox);
 vm.runInContext(
-  source.slice(start, end) +
+  questionsSource + '\n' + source.slice(start, end) +
     '\n;this.generatePuzzle = generatePuzzle; this.generateOperands = generateOperands; this.questionBanks = questionBanks;',
   sandbox
 );
@@ -97,7 +101,32 @@ function checkBank(banks) {
   return problems;
 }
 
-const bankProblems = checkBank(questionBanks);
+// questions.js must hold only the bank: no other top-level code, and game.js must not declare it again.
+function checkQuestionsFile() {
+  const problems = [];
+  // A top-level var or function would become a property of the sandbox global; const does not.
+  const probe = {};
+  vm.createContext(probe);
+  vm.runInContext(questionsSource, probe);
+  if (Object.keys(probe).length) {
+    problems.push('questions.js creates globals: ' + Object.keys(probe).join(', '));
+  }
+  if (vm.runInContext('typeof questionBanks', probe) !== 'object') {
+    problems.push('questions.js does not declare questionBanks');
+  }
+  // Column-0 lines may only be comments, blank lines, or the declaration and its closing brace.
+  questionsSource.split(/\r?\n/).forEach((line, i) => {
+    if (/^(\/\/.*|\s*|const questionBanks = \{|\};)$/.test(line)) return;
+    if (/^\s/.test(line)) return; // indented: inside the object literal
+    problems.push(`questions.js line ${i + 1} is top-level code: ${line.slice(0, 60)}`);
+  });
+  if (/const\s+questionBanks\s*=/.test(source)) {
+    problems.push('game.js still declares questionBanks');
+  }
+  return problems;
+}
+
+const bankProblems = [...checkBank(questionBanks), ...checkQuestionsFile()];
 if (bankProblems.length) {
   console.log('Question bank: FAIL');
   for (const p of bankProblems) console.log('  - ' + p);
