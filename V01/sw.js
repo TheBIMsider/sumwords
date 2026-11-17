@@ -5,7 +5,7 @@
  * game.js (checked by tests/pwa.test.js). Bump it on every release.
  */
 
-const CACHE_NAME = 'sumwords-v1.2.0';
+const CACHE_NAME = 'sumwords-v1.3.0';
 
 // Files the game needs, relative to this worker's folder (the scope).
 const PRECACHE_PATHS = [

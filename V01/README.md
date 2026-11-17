@@ -61,6 +61,7 @@ Plus an **"Everything"** category that combines all questions for maximum variet
   - Reveal which numbers to place in the equation
   - Check an equation's mark (✓ Correct or ✗) for one hint, without a Submit
 - **Undo:** Take back your last placed or removed number with the Undo button or Ctrl+Z (Cmd+Z on Mac), one move at a time
+- **Keyboard Play:** Play without a mouse: type a number to place it, move between blanks and tiles with the arrow keys, and press Escape to back out one step. Screen reader labels and visible focus rings are included (full list under Keyboard below)
 - **Smart Resume:** Automatically saves progress and offers to resume unfinished puzzles
 - **Confirm Before Discarding:** Reset, New Puzzle and changing the category or difficulty ask first when you have progress on the board
 - **Submit Feedback:** Submit marks every equation and column target so you can see what to fix, without revealing the trivia answer
@@ -69,6 +70,7 @@ Plus an **"Everything"** category that combines all questions for maximum variet
 - **Share Results:** After a win, copy a spoiler-free, Wordle-style grid of your attempts, with your star rating, to the clipboard; an equation solved with a hint shows as a yellow square
 - **Daily Puzzle:** One shared puzzle per day (Everything, Medium) from a seeded generator, so everyone gets the same puzzle with no server; play it once per day and share your result as `Daily #2-12`
 - **Mobile-Optimized:** Fully responsive design works great on phones and tablets
+- **Install and Offline:** Install Sumwords from your browser and, after one online visit, play offline on every difficulty, including the Daily puzzle (see Install and Offline below)
 - **Persistent Storage:** Game state, preferences, stats, and theme saved locally
 
 ### Visual Polish
@@ -185,6 +187,7 @@ sumwords/
 │   ├── feedback.test.js    # Checks the Submit mark for each equation and that no trivia answer is printed
 │   ├── generator.test.js   # Checks every generated puzzle is solvable, plus question bank rules
 │   ├── hints.test.js       # Checks every equation has its Hint button and choice row, and old hint code is gone
+│   ├── keyboard.test.js    # Checks keyboard play: typed numbers, arrow keys, Enter/Space, Backspace/Delete and Escape
 │   ├── play-polish.test.js # Checks the Reset/New Puzzle confirm rules and auto-advance lookup
 │   ├── pwa.test.js         # Checks the manifest, icon sizes, service worker cache list and install wiring
 │   ├── tutorial.test.js    # Checks the How to Play button, tutorial dialog markup and that replay never sets the seen flag
@@ -222,7 +225,7 @@ The 📅 Daily button in the header loads one puzzle per calendar day. Everyone 
 - Always Everything and Medium; the category and difficulty selectors are locked while a daily is loaded
 - Uses the player's local date, and is playable once per day. After a win the Daily button shows your result, Share result and "Next daily puzzle tomorrow"
 - Numbered `series-day`, for example `#2-12`. The series number only goes up when a change alters the dailies (new questions or a generator change), and the day count starts again at 1
-- Share text header is `Sumwords v1.2.0 · Daily #2-12`; the rest is the usual spoiler-free grid
+- Share text header is `Sumwords v1.3.0 · Daily #2-12`; the rest is the usual spoiler-free grid
 - A daily win counts as a normal Medium win and also shows in the Daily Puzzles block in Stats (there is no separate daily streak)
 
 ### Star Rating
@@ -328,8 +331,7 @@ This project was developed (Vibe Coded) over 21 sessions with Claude Chat and co
 - Daily puzzle: one shared puzzle per day from a seeded generator, with a daily number, finished-result view and daily statistics
 - Star rating and play time: 1 to 3 stars per win, play time on the win panel, stars in the share text and a star tally in the statistics
 - v1.2.0: daily puzzle, per-equation Hint button, share results with yellow hint squares, Submit feedback marks, star rating and play time, confirm before discarding progress, sticky number pool and column targets
-
-- Keyboard play and screen reader support: type a number to place it, arrow keys move between blanks and tiles, Escape cancels, visible focus rings in both themes and labels on every blank and tile
+- v1.3.0: keyboard play and screen reader support (type a number to place it, arrow keys between blanks and tiles, Escape backs out one step, visible focus rings), Undo and Check, a replayable How to Play with keyboard controls, six new categories (800 questions in 16 categories), installable offline play, and daily numbering restarts at `#2-1`
 
 ### Potential Future Enhancements
 
