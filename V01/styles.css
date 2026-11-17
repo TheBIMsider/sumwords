@@ -617,7 +617,13 @@ body {
   background-color: var(--button-warning-hover);
 }
 
-/* Both hints used: grey, and the "Hinted" text says so too */
+/* Both hints used: grey and still tappable, so the row can offer ✓ Check */
+.btn-hint-equation.is-hinted,
+.btn-hint-equation.is-hinted:hover {
+  background-color: var(--button-disabled-bg);
+}
+
+/* Finished daily: the pill is off altogether */
 .btn-hint-equation:disabled {
   background-color: var(--button-disabled-bg);
   color: var(--text-on-dark);
@@ -847,6 +853,38 @@ body {
   display: flex;
   gap: 16px;
   justify-content: center;
+}
+
+/* Undo sits beside Submit; Submit takes the rest of the row */
+.submit-row {
+  display: flex;
+  gap: 12px;
+}
+
+.submit-row .btn-submit {
+  flex: 1;
+  width: auto;
+}
+
+.btn-undo {
+  flex-shrink: 0;
+  padding: 16px 18px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  background-color: var(--bg-container);
+  border: 2px solid var(--border-dark);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-undo:hover:not(:disabled) {
+  background-color: var(--bg-card);
+}
+
+.btn-undo:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .btn-submit {
