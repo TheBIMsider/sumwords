@@ -210,7 +210,7 @@ function expect(name, condition, detail) {
   );
   expect(
     'plural attempts and hints',
-    lines[1] === '3 attempts · 1 hint',
+    lines[1] === '3 attempts · 1 hint ⭐',
     lines[1]
   );
   expect(
@@ -221,17 +221,32 @@ function expect(name, condition, detail) {
 
 {
   const line = shareText({ attempts: 1, hints: 1, history: [winningEntry()] }).split('\n')[1];
-  expect('singular attempt and hint wording', line === '1 attempt · 1 hint', line);
+  expect('singular attempt and hint wording', line === '1 attempt · 1 hint ⭐⭐', line);
 }
 
 {
   const line = shareText({ attempts: 1, hints: 0, history: [winningEntry()] }).split('\n')[1];
-  expect('a perfect game gets a star', line === '1 attempt · 0 hints ⭐', line);
+  expect('a perfect game ends with three stars', line === '1 attempt · 0 hints ⭐⭐⭐', line);
 }
 
 {
   const line = shareText({ attempts: 2, hints: 0, history: [wrongEntry(), winningEntry()] }).split('\n')[1];
-  expect('no star when the game is not perfect', !line.includes('⭐'), line);
+  expect('a 2-star game ends with two stars', line === '2 attempts · 0 hints ⭐⭐', line);
+}
+
+{
+  const line = shareText({ attempts: 3, hints: 3, history: [wrongEntry(), wrongEntry(), winningEntry()] }).split('\n')[1];
+  expect('a 1-star game ends with one star', line === '3 attempts · 3 hints ⭐', line);
+}
+
+{
+  // The stars come from attempts and hints alone, and time never appears
+  const text = shareText({ attempts: 1, hints: 0, history: [winningEntry()] });
+  expect(
+    'no time appears in the share text',
+    !/\bTime\b/i.test(text) && !/\d:\d\d/.test(text),
+    text
+  );
 }
 
 {
@@ -288,7 +303,7 @@ function expect(name, condition, detail) {
   expect('only the last 8 rows are shown', rows.length === 8, `rows: ${rows.length}`);
   expect(
     'the header still shows the true attempt count',
-    text.split('\n')[1] === '10 attempts · 2 hints',
+    text.split('\n')[1] === '10 attempts · 2 hints ⭐',
     text.split('\n')[1]
   );
   expect(

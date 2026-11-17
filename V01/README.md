@@ -53,8 +53,9 @@ Plus an **"Everything"** category that combines all questions for maximum variet
   - Reveal the answer to the trivia question
   - Reveal which numbers to place in the equation
 - **Smart Resume:** Automatically saves progress and offers to resume unfinished puzzles
-- **Statistics Tracking:** Track completed puzzles, attempts, hints used, perfect games, and win streaks
-- **Share Results:** After a win, copy a spoiler-free, Wordle-style grid of your attempts to the clipboard; an equation solved with a hint shows as a yellow square
+- **Statistics Tracking:** Track completed puzzles, attempts, hints used, perfect games, win streaks and stars earned
+- **Star Rating:** Every win earns 1 to 3 stars from attempts and hints (3 stars is one attempt with no hints), shown on the win panel with how long the puzzle took
+- **Share Results:** After a win, copy a spoiler-free, Wordle-style grid of your attempts, with your star rating, to the clipboard; an equation solved with a hint shows as a yellow square
 - **Daily Puzzle:** One shared puzzle per day (Everything, Medium) from a seeded generator, so everyone gets the same puzzle with no server; play it once per day and share your result as `Daily #1-12`
 - **Mobile-Optimized:** Fully responsive design works great on phones and tablets
 - **Persistent Storage:** Game state, preferences, stats, and theme saved locally
@@ -147,6 +148,7 @@ sumwords/
 │   ├── generator.test.js   # Checks every generated puzzle is solvable, plus question bank rules
 │   ├── hints.test.js       # Checks every equation has its Hint button and choice row, and old hint code is gone
 │   ├── play-polish.test.js # Checks the Reset/New Puzzle confirm rules and auto-advance lookup
+│   ├── scoring.test.js     # Checks the star rating, the star tally in the statistics and the play time clock
 │   ├── share.test.js       # Checks the share text and per-attempt results
 │   └── validation.test.js  # Checks Submit validation messages
 ├── README.md               # This file
@@ -180,6 +182,22 @@ The 📅 Daily button in the header loads one puzzle per calendar day. Everyone 
 - Share text header is `Sumwords v1.1.0 · Daily #1-12`; the rest is the usual spoiler-free grid
 - A daily win counts as a normal Medium win and also shows in the Daily Puzzles block in Stats (there is no separate daily streak)
 
+### Star Rating
+
+Every win earns 1 to 3 stars, worked out from the attempts (Submit presses) and hints it took. An extra attempt costs 2 points and each hint costs 1:
+
+| Points lost | Stars | Word |
+|---|---|---|
+| 0 (one attempt, no hints) | ⭐⭐⭐ | Perfect! |
+| 1 to 3 | ⭐⭐ | Nice work! |
+| 4 or more | ⭐ | Solved! |
+
+- Only a perfect game earns 3 stars, and any win earns at least 1
+- The win panel shows the stars, a one-word label and the time the puzzle took, for example `⭐⭐⭐ Perfect!` above `1 attempt · 0 hints · Time 2:41 · Win streak: 4`
+- Time counts only while the puzzle is on screen and the tab is visible, and Reset starts it over. It is shown but not scored, and it is not in the share text
+- The second line of the share text ends with your stars, for example `2 attempts · 1 hint ⭐⭐`
+- The rating is worked out from attempts and hints each time and is never saved
+
 ## 📊 Statistics
 
 The game tracks comprehensive statistics including:
@@ -187,7 +205,8 @@ The game tracks comprehensive statistics including:
 - Total puzzles completed
 - Total attempts
 - Hints used
-- Perfect games (no hints)
+- Perfect games (one attempt, no hints, which is also 3 stars)
+- Stars earned (wins at 1, 2 and 3 stars, counted from the version that added stars)
 - Current and best win streaks
 - Per-difficulty breakdowns
 - Daily puzzle totals (completed, attempts, hints, perfect games, average attempts)
@@ -264,6 +283,7 @@ This project was developed (Vibe Coded) over 21 sessions with Claude Chat and co
 - v1.1.0: 5 equations and visible operators on every level, audited question bank, automated puzzle and validation tests, version shown in the game
 - Share results: win panel with a spoiler-free, Wordle-style grid copied to the clipboard
 - Daily puzzle: one shared puzzle per day from a seeded generator, with a daily number, finished-result view and daily statistics
+- Star rating and play time: 1 to 3 stars per win, play time on the win panel, stars in the share text and a star tally in the statistics
 
 ### Potential Future Enhancements
 
