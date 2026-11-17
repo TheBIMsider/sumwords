@@ -87,7 +87,7 @@ Place numbers from the number pool into the equation blanks to make valid equati
 3. **Satisfy constraints:**
    - Each equation must be mathematically correct
    - Column totals must match the targets at the top
-4. **Submit** when all blanks are filled to check your solution
+4. **Submit** when all blanks are filled. Each equation gets a mark (✓ Correct, ✗ Numbers don't work, ✗ Answer doesn't fit the question, … Incomplete) and each column target gets a ✓ or ✗. The trivia answer is never shown
 
 ### Tips
 
@@ -149,6 +149,7 @@ sumwords/
 │   └── Sumwords_in_Action.png  # Landing page screenshot
 ├── tests/
 │   ├── daily.test.js       # Checks the daily puzzle: same date same puzzle, numbering, share header and daily stats
+│   ├── feedback.test.js    # Checks the Submit mark for each equation and that no trivia answer is printed
 │   ├── generator.test.js   # Checks every generated puzzle is solvable, plus question bank rules
 │   ├── hints.test.js       # Checks every equation has its Hint button and choice row, and old hint code is gone
 │   ├── play-polish.test.js # Checks the Reset/New Puzzle confirm rules and auto-advance lookup

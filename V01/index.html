@@ -293,12 +293,14 @@
           <span class="current" id="col1-current">0</span>
           <span class="separator">/</span>
           <span class="goal" id="col1-goal">36</span>
+          <span class="target-mark" id="col1-mark"></span>
         </div>
         <div class="target">
           <span class="label">Column 2</span>
           <span class="current" id="col2-current">0</span>
           <span class="separator">/</span>
           <span class="goal" id="col2-goal">17</span>
+          <span class="target-mark" id="col2-mark"></span>
         </div>
       </div>
 
@@ -377,6 +379,7 @@
               maxlength="3"
             />
           </div>
+          <p class="equation-status" data-status-for="1"></p>
         </div>
 
         <!-- Equation 2 -->
@@ -442,6 +445,7 @@
               maxlength="3"
             />
           </div>
+          <p class="equation-status" data-status-for="2"></p>
         </div>
 
         <!-- Equation 3 -->
@@ -507,6 +511,7 @@
               maxlength="3"
             />
           </div>
+          <p class="equation-status" data-status-for="3"></p>
         </div>
 
         <!-- Equation 4 -->
@@ -572,6 +577,7 @@
               maxlength="3"
             />
           </div>
+          <p class="equation-status" data-status-for="4"></p>
         </div>
 
         <!-- Equation 5 -->
@@ -637,6 +643,7 @@
               maxlength="3"
             />
           </div>
+          <p class="equation-status" data-status-for="5"></p>
         </div>
 
         <!-- Number Pool (bottom of screen) -->
@@ -697,7 +704,7 @@
         </div>
 
         <!-- Feedback Area -->
-        <div class="feedback" id="feedback">
+        <div class="feedback" id="feedback" role="status">
           <!-- Validation messages appear here -->
         </div>
 
@@ -733,7 +740,8 @@
               </li>
               <li>
                 <strong>Complete all equations</strong> - Make sure each
-                equation is mathematically correct
+                equation is mathematically correct. Submit marks each one
+                right, wrong or unfinished
               </li>
             </ol>
           </div>

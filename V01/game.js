@@ -2026,6 +2026,9 @@ function resetGameState() {
     eq.classList.remove('error', 'hinted');
   });
 
+  // Submit marks are not saved, so a fresh or resumed board starts without them
+  clearAllSubmitMarks();
+
   // Reset counters
   document.getElementById('attempt-count').textContent = '0';
   document.getElementById('hint-count').textContent = '0';
@@ -2282,6 +2285,7 @@ function placeNumberInBlank(blank, position) {
 
   // Store in game state
   gameState.userInputs[position] = gameState.selectedNumber;
+  clearEquationMark(equationIdOf(position)); // The player changed this equation
 
   // Mark pool number as used
   gameState.selectedNumberElement.classList.add('used');
@@ -2322,6 +2326,7 @@ function returnNumberToPool(blank, position) {
 
   // Remove from game state
   delete gameState.userInputs[position];
+  clearEquationMark(equationIdOf(position)); // The player changed this equation
 
   // Find and restore the FIRST 'used' pool number with this value
   const poolNumbers = document.querySelectorAll('.pool-number');
@@ -2379,6 +2384,10 @@ function updateColumnTotals() {
   document.getElementById('col1-current').textContent = col1Total;
   document.getElementById('col2-current').textContent = col2Total;
 
+  // An operand changed, so the Submit marks on the columns no longer apply
+  clearColumnMark('col1');
+  clearColumnMark('col2');
+
   // Update visual status using current puzzle targets
   updateColumnStatus('col1', col1Total, currentPuzzle.columnTargets.column1);
   updateColumnStatus('col2', col2Total, currentPuzzle.columnTargets.column2);
@@ -2416,23 +2425,29 @@ function handleSubmit() {
   gameState.attempts++;
   document.getElementById('attempt-count').textContent = gameState.attempts;
 
-  // Record this attempt for the share result (before validating, which only highlights)
-  gameState.attemptHistory.push(
-    buildAttemptEntry(
-      currentPuzzle.equations,
-      currentPuzzle.columnTargets,
-      gameState.userInputs,
-      gameState.hintedEquations
-    )
+  // Record this attempt for the share result (before validating, which only highlights).
+  // The on-screen marks below use the same classifyEquation results as this entry.
+  const statuses = currentPuzzle.equations.map((eq) =>
+    classifyEquation(eq, gameState.userInputs)
   );
+  const entry = buildAttemptEntry(
+    currentPuzzle.equations,
+    currentPuzzle.columnTargets,
+    gameState.userInputs,
+    gameState.hintedEquations,
+    statuses
+  );
+  gameState.attemptHistory.push(entry);
 
-  // Validate all conditions
+  // Validate all conditions (decides the win; its messages are not shown)
   const validation = validatePuzzle();
+
+  showSubmitMarks(statuses, entry.columns);
 
   if (validation.success) {
     handleWin();
   } else {
-    handleErrors(validation.errors);
+    showSubmitSummary(statuses, entry.columns);
   }
 }
 
@@ -2561,12 +2576,11 @@ function validatePuzzle() {
 
   // Check 5: Solutions match trivia answers.
   // An empty solution is already reported by Check 4, so skip it here.
+  // The trivia answer is never printed: this only says the solution does not fit.
   currentPuzzle.equations.forEach((eq) => {
     const userAnswer = gameState.userInputs[`sol-${eq.id}`];
     if (!isBlank(userAnswer) && userAnswer !== eq.answer) {
-      errors.push(
-        `Question ${eq.id} answer is ${userAnswer}, should be ${eq.answer}`
-      );
+      errors.push(`${equationLabel([eq.id])}: the solution does not fit the question`);
     }
   });
 
@@ -2611,9 +2625,124 @@ function handleWin() {
   triggerConfetti();
 }
 
-function handleErrors(errors) {
-  const message = 'Not quite right:\n' + errors.join('\n');
+/* ===================================
+  SUBMIT MARKS
+  =================================== */
+
+const EQUATION_STATUS_TEXT = {
+  correct: '✓ Correct',
+  math: "✗ Numbers don't work",
+  answer: "✗ Answer doesn't fit the question",
+  empty: '… Incomplete',
+};
+const EQUATION_STATUS_CLASS = {
+  correct: 'is-correct',
+  math: 'is-wrong',
+  answer: 'is-wrong',
+  empty: 'is-empty',
+};
+const EQUATION_STATUS_CLASSES = ['is-correct', 'is-wrong', 'is-empty'];
+
+/**
+ * Puts one status mark on every equation card and one ✓ or ✗ on each column target.
+ *
+ * @param {string[]} statuses - classifyEquation result per equation, in puzzle order
+ * @param {boolean[]} columns - [column1 ok, column2 ok], as in the attempt entry
+ */
+function showSubmitMarks(statuses, columns) {
+  currentPuzzle.equations.forEach((eq, index) => {
+    const status = statuses[index];
+    const card = document.querySelector(`.equation[data-equation="${eq.id}"]`);
+    card.classList.remove(...EQUATION_STATUS_CLASSES);
+    card.classList.add(EQUATION_STATUS_CLASS[status]);
+    card.querySelector('.equation-status').textContent =
+      EQUATION_STATUS_TEXT[status];
+  });
+  setColumnMark('col1', columns[0]);
+  setColumnMark('col2', columns[1]);
+}
+
+/**
+ * One-line summary for a Submit that is not a win, plus a "Check equations ..."
+ * line naming every equation that is not right yet.
+ *
+ * @param {string[]} statuses - classifyEquation result per equation, in puzzle order
+ * @param {boolean[]} columns - [column1 ok, column2 ok]
+ */
+function showSubmitSummary(statuses, columns) {
+  const correctCount = statuses.filter((s) => s === 'correct').length;
+  const columnText = (name, ok) => `${name} ${ok ? '✓' : '✗'}`;
+  let message =
+    `${correctCount} of ${statuses.length} equations correct · ` +
+    `${columnText('Column 1', columns[0])} · ${columnText('Column 2', columns[1])}`;
+
+  const notRight = currentPuzzle.equations
+    .filter((eq, index) => statuses[index] !== 'correct')
+    .map((eq) => eq.id);
+  if (notRight.length > 0) {
+    const last = notRight[notRight.length - 1];
+    const list =
+      notRight.length === 1
+        ? `${last}`
+        : `${notRight.slice(0, -1).join(', ')} and ${last}`;
+    message += `\nCheck ${notRight.length === 1 ? 'equation' : 'equations'} ${list}.`;
+  }
+
   showFeedback(message, 'error');
+}
+
+/**
+ * Removes the status mark from one equation card (called when the player edits it).
+ *
+ * @param {number} equationId - Equation id
+ */
+function clearEquationMark(equationId) {
+  const card = document.querySelector(`.equation[data-equation="${equationId}"]`);
+  if (!card) return;
+  card.classList.remove(...EQUATION_STATUS_CLASSES);
+  card.querySelector('.equation-status').textContent = '';
+}
+
+/**
+ * Removes every status mark: all cards and both column targets.
+ */
+function clearAllSubmitMarks() {
+  document.querySelectorAll('.equation').forEach((card) => {
+    card.classList.remove(...EQUATION_STATUS_CLASSES);
+    card.querySelector('.equation-status').textContent = '';
+  });
+  clearColumnMark('col1');
+  clearColumnMark('col2');
+}
+
+/**
+ * @param {string} columnId - 'col1' or 'col2'
+ * @param {boolean} matches - True when the column is complete and on target
+ */
+function setColumnMark(columnId, matches) {
+  const mark = document.getElementById(`${columnId}-mark`);
+  mark.textContent = matches ? '✓' : '✗';
+  mark.classList.toggle('is-correct', matches);
+  mark.classList.toggle('is-wrong', !matches);
+}
+
+/**
+ * @param {string} columnId - 'col1' or 'col2'
+ */
+function clearColumnMark(columnId) {
+  const mark = document.getElementById(`${columnId}-mark`);
+  mark.textContent = '';
+  mark.classList.remove('is-correct', 'is-wrong');
+}
+
+/**
+ * The equation number from a blank's position, e.g. 'op2-3' gives 3.
+ *
+ * @param {string} position - data-position of a blank ('op1-N', 'op2-N' or 'sol-N')
+ * @returns {number} Equation id
+ */
+function equationIdOf(position) {
+  return Number(position.split('-')[1]);
 }
 
 function showFeedback(message, type) {
@@ -2632,6 +2761,27 @@ const SHARE_SQUARES = { correct: '🟩', hinted: '🟨', wrong: '🟥', empty: '
 let shareLabelTimer = null;
 
 /**
+ * Classifies one equation for Submit feedback. Pure: reads only its arguments.
+ * 'empty' when any blank is unset (a real 0 counts as set); 'math' when the two
+ * numbers do not give the solution under the equation's own operator; 'answer'
+ * when the numbers work but the solution is not the trivia answer; 'correct'
+ * when both hold.
+ *
+ * @param {{id: number, operator: string, answer: number}} eq - One equation of currentPuzzle
+ * @param {object} userInputs - gameState.userInputs
+ * @returns {'correct'|'math'|'answer'|'empty'} The equation's status
+ */
+function classifyEquation(eq, userInputs) {
+  const op1 = userInputs[`op1-${eq.id}`];
+  const op2 = userInputs[`op2-${eq.id}`];
+  const sol = userInputs[`sol-${eq.id}`];
+  if (isBlank(op1) || isBlank(op2) || isBlank(sol)) return 'empty';
+  if (applyOperator(eq.operator, op1, op2) !== sol) return 'math';
+  if (sol !== eq.answer) return 'answer';
+  return 'correct';
+}
+
+/**
  * Records one Submit press as a spoiler-free result: each equation's status
  * and whether each column matches its target. Reads only its arguments.
  * An equation is 'correct' when its numbers work out AND the solution matches
@@ -2644,18 +2794,20 @@ let shareLabelTimer = null;
  * @param {{column1: number, column2: number}} columnTargets - currentPuzzle.columnTargets
  * @param {object} userInputs - gameState.userInputs
  * @param {object} [hintedEquations={}] - gameState.hintedEquations ({ equationId: ['?', '#'] })
+ * @param {string[]} [statuses] - classifyEquation result per equation; pass it when the
+ *   caller already has it (Submit does) so each equation is classified once
  * @returns {{equations: string[], columns: boolean[], hinted: boolean[]}} One attempt's result
  */
-function buildAttemptEntry(equations, columnTargets, userInputs, hintedEquations = {}) {
-  const equationResults = equations.map((eq) => {
-    const op1 = userInputs[`op1-${eq.id}`];
-    const op2 = userInputs[`op2-${eq.id}`];
-    const sol = userInputs[`sol-${eq.id}`];
-    if (isBlank(op1) || isBlank(op2) || isBlank(sol)) return 'empty';
-
-    const numbersWork = applyOperator(eq.operator, op1, op2) === sol;
-    return numbersWork && sol === eq.answer ? 'correct' : 'wrong';
-  });
+function buildAttemptEntry(
+  equations,
+  columnTargets,
+  userInputs,
+  hintedEquations = {},
+  statuses = equations.map((eq) => classifyEquation(eq, userInputs))
+) {
+  const equationResults = statuses.map((status) =>
+    status === 'correct' || status === 'empty' ? status : 'wrong'
+  );
 
   const columnComplete = (prefix, target) => {
     const values = equations.map((eq) => userInputs[`${prefix}-${eq.id}`]);
@@ -3257,6 +3409,7 @@ function validateSolutionInput(event) {
 
   // Update gameState with parsed integer or delete if empty
   const position = input.dataset.position;
+  clearEquationMark(equationIdOf(position)); // The player changed this equation
   if (value !== '') {
     gameState.userInputs[position] = parseInt(value, 10);
   } else {
@@ -3428,6 +3581,7 @@ function revealAnswer(equationId) {
 
   // Update gameState (using the HTML position format)
   gameState.userInputs[`sol-${equationId}`] = equation.answer;
+  clearEquationMark(equationId); // The equation changed, so its old mark no longer applies
   gameState.hintsUsed++;
 
   // Add hint marker emoji
@@ -3505,6 +3659,7 @@ function revealNumbers(equationId) {
 
   // Update column totals
   updateColumnTotals();
+  clearEquationMark(equationId); // The equation changed, so its old mark no longer applies
 
   // Track hint usage
   gameState.hintsUsed++;
