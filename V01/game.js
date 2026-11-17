@@ -3925,6 +3925,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Tutorial system
+  setupTutorial();
   showTutorialIfFirstVisit();
 });
 
@@ -3932,52 +3933,114 @@ document.addEventListener('DOMContentLoaded', () => {
 // TUTORIAL SYSTEM
 // ===================================
 
+// One overlay, two openings. 'first' is automatic on the first visit and shows
+// the "Don't show this again" checkbox. 'replay' comes from the How to Play
+// button: no checkbox, a Close button, and it never reads or writes the seen flag.
+let tutorialMode = 'first';
+
 /**
- * Shows tutorial overlay on first visit
+ * Wires the tutorial overlay once: How to Play button, close button, background
+ * click, and the keyboard handler (Escape and the Tab trap while it is open)
+ */
+function setupTutorial() {
+  const overlay = document.getElementById('tutorial-overlay');
+  if (!overlay) return;
+
+  document
+    .getElementById('how-to-play-btn')
+    .addEventListener('click', () => openTutorial('replay'));
+  document
+    .getElementById('tutorial-close')
+    .addEventListener('click', closeTutorial);
+  overlay.addEventListener('click', (event) => {
+    if (event.target === overlay) closeTutorial();
+  });
+
+  // Capture phase: Escape and Tab reach the dialog before any page handler
+  window.addEventListener('keydown', handleTutorialKeydown, true);
+}
+
+/**
+ * Shows the tutorial automatically until the player ticks "Don't show this again"
  * Uses localStorage to track if user has seen it
  */
 function showTutorialIfFirstVisit() {
   const tutorialSeen = localStorage.getItem('sumwords_tutorial_seen');
+  if (!tutorialSeen) openTutorial('first');
+}
 
-  // If tutorial hasn't been seen, show it
-  if (!tutorialSeen) {
-    const tutorialOverlay = document.getElementById('tutorial-overlay');
-    if (tutorialOverlay) {
-      tutorialOverlay.classList.remove('hidden');
+/**
+ * Opens the tutorial overlay in the given mode and moves focus into the dialog
+ * @param {'first'|'replay'} mode
+ */
+function openTutorial(mode) {
+  const overlay = document.getElementById('tutorial-overlay');
+  if (!overlay || !overlay.classList.contains('hidden')) return;
+
+  tutorialMode = mode;
+  const replay = mode === 'replay';
+  document.getElementById('tutorial-checkbox').hidden = replay;
+  document.getElementById('tutorial-close').textContent = replay
+    ? 'Close'
+    : "Got It! Let's Play";
+
+  overlay.classList.remove('hidden');
+  document.getElementById('tutorial-title').focus();
+}
+
+/**
+ * Closes the tutorial. Only a first-visit close can save the "don't show" flag,
+ * and only when its checkbox is ticked. Replay returns focus to How to Play.
+ */
+function closeTutorial() {
+  const overlay = document.getElementById('tutorial-overlay');
+  if (!overlay || overlay.classList.contains('hidden')) return;
+
+  overlay.classList.add('hidden');
+
+  if (tutorialMode === 'first') {
+    const dontShowCheckbox = document.getElementById('tutorial-dont-show');
+    if (dontShowCheckbox.checked) {
+      localStorage.setItem('sumwords_tutorial_seen', 'true');
     }
-  }
-
-  // Setup tutorial close button
-  const tutorialClose = document.getElementById('tutorial-close');
-  if (tutorialClose) {
-    tutorialClose.addEventListener('click', closeTutorial);
-  }
-
-  // Setup tutorial overlay click (close on background click)
-  const tutorialOverlay = document.getElementById('tutorial-overlay');
-  if (tutorialOverlay) {
-    tutorialOverlay.addEventListener('click', function (e) {
-      if (e.target === tutorialOverlay) {
-        closeTutorial();
-      }
-    });
+  } else {
+    // On phones the How to Play button sits in the closed header menu, so the
+    // menu toggle takes focus instead
+    const howToPlay = document.getElementById('how-to-play-btn');
+    const target = howToPlay.offsetParent
+      ? howToPlay
+      : document.getElementById('menu-toggle');
+    target.focus();
   }
 }
 
 /**
- * Closes tutorial and optionally saves preference
+ * While the tutorial is open: Escape closes it, and Tab / Shift+Tab stay inside
+ * the dialog (wrapping at both ends). Registered in the capture phase.
+ * @param {KeyboardEvent} event
  */
-function closeTutorial() {
-  const tutorialOverlay = document.getElementById('tutorial-overlay');
-  const dontShowCheckbox = document.getElementById('tutorial-dont-show');
+function handleTutorialKeydown(event) {
+  const overlay = document.getElementById('tutorial-overlay');
+  if (!overlay || overlay.classList.contains('hidden')) return;
 
-  // Hide the overlay
-  if (tutorialOverlay) {
-    tutorialOverlay.classList.add('hidden');
+  if (event.key === 'Escape') {
+    event.stopPropagation(); // Escape belongs to the dialog, not the header menu or a hint row
+    closeTutorial();
+    return;
   }
+  if (event.key !== 'Tab') return;
 
-  // Save preference if checkbox is checked
-  if (dontShowCheckbox && dontShowCheckbox.checked) {
-    localStorage.setItem('sumwords_tutorial_seen', 'true');
+  // Visible stops in DOM order: the heading, then every control that can take focus
+  const stops = Array.from(
+    overlay.querySelectorAll('#tutorial-title, summary, input, button')
+  ).filter((el) => el.offsetParent !== null);
+  const index = stops.indexOf(document.activeElement);
+
+  if (event.shiftKey && index <= 0) {
+    event.preventDefault();
+    stops[stops.length - 1].focus();
+  } else if (!event.shiftKey && (index === -1 || index === stops.length - 1)) {
+    event.preventDefault();
+    stops[0].focus();
   }
 }

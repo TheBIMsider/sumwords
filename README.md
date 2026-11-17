@@ -60,7 +60,7 @@ Plus an **"Everything"** category that combines all questions for maximum variet
 
 ### Game Features
 
-- **Interactive Tutorial:** First-time users see a helpful tutorial explaining gameplay with a "Don't show again" option
+- **Interactive Tutorial:** First-time users see a helpful tutorial explaining gameplay with a "Don't show again" option. Replay it any time from the 📖 How to Play button in the header, which also lists the keyboard controls
 - **Dark Mode:** Toggle between light and dark themes with persistent preference
 - **Hint System:** Every equation has its own Hint button; tap it to choose one of two hints
   - Reveal the answer to the trivia question
@@ -116,8 +116,9 @@ Place numbers from the number pool into the equation blanks to make valid equati
 - **Type a number** with a blank selected to place the first unused tile with that value. A multi-digit number places when it is unambiguous, on **Enter**, or after a short pause
 - **Arrow keys** move between the number blanks (and select them), or across the unused tiles when a pool tile is focused
 - **Enter** or **Space** places the focused pool tile or clears a filled blank; **Backspace** or **Delete** clears a filled blank
-- **Escape** cancels one thing at a time: the typed digits, then the selected tile, then the selected blank
-- **Ctrl+Z** (Cmd+Z on Mac) undoes the last placed or removed number, unless a text box has focus
+- **Escape** cancels one thing at a time: an open hint row, the typed digits, then the selected tile, then the selected blank
+- **Ctrl+Z** (Cmd+Z on Mac) undoes the last placed or removed number, unless a text box has focus. **✓ Check** is in an equation's Hint row and costs one hint
+- The 📖 How to Play button in the header replays the tutorial, including this list. It never changes the "Don't show again" setting
 - Answer boxes are reached with **Tab**: type up to 3 digits, and **Enter** jumps to the next one
 
 ## 🛠️ Technology Stack
@@ -178,6 +179,7 @@ sumwords/
 │   ├── generator.test.js   # Checks every generated puzzle is solvable, plus question bank rules
 │   ├── hints.test.js       # Checks every equation has its Hint button and choice row, and old hint code is gone
 │   ├── play-polish.test.js # Checks the Reset/New Puzzle confirm rules and auto-advance lookup
+│   ├── tutorial.test.js    # Checks the How to Play button, tutorial dialog markup and that replay never sets the seen flag
 │   ├── scoring.test.js     # Checks the star rating, the star tally in the statistics and the play time clock
 │   ├── share.test.js       # Checks the share text and per-attempt results
 │   ├── undo.test.js        # Checks the Undo move history, the Check mark and when Check costs a hint

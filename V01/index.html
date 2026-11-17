@@ -286,6 +286,7 @@
               >🏠 Home</a
             >
             <button class="btn-header" id="stats-btn">📊 Stats</button>
+            <button class="btn-header" id="how-to-play-btn">📖 How to Play</button>
             <button class="btn-header" id="daily-btn">📅 Daily</button>
             <button class="btn-header" id="new-puzzle-btn">
               🎲 New Puzzle
@@ -786,10 +787,16 @@
     </div>
 
     <!-- Tutorial Overlay -->
-    <div id="tutorial-overlay" class="modal hidden">
+    <div
+      id="tutorial-overlay"
+      class="modal hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="tutorial-title"
+    >
       <div class="modal-content tutorial-content">
         <div class="modal-header">
-          <h2>🎓 Welcome to Sumwords!</h2>
+          <h2 id="tutorial-title" tabindex="-1">🎓 Welcome to Sumwords!</h2>
         </div>
         <div class="modal-body tutorial-body">
           <div class="tutorial-section">
@@ -823,8 +830,8 @@
               <li>Use the column targets to narrow down number choices</li>
               <li>Tap Hint on an equation to reveal its answer or its numbers</li>
               <li>
-                On a keyboard, press Tab to reach a blank and type a number to
-                place it; arrow keys move between blanks, and Escape cancels
+                Everything also works from the keyboard: see Keyboard controls
+                below
               </li>
               <li>
                 Made a slip? Undo (or Ctrl+Z) takes back your last placed or
@@ -839,8 +846,46 @@
             </ul>
           </div>
 
+          <div class="tutorial-section">
+            <details class="tutorial-details">
+              <summary>⌨️ Keyboard controls</summary>
+              <ul class="tutorial-list">
+                <li>
+                  <strong>Tab</strong> reaches the blanks, then the number pool
+                  as one stop, then the answer boxes
+                </li>
+                <li>
+                  <strong>Type a number</strong> to place it in the selected
+                  blank. Multi-digit numbers place on Enter, or after a short
+                  pause
+                </li>
+                <li>
+                  <strong>Arrow keys</strong> move between blanks, or between
+                  unused tiles in the pool
+                </li>
+                <li>
+                  <strong>Enter or Space</strong> places the focused tile, or
+                  removes the number from the focused blank
+                </li>
+                <li>
+                  <strong>Backspace or Delete</strong> clears a filled blank
+                </li>
+                <li>
+                  <strong>Escape</strong> backs out one thing at a time: the
+                  hint row, typed digits, the selected tile, then the selected
+                  blank
+                </li>
+                <li>
+                  <strong>Ctrl+Z</strong> (Cmd+Z on Mac) undoes the last
+                  placement or removal. Check is in an equation's Hint row and
+                  counts as a hint
+                </li>
+              </ul>
+            </details>
+          </div>
+
           <div class="tutorial-footer">
-            <label class="tutorial-checkbox">
+            <label class="tutorial-checkbox" id="tutorial-checkbox">
               <input type="checkbox" id="tutorial-dont-show" />
               <span>Don't show this again</span>
             </label>
