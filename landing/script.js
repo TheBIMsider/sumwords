@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Observe all major sections
   const sections = document.querySelectorAll(
-    '.stats, .how-to-play, .features, .categories, .cta'
+    '.stats, .how-to-play, .difficulty, .marks, .features, .categories, .cta'
   );
   sections.forEach((section) => {
     section.style.opacity = '0';

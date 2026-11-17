@@ -184,6 +184,117 @@
       </div>
     </section>
 
+    <!-- Difficulty Levels Section -->
+    <section class="difficulty">
+      <div class="container">
+        <h2>Difficulty Levels</h2>
+        <p class="section-intro">
+          Every level has 5 equations with visible operators. Levels change the
+          math, not the trivia, so any question can appear on any level.
+        </p>
+        <table class="difficulty-table">
+          <caption>
+            Settings by difficulty
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col">Setting</th>
+              <th scope="col">Easy</th>
+              <th scope="col">Medium</th>
+              <th scope="col">Hard</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">Numbers up to</th>
+              <td>50</td>
+              <td>100</td>
+              <td>200</td>
+            </tr>
+            <tr>
+              <th scope="row">Operators</th>
+              <td>+ −</td>
+              <td>+ −</td>
+              <td>+ − × ÷</td>
+            </tr>
+            <tr>
+              <th scope="row">Number pool</th>
+              <td>10</td>
+              <td>12</td>
+              <td>16</td>
+            </tr>
+            <tr>
+              <th scope="row">Decoys</th>
+              <td>0</td>
+              <td>2</td>
+              <td>6</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="section-note">
+          Every trivia answer is a whole number from 2 to 400. Bigger figures are
+          asked in thousands or millions, and the question says so.
+        </p>
+        <details class="fold">
+          <summary>More about the levels</summary>
+          <ul class="fold-body">
+            <li>
+              Each equation uses two pool numbers, so the pool holds 10 numbers
+              on every level before decoys are added.
+            </li>
+            <li>
+              Decoys are extra pool numbers that belong to no equation. You have
+              to work out which ones to leave out.
+            </li>
+            <li>
+              Random picks one of the three levels for you.
+            </li>
+          </ul>
+        </details>
+      </div>
+    </section>
+
+    <!-- What the Marks Mean Section -->
+    <section class="marks">
+      <div class="container">
+        <h2>What the Marks Mean</h2>
+        <p class="section-intro">
+          Press Submit to check your work. Each equation card gets one mark, and
+          each column target gets ✓ or ✗. The trivia answer is never shown.
+        </p>
+        <ul class="marks-list">
+          <li>
+            <strong>✓ Correct:</strong> the numbers work with the operator and
+            match the trivia answer.
+          </li>
+          <li>
+            <strong>✗ Numbers don't work:</strong> the two numbers do not give
+            the solution with that operator.
+          </li>
+          <li>
+            <strong>✗ Answer doesn't fit the question:</strong> the numbers work,
+            but the solution is not the trivia answer.
+          </li>
+          <li>
+            <strong>… Incomplete:</strong> a blank is still empty.
+          </li>
+        </ul>
+        <details class="fold">
+          <summary>How column marks work</summary>
+          <ul class="fold-body">
+            <li>
+              Each column ✓ or ✗ compares that column's total with its target at
+              the top.
+            </li>
+            <li>
+              Submit marks equations and columns. It does not point to a single
+              wrong number.
+            </li>
+          </ul>
+        </details>
+      </div>
+    </section>
+
     <!-- Features Section -->
     <section class="features">
       <div class="container">
@@ -201,25 +312,28 @@
             <div class="feature-icon">📅</div>
             <h3>Daily Puzzle</h3>
             <p>
-              One shared puzzle every day. Everyone gets the same one, so you
-              can compare results with friends.
+              One shared puzzle a day, always Everything and Medium. Everyone
+              gets the same one, you can play it once per day, and you can
+              share your result as Daily #2-12.
             </p>
           </div>
           <div class="feature-card">
             <div class="feature-icon">💡</div>
             <h3>Hint System</h3>
             <p>
-              Two types of hints available: reveal the answer to a trivia
-              question, or reveal the numbers for an equation.
+              Tap Hint on any equation to reveal its trivia answer or its
+              numbers. ✓ Check shows whether that equation is right for one
+              hint, and is free while it is incomplete or already marked.
             </p>
           </div>
           <div class="feature-card">
             <div class="feature-icon">📊</div>
             <h3>Statistics Tracking</h3>
             <p>
-              Every win earns 1 to 3 stars, and your stats track completed
-              puzzles, streaks, and perfect games. Share a spoiler-free result
-              grid, stars included, after each win.
+              Every win earns 1 to 3 stars. Three stars is one attempt with no
+              hints: each extra attempt costs 2 points and each hint costs 1.
+              The win panel shows your time, and stats track completed puzzles,
+              streaks, and stars.
             </p>
           </div>
           <div class="feature-card">
@@ -245,6 +359,37 @@
               Modern, intuitive design with color-coded feedback and visual
               polish.
             </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">↩️</div>
+            <h3>Undo</h3>
+            <p>
+              Made a slip? Undo takes back your last placed or removed number.
+              Use the Undo button or Ctrl+Z (Cmd+Z on Mac). The history is kept
+              in memory only, so a page refresh clears it.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">⬇️</div>
+            <h3>Install and Play Offline</h3>
+            <p>
+              Install Sumwords like an app and play offline after one online
+              visit, Daily puzzle included.
+            </p>
+            <details class="fold">
+              <summary>How to install</summary>
+              <ul class="fold-body">
+                <li>
+                  <strong>Chrome, Edge or Android Chrome:</strong> use the
+                  install prompt, or open the browser menu and choose Install
+                  app.
+                </li>
+                <li>
+                  <strong>iPhone or iPad:</strong> open the game in Safari, tap
+                  Share, then Add to Home Screen.
+                </li>
+              </ul>
+            </details>
           </div>
         </div>
       </div>
