@@ -271,17 +271,23 @@
             <option value="medium">Medium</option>
             <option value="hard">Hard</option>
           </select>
+          <span id="header-streak" class="streak-chip is-zero" title="Current win streak" aria-label="Current win streak: 0 wins">🔥 0</span>
         </div>
         <div class="header-menu">
-          <!-- Menu button: only shown at 600px and below -->
-          <button
-            class="btn-header menu-toggle"
-            id="menu-toggle"
-            aria-expanded="false"
-            aria-controls="header-controls"
-          >
-            ☰ Menu
-          </button>
+          <!-- Menu button and streak chip: only shown at 600px and below.
+               The chip is a second copy of #header-streak (kept in step by
+               refreshStreakDisplay); only one is visible at any width. -->
+          <div class="menu-row">
+            <button
+              class="btn-header menu-toggle"
+              id="menu-toggle"
+              aria-expanded="false"
+              aria-controls="header-controls"
+            >
+              ☰ Menu
+            </button>
+            <span class="streak-chip streak-chip-phone is-zero" title="Current win streak" aria-label="Current win streak: 0 wins">🔥 0</span>
+          </div>
           <div class="header-controls" id="header-controls">
             <a
               href="https://thebimsider.github.io/sumwords/landing/"

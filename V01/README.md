@@ -65,7 +65,7 @@ Plus an **"Everything"** category that combines all questions for maximum variet
 - **Smart Resume:** Automatically saves progress and offers to resume unfinished puzzles
 - **Confirm Before Discarding:** Reset, New Puzzle and changing the category or difficulty ask first when you have progress on the board
 - **Submit Feedback:** Submit marks every equation and column target so you can see what to fix, without revealing the trivia answer
-- **Statistics Tracking:** Track completed puzzles, attempts, hints used, perfect games, win streaks and stars earned
+- **Statistics Tracking:** Track completed puzzles, attempts, hints used, perfect games, win streaks and stars earned. The current win streak is also always visible as a 🔥 chip in the header
 - **Star Rating:** Every win earns 1 to 3 stars from attempts and hints (3 stars is one attempt with no hints), shown on the win panel with how long the puzzle took
 - **Share Results:** After a win, copy a spoiler-free, Wordle-style grid of your attempts, with your star rating, to the clipboard; an equation solved with a hint shows as a yellow square
 - **Daily Puzzle:** One shared puzzle per day (Everything, Medium) from a seeded generator, so everyone gets the same puzzle with no server; play it once per day and share your result as `Daily #2-12`
@@ -193,6 +193,7 @@ sumwords/
 │   ├── tutorial.test.js    # Checks the How to Play button, tutorial dialog markup and that replay never sets the seen flag
 │   ├── scoring.test.js     # Checks the star rating, the star tally in the statistics and the play time clock
 │   ├── share.test.js       # Checks the share text and per-attempt results
+│   ├── streak.test.js      # Checks the header streak chip: placement, saved streak read, label and refresh call sites
 │   ├── undo.test.js        # Checks the Undo move history, the Check mark and when Check costs a hint
 │   └── validation.test.js  # Checks Submit validation messages
 ├── README.md               # This file

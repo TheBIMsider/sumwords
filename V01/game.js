@@ -969,6 +969,41 @@ function resetStreak() {
   saveStatistics(stats);
 }
 
+/**
+ * The win streak to show in the header. A missing, non-integer or negative
+ * value (including a corrupted save) reads as 0. Read-only.
+ * @returns {number}
+ */
+function getCurrentStreak() {
+  const stats = loadStatistics();
+  const value = stats && stats.overall ? stats.overall.currentStreak : 0;
+  return Number.isInteger(value) && value > 0 ? value : 0;
+}
+
+/**
+ * Screen reader label for the header streak chip
+ * @param {number} streak
+ * @returns {string}
+ */
+function formatStreakLabel(streak) {
+  return `Current win streak: ${streak} ${streak === 1 ? 'win' : 'wins'}`;
+}
+
+/**
+ * Re-read the saved streak and update the header chip (text, label, muted style)
+ */
+function refreshStreakDisplay() {
+  // Two copies exist (beside the selects, and beside the phone Menu button)
+  const chips = document.querySelectorAll('.streak-chip');
+  if (!chips.length) return;
+  const streak = getCurrentStreak();
+  chips.forEach((chip) => {
+    chip.textContent = `🔥 ${streak}`;
+    chip.setAttribute('aria-label', formatStreakLabel(streak));
+    chip.classList.toggle('is-zero', streak === 0);
+  });
+}
+
 /* ===================================
   INITIALIZATION
   =================================== */
@@ -1009,6 +1044,7 @@ function initializeGame() {
   setupEventListeners();
   setupStatsModalListeners();
   refreshDailyUi();
+  refreshStreakDisplay();
 
   // Check for saved puzzle state
   const savedPuzzle = loadPuzzleState();
@@ -2085,6 +2121,7 @@ function handleWin() {
     gameState.hintsUsed,
     gameState.mode === 'daily'
   );
+  refreshStreakDisplay(); // After the save, so the chip shows the new streak
 
   // A finished daily is remembered under its own key (see saveDailyResult)
   if (gameState.mode === 'daily') {
@@ -3284,6 +3321,7 @@ function handleReset() {
   // Reset streak only if the player had played this puzzle
   if (breaksStreak) {
     resetStreak();
+    refreshStreakDisplay();
   }
 
   // Clear saved state and save fresh reset state
@@ -3883,6 +3921,9 @@ function handleResetStats() {
 
     // Also reset tutorial flag so user can see it again if they want
     localStorage.removeItem('sumwords_tutorial_seen');
+
+    // The header chip sits behind the modal, so refresh it now
+    refreshStreakDisplay();
 
     // Reload the stats modal to show zeros
     showStatsModal();

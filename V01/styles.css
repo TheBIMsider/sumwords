@@ -311,8 +311,10 @@ body {
 
 .puzzle-info {
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
   justify-content: center;
+  align-items: center;
   font-size: 14px;
 }
 
@@ -340,6 +342,39 @@ body {
 .puzzle-select:focus {
   outline: none;
   box-shadow: 0 0 0 3px var(--selection-shadow);
+}
+
+/* Header streak chip: same pill as .puzzle-select, but read-only */
+.streak-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 12px;
+  border: 2px solid var(--puzzle-select-border);
+  background-color: var(--puzzle-select-bg);
+  color: var(--color-primary-blue);
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: default;
+}
+
+.streak-chip.is-zero {
+  color: var(--text-secondary);
+  border-color: var(--text-secondary);
+  background-color: transparent;
+}
+
+/* The phone copy (beside the Menu button) is hidden until the 600px rules */
+.streak-chip-phone {
+  display: none;
+}
+
+.menu-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .header-controls {
@@ -1170,6 +1205,17 @@ body {
     align-items: center;
     justify-content: center;
     min-height: 44px;
+  }
+
+  /* Streak chip moves from the selects row to beside the Menu button */
+  .puzzle-info .streak-chip {
+    display: none;
+  }
+
+  .streak-chip-phone {
+    display: inline-flex;
+    min-height: 44px;
+    box-sizing: border-box;
   }
 
   .header-controls {
