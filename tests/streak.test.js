@@ -60,7 +60,11 @@ check('the chip is not inside #header-controls', chipIndex < controlsStart);
 const chipTag = html.match(/<span\s+id="header-streak"[^>]*>/);
 check('the chip is a span, not a button', chipTag !== null);
 check('the chip is not focusable (no tabindex)', chipTag && !/tabindex/.test(chipTag[0]));
-check('the chip has no live region', chipTag && !/aria-live|role=/.test(chipTag[0]));
+check('the chip has no live region', chipTag && !/aria-live/.test(chipTag[0]));
+check(
+  'the chip is role="img" so its aria-label is announced',
+  chipTag && /role="img"/.test(chipTag[0])
+);
 
 // The phone copy sits beside the Menu button, outside the dropdown panel
 const menuStart = html.indexOf('class="header-menu"');
@@ -77,6 +81,7 @@ const phoneTag = html.slice(
 );
 check('the phone copy has no id (ids stay unique)', !/\sid=/.test(phoneTag));
 check('the phone copy is not focusable', !/tabindex/.test(phoneTag));
+check('the phone copy is role="img" too', /role="img"/.test(phoneTag));
 
 // ---- game.js: call sites ----
 console.log('game.js');
