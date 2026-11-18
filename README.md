@@ -78,6 +78,7 @@ Plus an **"Everything"** category that combines all questions for maximum variet
 - **Mobile-Optimized:** Fully responsive design works great on phones and tablets
 - **Install and Offline:** Install Sumwords from your browser and, after one online visit, play offline on every difficulty, including the Daily puzzle (see Install and Offline below)
 - **Persistent Storage:** Game state, preferences, stats, and theme saved locally
+- **Remembered Choices:** Your last category and difficulty are kept between visits. Starting a daily does not change them, and an unreadable saved choice falls back to Sports or Random
 
 ### Visual Polish
 
@@ -196,6 +197,7 @@ sumwords/
 │   ├── hints.test.js       # Checks every equation has its Hint button and choice row, and old hint code is gone
 │   ├── keyboard.test.js    # Checks keyboard play: typed numbers, arrow keys, Enter/Space, Backspace/Delete and Escape
 │   ├── play-polish.test.js # Checks the Reset/New Puzzle confirm rules and auto-advance lookup
+│   ├── preferences.test.js # Checks the remembered category and difficulty: bad saved values fall back per field
 │   ├── pwa.test.js         # Checks the manifest, icon sizes, service worker cache list and install wiring
 │   ├── tutorial.test.js    # Checks the How to Play button, tutorial dialog markup and that replay never sets the seen flag
 │   ├── scoring.test.js     # Checks the star rating, the star tally in the statistics and the play time clock

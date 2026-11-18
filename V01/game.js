@@ -785,10 +785,45 @@ function loadPreferences() {
     const preferences = JSON.parse(saved);
     return preferences;
   } catch (error) {
-    console.error('Failed to load preferences:', error);
+    // Unreadable stored value: drop it and fall back to the defaults
     localStorage.removeItem('sumwords_preferences');
     return null;
   }
+}
+
+// Used when a saved preference is missing or not one of the select's options
+const DEFAULT_PREFERENCES = { category: 'sports', difficulty: 'random' };
+
+/**
+ * Check saved preferences field by field against the options the selects
+ * actually offer. A bad or missing field falls back to its default on its own,
+ * so a good category survives a bad difficulty. Pure: no DOM, no storage.
+ * @param {*} saved Parsed value from loadPreferences (any type, or null)
+ * @param {string[]} validCategories Category option values
+ * @param {string[]} validDifficulties Difficulty option values
+ * @returns {{category: string, difficulty: string}}
+ */
+function sanitizePreferences(saved, validCategories, validDifficulties) {
+  const isObject =
+    saved !== null && typeof saved === 'object' && !Array.isArray(saved);
+  const category =
+    isObject && validCategories.includes(saved.category)
+      ? saved.category
+      : DEFAULT_PREFERENCES.category;
+  const difficulty =
+    isObject && validDifficulties.includes(saved.difficulty)
+      ? saved.difficulty
+      : DEFAULT_PREFERENCES.difficulty;
+  return { category, difficulty };
+}
+
+/**
+ * Read the option values of a <select>
+ * @param {HTMLSelectElement} select
+ * @returns {string[]}
+ */
+function readSelectValues(select) {
+  return Array.from(select.options, (option) => option.value);
 }
 
 /**
@@ -1019,8 +1054,6 @@ document.addEventListener('DOMContentLoaded', () => {
 function initializeGame() {
   showGameVersion();
 
-  // Load saved preferences
-  const savedPreferences = loadPreferences();
   const categorySelect = document.getElementById('category-select');
   const difficultySelect = document.getElementById('difficulty-select');
 
@@ -1029,16 +1062,16 @@ function initializeGame() {
     return;
   }
 
-  if (savedPreferences) {
-    categorySelect.value = savedPreferences.category;
-    difficultySelect.value = savedPreferences.difficulty;
-    gameState.currentCategory = savedPreferences.category;
-    gameState.currentDifficulty = savedPreferences.difficulty;
-  } else {
-    // Use default values from dropdowns
-    gameState.currentCategory = categorySelect.value;
-    gameState.currentDifficulty = difficultySelect.value;
-  }
+  // Load saved preferences, each field checked against the select options
+  const prefs = sanitizePreferences(
+    loadPreferences(),
+    readSelectValues(categorySelect),
+    readSelectValues(difficultySelect)
+  );
+  categorySelect.value = prefs.category;
+  difficultySelect.value = prefs.difficulty;
+  gameState.currentCategory = prefs.category;
+  gameState.currentDifficulty = prefs.difficulty;
 
   // Set up event listeners FIRST (before showing any modals)
   setupEventListeners();
@@ -3174,16 +3207,19 @@ function loadDailyBoard(dateString) {
 function leaveDaily() {
   if (gameState.mode !== 'daily') return;
 
-  const prefs = loadPreferences() || {
-    category: 'sports',
-    difficulty: 'random',
-  }; // Same defaults as the first dropdown options
+  const categorySelect = document.getElementById('category-select');
+  const difficultySelect = document.getElementById('difficulty-select');
+  const prefs = sanitizePreferences(
+    loadPreferences(),
+    readSelectValues(categorySelect),
+    readSelectValues(difficultySelect)
+  );
   gameState.mode = 'normal';
   gameState.dailyDate = null;
   gameState.currentCategory = prefs.category;
   gameState.currentDifficulty = prefs.difficulty;
-  document.getElementById('category-select').value = prefs.category;
-  document.getElementById('difficulty-select').value = prefs.difficulty;
+  categorySelect.value = prefs.category;
+  difficultySelect.value = prefs.difficulty;
   refreshDailyUi();
 }
 
