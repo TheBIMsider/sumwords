@@ -261,7 +261,7 @@ The game tracks comprehensive statistics including:
 - Hints used
 - Perfect games (one attempt, no hints, which is also 3 stars)
 - Stars earned (wins at 1, 2 and 3 stars, counted from the version that added stars)
-- Current and best win streaks
+- Current and best win streaks (the current streak is also always shown as a 🔥 chip in the game header)
 - Per-difficulty breakdowns
 - Daily puzzle totals (completed, attempts, hints, perfect games, average attempts)
 
